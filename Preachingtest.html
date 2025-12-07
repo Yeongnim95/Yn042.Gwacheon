@@ -1,361 +1,357 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
+    
+    <title>Discourse dissemination Tracker</title>
+    <style>
+        :root {
+            --primary-green: #43a047;
+            --dark-green: #2e7d32;
+            --light-green-bg: #f1f8e9;
+            --border-color: #c5e1a5;
+            --text-color: #333;
+            --danger-red: #e53935;
+            
+            /* 亮色模式變數 */
+            --bg-gradient-start: #e8f5e9;
+            --bg-gradient-end: #c8e6c9;
+            --nav-bg: white;
+            --nav-shadow: rgba(0,0,0,0.05);
+            --container-bg: rgba(255, 255, 255, 0.98);
+            --container-shadow: rgba(0, 0, 0, 0.1);
+            --input-bg: white;
+            --input-border: #c5e1a5;
+            --card-bg: white;
+            --card-border: #eee;
+            --detail-bg: #fafafa;
+            --toolbar-bg: #fafafa;
+            --hover-bg: #f9fbe7;
+            --expanded-bg: #f1f8e9;
+            --menu-text: #666;
+            --stat-text: #555;
+            --date-text: #2e7d32;
+            --content-text: #555;
+            --loading-text: #888;
+        }
 
-```
-<title>Discourse dissemination Tracker</title>
-<style>
-    :root {
-        --primary-green: #43a047;
-        --dark-green: #2e7d32;
-        --light-green-bg: #f1f8e9;
-        --border-color: #c5e1a5;
-        --text-color: #333;
-        --danger-red: #e53935;
+        /* 暗黑模式 */
+        [data-theme="dark"] {
+            --primary-green: #66bb6a;
+            --dark-green: #81c784;
+            --light-green-bg: #1b2e1b;
+            --border-color: #2e4a2e;
+            --text-color: #e0e0e0;
+            --danger-red: #ef5350;
+            
+            --bg-gradient-start: #1a1a1a;
+            --bg-gradient-end: #0d1f0d;
+            --nav-bg: #1e1e1e;
+            --nav-shadow: rgba(0,0,0,0.3);
+            --container-bg: rgba(30, 30, 30, 0.98);
+            --container-shadow: rgba(0, 0, 0, 0.4);
+            --input-bg: #2a2a2a;
+            --input-border: #3d5a3d;
+            --card-bg: #252525;
+            --card-border: #333;
+            --detail-bg: #1a1a1a;
+            --toolbar-bg: #1a1a1a;
+            --hover-bg: #2a3a2a;
+            --expanded-bg: #1b2e1b;
+            --menu-text: #aaa;
+            --stat-text: #bbb;
+            --date-text: #81c784;
+            --content-text: #ccc;
+            --loading-text: #888;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            /* 修改點：新增 Emoji 字體支援 
+               "Apple Color Emoji" -> iOS/macOS
+               "Segoe UI Emoji", "Segoe UI Symbol" -> Windows
+               "Noto Color Emoji" -> Android/Linux
+            */
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", 
+                         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 
+                         sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- 導航列 --- */
+        nav {
+            background: var(--nav-bg);
+            padding: 0 20px;
+            box-shadow: 0 2px 10px var(--nav-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nav-left { display: flex; align-items: center; }
+
+        .nav-title {
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-right: 20px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        .nav-title span { margin-left: 8px; }
+
+        .menu-items { display: flex; gap: 5px; }
+
+        .menu-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--menu-text);
+            transition: all 0.3s;
+        }
+        .menu-btn.active { background-color: var(--primary-green); color: white; font-weight: bold; }
+
+        .lang-select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.9rem;
+            color: var(--text-color);
+            outline: none;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* --- 容器 --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: var(--container-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--container-shadow);
+            padding: 25px;
+            min-height: 600px;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .page-section { display: none; animation: fadeIn 0.3s ease; }
+        .page-section.active-section { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 {
+            color: var(--dark-green);
+            border-bottom: 3px solid #a8e063;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* --- 表單 --- */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-full-width { grid-column: 1 / -1; }
+        .form-group { margin-bottom: 5px; min-width: 0; }
         
-        /* 亮色模式變數 */
-        --bg-gradient-start: #e8f5e9;
-        --bg-gradient-end: #c8e6c9;
-        --nav-bg: white;
-        --nav-shadow: rgba(0,0,0,0.05);
-        --container-bg: rgba(255, 255, 255, 0.98);
-        --container-shadow: rgba(0, 0, 0, 0.1);
-        --input-bg: white;
-        --input-border: #c5e1a5;
-        --card-bg: white;
-        --card-border: #eee;
-        --detail-bg: #fafafa;
-        --toolbar-bg: #fafafa;
-        --hover-bg: #f9fbe7;
-        --expanded-bg: #f1f8e9;
-        --menu-text: #666;
-        --stat-text: #555;
-        --date-text: #2e7d32;
-        --content-text: #555;
-        --loading-text: #888;
-    }
-
-    /* 暗黑模式 */
-    [data-theme="dark"] {
-        --primary-green: #66bb6a;
-        --dark-green: #81c784;
-        --light-green-bg: #1b2e1b;
-        --border-color: #2e4a2e;
-        --text-color: #e0e0e0;
-        --danger-red: #ef5350;
-        
-        --bg-gradient-start: #1a1a1a;
-        --bg-gradient-end: #0d1f0d;
-        --nav-bg: #1e1e1e;
-        --nav-shadow: rgba(0,0,0,0.3);
-        --container-bg: rgba(30, 30, 30, 0.98);
-        --container-shadow: rgba(0, 0, 0, 0.4);
-        --input-bg: #2a2a2a;
-        --input-border: #3d5a3d;
-        --card-bg: #252525;
-        --card-border: #333;
-        --detail-bg: #1a1a1a;
-        --toolbar-bg: #1a1a1a;
-        --hover-bg: #2a3a2a;
-        --expanded-bg: #1b2e1b;
-        --menu-text: #aaa;
-        --stat-text: #bbb;
-        --date-text: #81c784;
-        --content-text: #ccc;
-        --loading-text: #888;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-        /* 修改點：新增 Emoji 字體支援 
-           "Apple Color Emoji" -> iOS/macOS
-           "Segoe UI Emoji", "Segoe UI Symbol" -> Windows
-           "Noto Color Emoji" -> Android/Linux
-        */
-        font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", 
-                     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 
-                     sans-serif;
-        background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        color: var(--text-color);
-        transition: background 0.3s ease, color 0.3s ease;
-    }
-
-    /* --- 導航列 --- */
-    nav {
-        background: var(--nav-bg);
-        padding: 0 20px;
-        box-shadow: 0 2px 10px var(--nav-shadow);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 60px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .nav-left { display: flex; align-items: center; }
-
-    .nav-title {
-        font-weight: bold;
-        color: var(--primary-green);
-        margin-right: 20px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-    }
-    .nav-title span { margin-left: 8px; }
-
-    .menu-items { display: flex; gap: 5px; }
-
-    .menu-btn {
-        background: transparent;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 0.95rem;
-        color: var(--menu-text);
-        transition: all 0.3s;
-    }
-    .menu-btn.active { background-color: var(--primary-green); color: white; font-weight: bold; }
-
-    .lang-select {
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: 1px solid var(--border-color);
-        background: var(--input-bg);
-        font-size: 0.9rem;
-        color: var(--text-color);
-        outline: none;
-        transition: background 0.3s ease, border-color 0.3s ease;
-    }
-
-    /* --- 容器 --- */
-    .container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 20px auto;
-        background: var(--container-bg);
-        border-radius: 16px;
-        box-shadow: 0 10px 30px var(--container-shadow);
-        padding: 25px;
-        min-height: 600px;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .page-section { display: none; animation: fadeIn 0.3s ease; }
-    .page-section.active-section { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    h2 {
-        color: var(--dark-green);
-        border-bottom: 3px solid #a8e063;
-        padding-bottom: 10px;
-        margin-top: 0;
-    }
-
-    /* --- 表單 --- */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .form-full-width { grid-column: 1 / -1; }
-    .form-group { margin-bottom: 5px; min-width: 0; }
-    
-    label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--dark-green); font-size: 0.9rem; }
-    
-    input, select, textarea {
-        width: 100%; 
-        max-width: 100%; 
-        padding: 10px; 
-        border: 1px solid var(--border-color);
-        border-radius: 6px; 
-        font-size: 15px; 
-        outline: none;
-        box-sizing: border-box; 
-        min-width: 0;
-        background: var(--input-bg);
-        color: var(--text-color);
-        transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-        /* 確保輸入框內也能正確顯示 Emoji */
-        font-family: inherit;
-    }
-    
-    /* 日期輸入框特別處理 - 防止超出容器 */
-    input[type="date"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        min-height: 44px;
-    }
-    
-    /* 日期輸入框暗黑模式圖標顏色 */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: var(--date-picker-filter, none);
-    }
-    [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-    }
-    
-    input:focus, select:focus, textarea:focus { border-color: var(--primary-green); box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.15); }
-    
-    .status-bar {
-        grid-column: 1 / -1; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 10px; display: none;
-    }
-    .status-found { background: var(--expanded-bg); color: var(--date-text); }
-    .status-new { background: #fff3e0; color: #ef6c00; }
-    [data-theme="dark"] .status-new { background: #3d2c1a; color: #ffb74d; }
-    .status-loading { background: #e3f2fd; color: #1565c0; text-align: center; }
-    [data-theme="dark"] .status-loading { background: #1a2a3d; color: #64b5f6; }
-
-    button.submit-btn {
-        width: 100%; padding: 14px; margin-top: 20px;
-        background: var(--primary-green); color: white; border: none; border-radius: 8px;
-        font-size: 1rem; font-weight: bold; cursor: pointer;
-        transition: background 0.3s ease;
-    }
-    button.submit-btn:disabled { background: #666; cursor: not-allowed; }
-
-    /* --- 後台列表 --- */
-    .backend-toolbar {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 15px; padding: 10px; background: var(--toolbar-bg); border-radius: 8px; flex-wrap: wrap; gap: 10px;
-        min-height: 50px;
-        transition: background 0.3s ease;
-    }
-    
-    .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: var(--stat-text); flex-wrap: wrap; }
-    
-    .stat-item { display: flex; align-items: center; white-space: nowrap; }
-    .stat-divider { margin: 0 8px; color: var(--border-color); }
-    .highlight-stat { color: var(--date-text); }
-
-    .edit-controls { display: none; align-items: center; gap: 10px; }
-    .show-edit .edit-controls { display: flex; } 
-    
-    .toggle-edit-btn {
-        background: #2196f3; color: white; border: none; padding: 8px 16px; 
-        border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
-        transition: background 0.3s;
-    }
-    .toggle-edit-btn.editing { background: var(--primary-green); }
-
-    .delete-btn {
-        background: #ffebee; color: #c62828; border: 1px solid #ffcdd2;
-        padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
-    }
-    [data-theme="dark"] .delete-btn {
-        background: #3d1a1a; color: #ef5350; border-color: #5a2a2a;
-    }
-
-    /* Grid System */
-    .grid-row {
-        display: grid;
-        grid-template-columns: 0px 0.8fr 1fr 1.2fr 1.5fr 0px; 
-        align-items: center; padding: 15px; transition: all 0.3s ease;
-    }
-    .list-container.edit-mode .grid-row {
-        grid-template-columns: 40px 0.8fr 1fr 1.2fr 1.5fr 40px; 
-    }
-
-    .list-header-row {
-        background: var(--primary-green); color: white; font-weight: bold;
-        border-radius: 8px 8px 0 0; margin-top: 10px;
-        padding: 10px 15px; 
-    }
-    
-    .sortable { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
-
-    .user-card { border: 1px solid var(--card-border); border-top: none; background: var(--card-bg); transition: background 0.3s ease, border-color 0.3s ease; }
-    .user-card:last-child { border-radius: 0 0 8px 8px; }
-
-    .user-summary { cursor: pointer; font-size: 1rem; }
-    .user-summary:hover { background: var(--hover-bg); }
-    .user-summary.expanded { background: var(--expanded-bg); border-bottom: 1px solid var(--card-border); }
-
-    .user-details { display: none; background: var(--detail-bg); transition: background 0.3s ease; }
-    .user-details.show { display: block; }
-
-    .detail-row { border-bottom: 1px solid var(--card-border); background: var(--card-bg); color: var(--content-text); font-size: 1rem; transition: background 0.3s ease, border-color 0.3s ease; }
-    .detail-row:last-child { border-bottom: none; }
-
-    .check-cell { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-    .list-container.edit-mode .check-cell { opacity: 1; }
-
-    .action-cell { overflow: hidden; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-    .list-container.edit-mode .action-cell { opacity: 1; }
-
-    /* 內容換行顯示設定 */
-    .col-content, .detail-row .editable {
-        white-space: pre-wrap; 
-        word-break: break-word; 
-    }
-
-    .editable { cursor: default; }
-    .list-container.edit-mode .editable { 
-        cursor: pointer; border: 1px dashed var(--border-color); border-radius: 4px; padding: 2px 4px; background: var(--card-bg);
-    }
-    .list-container.edit-mode .editable:hover { border-color: #2196f3; background: var(--hover-bg); }
-    [data-theme="dark"] .list-container.edit-mode .editable:hover { background: #1a3a5a; }
-
-    .btn-remove-log {
-        background: #ffcdd2; color: #b71c1c; border: none; width: 24px; height: 24px;
-        border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
-    }
-    [data-theme="dark"] .btn-remove-log {
-        background: #5a2a2a; color: #ef5350;
-    }
-
-    .tag { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; color: white; display: inline-block; }
-    .tag-me { background: #26a69a; }
-    .tag-other { background: #ef5350; }
-
-    /* RWD 響應式調整 */
-    @media (max-width: 700px) {
-        .container { padding: 20px 15px; margin: 10px auto; width: 95%; }
-        .form-grid { grid-template-columns: 1fr; }
-        .nav-title span { display: none; }
-        .list-header-row { display: none; } 
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--dark-green); font-size: 0.9rem; }
         
         input, select, textarea {
-            width: 100% !important;
-            max-width: 100% !important;
+            width: 100%; 
+            max-width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px; 
+            font-size: 15px; 
+            outline: none;
+            box-sizing: border-box; 
+            min-width: 0;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            /* 確保輸入框內也能正確顯示 Emoji */
+            font-family: inherit;
         }
         
-        /* 修正日期輸入框超出邊界問題 */
+        /* 日期輸入框特別處理 - 防止超出容器 */
         input[type="date"] {
-            width: 100% !important;
-            max-width: 100% !important;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            min-height: 44px;
+        }
+        
+        /* 日期輸入框暗黑模式圖標顏色 */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: var(--date-picker-filter, none);
+        }
+        [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-green); box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.15); }
+        
+        .status-bar {
+            grid-column: 1 / -1; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 10px; display: none;
+        }
+        .status-found { background: var(--expanded-bg); color: var(--date-text); }
+        .status-new { background: #fff3e0; color: #ef6c00; }
+        [data-theme="dark"] .status-new { background: #3d2c1a; color: #ffb74d; }
+        .status-loading { background: #e3f2fd; color: #1565c0; text-align: center; }
+        [data-theme="dark"] .status-loading { background: #1a2a3d; color: #64b5f6; }
+
+        button.submit-btn {
+            width: 100%; padding: 14px; margin-top: 20px;
+            background: var(--primary-green); color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button.submit-btn:disabled { background: #666; cursor: not-allowed; }
+
+        /* --- 後台列表 --- */
+        .backend-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding: 10px; background: var(--toolbar-bg); border-radius: 8px; flex-wrap: wrap; gap: 10px;
+            min-height: 50px;
+            transition: background 0.3s ease;
+        }
+        
+        .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: var(--stat-text); flex-wrap: wrap; }
+        
+        .stat-item { display: flex; align-items: center; white-space: nowrap; }
+        .stat-divider { margin: 0 8px; color: var(--border-color); }
+        .highlight-stat { color: var(--date-text); }
+
+        .edit-controls { display: none; align-items: center; gap: 10px; }
+        .show-edit .edit-controls { display: flex; } 
+        
+        .toggle-edit-btn {
+            background: #2196f3; color: white; border: none; padding: 8px 16px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .toggle-edit-btn.editing { background: var(--primary-green); }
+
+        .delete-btn {
+            background: #ffebee; color: #c62828; border: 1px solid #ffcdd2;
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
+        }
+        [data-theme="dark"] .delete-btn {
+            background: #3d1a1a; color: #ef5350; border-color: #5a2a2a;
         }
 
-        .grid-row, .list-container.edit-mode .grid-row {
-            display: flex; flex-direction: column; align-items: flex-start; gap: 5px; position: relative;
-            padding-left: 15px;
+        /* Grid System */
+        .grid-row {
+            display: grid;
+            grid-template-columns: 0px 0.8fr 1fr 1.2fr 1.5fr 0px; 
+            align-items: center; padding: 15px; transition: all 0.3s ease;
         }
-        .list-container.edit-mode .grid-row { padding-left: 45px; } 
-        
-        .check-cell { position: absolute; left: 10px; top: 15px; width: auto; opacity: 0; pointer-events: none;}
-        .list-container.edit-mode .check-cell { opacity: 1; pointer-events: auto; }
-        
-        .action-cell { position: absolute; right: 10px; top: 10px; width: auto; opacity: 0; pointer-events: none;}
-        .list-container.edit-mode .action-cell { opacity: 1; pointer-events: auto; }
-        
-        .col-date { font-size: 0.85rem; color: #666; }
-        .col-content { width: 100%; white-space: pre-wrap; }
-    }
-</style>
-```
+        .list-container.edit-mode .grid-row {
+            grid-template-columns: 40px 0.8fr 1fr 1.2fr 1.5fr 40px; 
+        }
 
+        .list-header-row {
+            background: var(--primary-green); color: white; font-weight: bold;
+            border-radius: 8px 8px 0 0; margin-top: 10px;
+            padding: 10px 15px; 
+        }
+        
+        .sortable { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
+
+        .user-card { border: 1px solid var(--card-border); border-top: none; background: var(--card-bg); transition: background 0.3s ease, border-color 0.3s ease; }
+        .user-card:last-child { border-radius: 0 0 8px 8px; }
+
+        .user-summary { cursor: pointer; font-size: 1rem; }
+        .user-summary:hover { background: var(--hover-bg); }
+        .user-summary.expanded { background: var(--expanded-bg); border-bottom: 1px solid var(--card-border); }
+
+        .user-details { display: none; background: var(--detail-bg); transition: background 0.3s ease; }
+        .user-details.show { display: block; }
+
+        .detail-row { border-bottom: 1px solid var(--card-border); background: var(--card-bg); color: var(--content-text); font-size: 1rem; transition: background 0.3s ease, border-color 0.3s ease; }
+        .detail-row:last-child { border-bottom: none; }
+
+        .check-cell { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .list-container.edit-mode .check-cell { opacity: 1; }
+
+        .action-cell { overflow: hidden; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .list-container.edit-mode .action-cell { opacity: 1; }
+
+        /* 內容換行顯示設定 */
+        .col-content, .detail-row .editable {
+            white-space: pre-wrap; 
+            word-break: break-word; 
+        }
+
+        .editable { cursor: default; }
+        .list-container.edit-mode .editable { 
+            cursor: pointer; border: 1px dashed var(--border-color); border-radius: 4px; padding: 2px 4px; background: var(--card-bg);
+        }
+        .list-container.edit-mode .editable:hover { border-color: #2196f3; background: var(--hover-bg); }
+        [data-theme="dark"] .list-container.edit-mode .editable:hover { background: #1a3a5a; }
+
+        .btn-remove-log {
+            background: #ffcdd2; color: #b71c1c; border: none; width: 24px; height: 24px;
+            border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        [data-theme="dark"] .btn-remove-log {
+            background: #5a2a2a; color: #ef5350;
+        }
+
+        .tag { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; color: white; display: inline-block; }
+        .tag-me { background: #26a69a; }
+        .tag-other { background: #ef5350; }
+
+        /* RWD 響應式調整 */
+        @media (max-width: 700px) {
+            .container { padding: 20px 15px; margin: 10px auto; width: 95%; }
+            .form-grid { grid-template-columns: 1fr; }
+            .nav-title span { display: none; }
+            .list-header-row { display: none; } 
+            
+            input, select, textarea {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* 修正日期輸入框超出邊界問題 */
+            input[type="date"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+
+            .grid-row, .list-container.edit-mode .grid-row {
+                display: flex; flex-direction: column; align-items: flex-start; gap: 5px; position: relative;
+                padding-left: 15px;
+            }
+            .list-container.edit-mode .grid-row { padding-left: 45px; } 
+            
+            .check-cell { position: absolute; left: 10px; top: 15px; width: auto; opacity: 0; pointer-events: none;}
+            .list-container.edit-mode .check-cell { opacity: 1; pointer-events: auto; }
+            
+            .action-cell { position: absolute; right: 10px; top: 10px; width: auto; opacity: 0; pointer-events: none;}
+            .list-container.edit-mode .action-cell { opacity: 1; pointer-events: auto; }
+            
+            .col-date { font-size: 0.85rem; color: #666; }
+            .col-content { width: 100%; white-space: pre-wrap; }
+        }
+    </style>
 </head>
 <body>
 
@@ -370,16 +366,13 @@
             <button class="menu-btn" onclick="switchPage('backend')" id="btn-backend">데이터</button>
         </div>
     </div>
-
-```
-<div class="lang-switch">
-    <select class="lang-select" onchange="window.setLanguage(this.value)">
-        <option value="ko">한국어</option>
-        <option value="zh">中文</option>
-    </select>
-</div>
-```
-
+    
+    <div class="lang-switch">
+        <select class="lang-select" onchange="window.setLanguage(this.value)">
+            <option value="ko">한국어</option>
+            <option value="zh">中文</option>
+        </select>
+    </div>
 </nav>
 
 <div class="container">
@@ -387,74 +380,71 @@
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
         <div id="statusMsg" class="status-bar"></div>
 
-```
-    <div class="form-grid">
-        <div class="form-group">
-            <label id="lbl-id">번호</label>
-            <input type="text" id="idInput" placeholder="9999" oninput="window.handleIdInput()">
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-id">번호</label>
+                <input type="text" id="idInput" placeholder="9999" oninput="window.handleIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-name">이름</label>
+                <input type="text" id="nameInput" placeholder="이름 입력" oninput="window.handleNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-date">날짜</label>
+                <input type="date" id="recordDate">
+            </div>
+            <div class="form-group">
+                <label id="lbl-type">회신 유형</label>
+                <select id="replyType">
+                    <option value="me" id="opt-me">내가 회신</option>
+                    <option value="other" id="opt-other">상대방 회신</option>
+                </select>
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-content">내용</label>
+                <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
+            </div>
         </div>
-        <div class="form-group">
-            <label id="lbl-name">이름</label>
-            <input type="text" id="nameInput" placeholder="이름 입력" oninput="window.handleNameInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-date">날짜</label>
-            <input type="date" id="recordDate">
-        </div>
-        <div class="form-group">
-            <label id="lbl-type">회신 유형</label>
-            <select id="replyType">
-                <option value="me" id="opt-me">내가 회신</option>
-                <option value="other" id="opt-other">상대방 회신</option>
-            </select>
-        </div>
-        <div class="form-group form-full-width">
-            <label id="lbl-content">내용</label>
-            <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
-        </div>
+        <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
     </div>
-    <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
-</div>
 
-<div id="backendSection" class="page-section">
-    <h2 id="txt-backend-header">데이터 관리</h2>
-    
-    <div class="backend-toolbar">
-        <div class="toolbar-left">
-            <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
-            <span class="stat-divider">|</span>
-            <span class="stat-item highlight-stat" id="txt-interaction-count">실제 교류 (대화): 0명</span>
-
-            <div class="edit-controls" id="editControls">
+    <div id="backendSection" class="page-section">
+        <h2 id="txt-backend-header">데이터 관리</h2>
+        
+        <div class="backend-toolbar">
+            <div class="toolbar-left">
+                <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
                 <span class="stat-divider">|</span>
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" id="selectAll" onclick="window.toggleSelectAll()" style="width:18px; height:18px; margin-right:5px;">
-                    <span id="txt-select-all">전체 선택</span>
-                </label>
-                <button class="delete-btn" onclick="window.deleteSelected()" id="btn-delete">선택 삭제</button>
+                <span class="stat-item highlight-stat" id="txt-interaction-count">실제 교류 (대화): 0명</span>
+
+                <div class="edit-controls" id="editControls">
+                    <span class="stat-divider">|</span>
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="selectAll" onclick="window.toggleSelectAll()" style="width:18px; height:18px; margin-right:5px;">
+                        <span id="txt-select-all">전체 선택</span>
+                    </label>
+                    <button class="delete-btn" onclick="window.deleteSelected()" id="btn-delete">선택 삭제</button>
+                </div>
+            </div>
+            <button class="toggle-edit-btn" onclick="window.toggleEditMode()" id="btn-toggle-edit">편집</button>
+        </div>
+
+        <div class="list-container" id="dataListContainer">
+            <div class="list-header-row grid-row">
+                <div class="check-cell"></div>
+                <div id="col-id">번호</div>
+                <div id="col-name">이름</div>
+                <div class="sortable" onclick="window.toggleSort()">
+                    <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
+                </div>
+                <div id="col-content">최신 내용</div>
+                <div class="action-cell"></div>
+            </div>
+            <div id="dataList">
+                <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
             </div>
         </div>
-        <button class="toggle-edit-btn" onclick="window.toggleEditMode()" id="btn-toggle-edit">편집</button>
     </div>
-
-    <div class="list-container" id="dataListContainer">
-        <div class="list-header-row grid-row">
-            <div class="check-cell"></div>
-            <div id="col-id">번호</div>
-            <div id="col-name">이름</div>
-            <div class="sortable" onclick="window.toggleSort()">
-                <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
-            </div>
-            <div id="col-content">최신 내용</div>
-            <div class="action-cell"></div>
-        </div>
-        <div id="dataList">
-            <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
-        </div>
-    </div>
-</div>
-```
-
 </div>
 
 <script type="module">
@@ -1036,6 +1026,5 @@
     }
 
 </script>
-
 </body>
 </html>
