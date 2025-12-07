@@ -180,14 +180,98 @@
         padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
     }
 
+    /* 頭像樣式 */
+    .avatar-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+    .user-avatar:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* 個人資訊彈出框 */
+    .profile-popup {
+        display: none;
+        position: absolute;
+        top: 45px;
+        left: 0;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 15px;
+        min-width: 200px;
+        z-index: 50;
+        animation: popupFadeIn 0.2s ease;
+    }
+    .profile-popup.show {
+        display: block;
+    }
+    @keyframes popupFadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .profile-popup-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 0.9rem;
+    }
+    .profile-popup-item:last-child {
+        border-bottom: none;
+    }
+    .profile-popup-label {
+        color: #888;
+        font-weight: bold;
+    }
+    .profile-popup-value {
+        color: #333;
+    }
+
+    /* 活躍度標籤 */
+    .activity-badge {
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: white;
+        display: inline-block;
+    }
+    .activity-high {
+        background: #e53935;
+    }
+    .activity-normal {
+        background: #43a047;
+    }
+    .activity-low {
+        background: #1e88e5;
+    }
+
     /* Grid System */
     .grid-row {
         display: grid;
-        grid-template-columns: 0px 0.8fr 1fr 1.2fr 1.5fr 0px; 
+        grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 0px; 
         align-items: center; padding: 15px; transition: all 0.3s ease;
     }
     .list-container.edit-mode .grid-row {
-        grid-template-columns: 40px 0.8fr 1fr 1.2fr 1.5fr 40px; 
+        grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 40px; 
     }
 
     .list-header-row {
@@ -260,10 +344,37 @@
         }
 
         .grid-row, .list-container.edit-mode .grid-row {
-            display: flex; flex-direction: column; align-items: flex-start; gap: 5px; position: relative;
-            padding-left: 15px;
+            display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; position: relative;
+            padding-left: 15px; padding-right: 15px;
         }
         .list-container.edit-mode .grid-row { padding-left: 45px; } 
+
+        .user-summary.grid-row {
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        .avatar-cell {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+
+        .profile-popup {
+            left: auto;
+            right: 0;
+            min-width: 180px;
+        }
+
+        .activity-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+        }
         
         .check-cell { position: absolute; left: 10px; top: 15px; width: auto; opacity: 0; pointer-events: none;}
         .list-container.edit-mode .check-cell { opacity: 1; pointer-events: auto; }
@@ -273,6 +384,10 @@
         
         .col-date { font-size: 0.85rem; color: #666; }
         .col-content { width: 100%; white-space: pre-wrap; }
+
+        .detail-row.grid-row {
+            padding-left: 50px;
+        }
     }
 </style>
 
@@ -287,6 +402,7 @@
         </div>
         <div class="menu-items">
             <button class="menu-btn active" onclick="switchPage('entry')" id="btn-entry">등록</button>
+            <button class="menu-btn" onclick="switchPage('profile')" id="btn-profile">개인정보</button>
             <button class="menu-btn" onclick="switchPage('backend')" id="btn-backend">데이터</button>
         </div>
     </div>
@@ -333,6 +449,35 @@
     <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
 </div>
 
+<div id="profileSection" class="page-section">
+    <h2 id="txt-profile-header">개인정보 등록</h2>
+    <div id="profileStatusMsg" class="status-bar"></div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label id="lbl-profile-id">번호</label>
+            <input type="text" id="profileIdInput" placeholder="9999" oninput="window.handleProfileIdInput()">
+        </div>
+        <div class="form-group">
+            <label id="lbl-profile-name">이름</label>
+            <input type="text" id="profileNameInput" placeholder="이름 입력" oninput="window.handleProfileNameInput()">
+        </div>
+        <div class="form-group">
+            <label id="lbl-profile-location">거주지</label>
+            <input type="text" id="profileLocation" placeholder="">
+        </div>
+        <div class="form-group">
+            <label id="lbl-profile-phone">휴대폰</label>
+            <input type="tel" id="profilePhone" placeholder="">
+        </div>
+        <div class="form-group form-full-width">
+            <label id="lbl-profile-contact">연락 방법</label>
+            <input type="text" id="profileContact" placeholder="">
+        </div>
+    </div>
+    <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
+</div>
+
 <div id="backendSection" class="page-section">
     <h2 id="txt-backend-header">데이터 관리</h2>
     
@@ -357,7 +502,9 @@
     <div class="list-container" id="dataListContainer">
         <div class="list-header-row grid-row">
             <div class="check-cell"></div>
+            <div></div>
             <div id="col-id">번호</div>
+            <div id="col-activity">활동</div>
             <div id="col-name">이름</div>
             <div class="sortable" onclick="window.toggleSort()">
                 <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
@@ -457,7 +604,7 @@
 
     const i18n = {
         ko: {
-            appTitle: "전도 관리 시스템", btnEntry: "등록", btnBackend: "데이터",
+            appTitle: "전도 관리 시스템", btnEntry: "등록", btnProfile: "개인정보", btnBackend: "데이터",
             headerEntry: "전도 섭외자 등록", lblId: "번호", lblName: "이름",
             lblDate: "날짜", lblType: "회신 유형", lblContent: "내용",
             optMe: "내가 회신", optOther: "상대방 회신",
@@ -467,6 +614,8 @@
             txtInteraction: "실제 교류 (대화): ",
             btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
             colId: "번호", colName: "이름", colDate: "최근 날짜", colContent: "최신 내용",
+            colActivity: "활동",
+            activityHigh: "활발", activityNormal: "보통", activityLow: "저조",
             statusFound: "✔ 기존 데이터 발견: ", statusNew: "✚ 새로운 번호/이름입니다.",
             statusNewId: "✚ 새 섭외자! 추천 번호: ",
             alertIncomplete: "모든 항목을 입력해주세요.",
@@ -476,10 +625,15 @@
             tagMe: "본인", tagOther: "상대", msgEmpty: "(기록 없음)",
             msgCloudError: "Firebase 설정이 필요합니다. 코드를 확인해주세요.",
             errIdConflict: "오류: 이 번호는 이미 다른 사람에게 할당되어 있습니다.",
-            errNameConflict: "오류: 이 이름은 이미 다른 번호를 사용 중입니다."
+            errNameConflict: "오류: 이 이름은 이미 다른 번호를 사용 중입니다.",
+            headerProfile: "개인정보 등록", lblProfileId: "번호", lblProfileName: "이름",
+            lblProfileLocation: "거주지", lblProfilePhone: "휴대폰", lblProfileContact: "연락 방법",
+            btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
+            alertProfileIdRequired: "번호를 먼저 입력해주세요.",
+            popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법"
         },
         zh: {
-            appTitle: "傳道整理系統", btnEntry: "傳道登錄", btnBackend: "後台資料",
+            appTitle: "傳道整理系統", btnEntry: "傳道登錄", btnProfile: "個人資料", btnBackend: "後台資料",
             headerEntry: "傳道登錄表", lblId: "編號", lblName: "姓名",
             lblDate: "日期", lblType: "回覆類型", lblContent: "回覆內容",
             optMe: "我回覆", optOther: "對方回覆",
@@ -489,6 +643,8 @@
             txtInteraction: "實際交流 (有對話): ",
             btnDelete: "刪除選取", btnEdit: "編輯", btnDone: "完成",
             colId: "編號", colName: "姓名", colDate: "最近日期", colContent: "最新內容",
+            colActivity: "活躍度",
+            activityHigh: "活躍", activityNormal: "一般", activityLow: "低活躍",
             statusFound: "✔ 已找到舊資料：", statusNew: "✚ 這是新的編號，請輸入姓名",
             statusNewId: "✚ 新朋友！系統建議編號：",
             alertIncomplete: "請填寫所有欄位",
@@ -498,7 +654,12 @@
             tagMe: "我", tagOther: "他", msgEmpty: "(尚無紀錄)",
             msgCloudError: "尚未設定雲端金鑰，無法儲存。請參閱說明設置 Firebase。",
             errIdConflict: "錯誤：此編號已經被其他人使用，請檢查。",
-            errNameConflict: "錯誤：此姓名已經擁有另一個編號，請檢查。"
+            errNameConflict: "錯誤：此姓名已經擁有另一個編號，請檢查。",
+            headerProfile: "個人資料登錄", lblProfileId: "編號", lblProfileName: "姓名",
+            lblProfileLocation: "居住地", lblProfilePhone: "手機", lblProfileContact: "聯絡方法",
+            btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
+            alertProfileIdRequired: "請先輸入編號。",
+            popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法"
         }
     };
 
@@ -535,13 +696,17 @@
     function applyLanguage() {
         const t = i18n[currentLang];
         const map = {
-            'txt-app-title': t.appTitle, 'btn-entry': t.btnEntry, 'btn-backend': t.btnBackend,
+            'txt-app-title': t.appTitle, 'btn-entry': t.btnEntry, 'btn-profile': t.btnProfile, 'btn-backend': t.btnBackend,
             'txt-entry-header': t.headerEntry, 'lbl-id': t.lblId, 'lbl-name': t.lblName,
             'lbl-date': t.lblDate, 'lbl-type': t.lblType, 'lbl-content': t.lblContent,
             'opt-me': t.optMe, 'opt-other': t.optOther, 'btn-submit': t.btnSubmit,
             'txt-backend-header': t.headerBackend, 'txt-select-all': t.txtSelectAll,
             'btn-delete': t.btnDelete, 'col-id': t.colId, 'col-name': t.colName,
-            'col-date': t.colDate, 'col-content': t.colContent
+            'col-activity': t.colActivity, 'col-date': t.colDate, 'col-content': t.colContent,
+            'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
+            'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
+            'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
+            'btn-profile-save': t.btnProfileSave
         };
         for (const [id, text] of Object.entries(map)) {
             const el = document.getElementById(id);
@@ -826,12 +991,59 @@
             card.className = 'user-card';
             const displayDate = user.lastLog.date === '0000-00-00' ? '-' : user.lastLog.date;
 
+            // 計算活躍度
+            const now = new Date();
+            const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
+            let activityLevel = 'low';
+            let activityText = t.activityLow;
+            let activityClass = 'activity-low';
+            
+            if (lastLogDate) {
+                const daysDiff = Math.floor((now - lastLogDate) / (1000 * 60 * 60 * 24));
+                if (daysDiff <= 7) {
+                    activityLevel = 'high';
+                    activityText = t.activityHigh;
+                    activityClass = 'activity-high';
+                } else if (daysDiff <= 30) {
+                    activityLevel = 'normal';
+                    activityText = t.activityNormal;
+                    activityClass = 'activity-normal';
+                }
+            }
+
+            // 獲取用戶首字母作為頭像
+            const avatarLetter = user.name ? user.name.charAt(0).toUpperCase() : '?';
+            
+            // 獲取個人資料
+            const profile = user.profile || {};
+            const locationText = profile.location || '-';
+            const phoneText = profile.phone || '-';
+            const contactText = profile.contact || '-';
+
             const summaryHtml = `
                 <div class="user-summary grid-row" onclick="window.toggleDetails('${user.id}')">
                     <div class="check-cell" onclick="event.stopPropagation()">
                         <input type="checkbox" name="selectUser" value="${user.id}">
                     </div>
+                    <div class="avatar-cell" style="position:relative;" onclick="event.stopPropagation()">
+                        <div class="user-avatar" onclick="window.toggleProfilePopup('${user.id}')">${avatarLetter}</div>
+                        <div class="profile-popup" id="popup-${user.id}">
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupLocation}</span>
+                                <span class="profile-popup-value">${locationText}</span>
+                            </div>
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupPhone}</span>
+                                <span class="profile-popup-value">${phoneText}</span>
+                            </div>
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupContact}</span>
+                                <span class="profile-popup-value">${contactText}</span>
+                            </div>
+                        </div>
+                    </div>
                     <div style="font-weight:bold; color:#666;">${user.id}</div>
+                    <div><span class="activity-badge ${activityClass}">${activityText}</span></div>
                     <div style="font-weight:bold; font-size:1.05rem;">${user.name}</div>
                     <div class="col-date editable" style="color:#2e7d32;" onclick="window.editDate(event, '${user.id}', 0, this)">${displayDate}</div>
                     <div class="col-content editable" onclick="window.editContent(event, '${user.id}', 0, this)">${user.lastLog.content}</div>
@@ -846,7 +1058,9 @@
                     <div class="detail-row grid-row">
                         <div class="check-cell"></div>
                         <div></div>
+                        <div></div>
                         <div><span class="tag ${typeClass}">${typeText}</span></div>
+                        <div></div>
                         <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}</div>
                         <div class="editable" onclick="window.editContent(event, '${user.id}', ${idx}, this)">${log.content}</div>
                         <div class="action-cell">
@@ -864,6 +1078,25 @@
         }
         updateCounter();
     }
+
+    // 切換個人資訊彈出框
+    window.toggleProfilePopup = (uid) => {
+        const popup = document.getElementById(`popup-${uid}`);
+        const allPopups = document.querySelectorAll('.profile-popup');
+        allPopups.forEach(p => {
+            if (p.id !== `popup-${uid}`) {
+                p.classList.remove('show');
+            }
+        });
+        popup.classList.toggle('show');
+    };
+
+    // 點擊其他地方關閉彈出框
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-avatar') && !e.target.closest('.profile-popup')) {
+            document.querySelectorAll('.profile-popup').forEach(p => p.classList.remove('show'));
+        }
+    });
 
     window.toggleEditMode = () => {
         isEditMode = !isEditMode;
@@ -913,8 +1146,17 @@
     window.switchPage = (page) => {
         document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-        if (page === 'entry') { document.getElementById('entrySection').classList.add('active-section'); document.getElementById('btn-entry').classList.add('active'); }
-        else { document.getElementById('backendSection').classList.add('active-section'); document.getElementById('btn-backend').classList.add('active'); renderBackend(); }
+        if (page === 'entry') { 
+            document.getElementById('entrySection').classList.add('active-section'); 
+            document.getElementById('btn-entry').classList.add('active'); 
+        } else if (page === 'profile') {
+            document.getElementById('profileSection').classList.add('active-section'); 
+            document.getElementById('btn-profile').classList.add('active'); 
+        } else { 
+            document.getElementById('backendSection').classList.add('active-section'); 
+            document.getElementById('btn-backend').classList.add('active'); 
+            renderBackend(); 
+        }
     };
     
     function updateCounter() {
@@ -935,6 +1177,109 @@
         const maxId = localDb.reduce((max, u) => Math.max(max, parseInt(u.id, 10)), 0);
         return String(maxId + 1).padStart(4, '0');
     }
+
+    // --- 個人資料頁面功能 ---
+    function showProfileStatus(msg, type) {
+        const el = document.getElementById('profileStatusMsg');
+        el.textContent = msg;
+        el.className = `status-bar status-${type}`;
+        el.style.display = 'block';
+    }
+
+    window.handleProfileIdInput = () => {
+        const t = i18n[currentLang];
+        const idVal = document.getElementById('profileIdInput').value.trim();
+        
+        if (!idVal) {
+            document.getElementById('profileNameInput').value = '';
+            document.getElementById('profileLocation').value = '';
+            document.getElementById('profilePhone').value = '';
+            document.getElementById('profileContact').value = '';
+            document.getElementById('profileStatusMsg').style.display = 'none';
+            return;
+        }
+
+        const user = localDb.find(u => u.id === idVal);
+        if (user) {
+            document.getElementById('profileNameInput').value = user.name;
+            showProfileStatus(t.statusFound + user.name, 'found');
+            // 載入現有個人資料
+            const profile = user.profile || {};
+            document.getElementById('profileLocation').value = profile.location || '';
+            document.getElementById('profilePhone').value = profile.phone || '';
+            document.getElementById('profileContact').value = profile.contact || '';
+        } else {
+            if(idVal.length >= 4) showProfileStatus(t.statusNew, 'new');
+            else document.getElementById('profileStatusMsg').style.display = 'none';
+            document.getElementById('profileLocation').value = '';
+            document.getElementById('profilePhone').value = '';
+            document.getElementById('profileContact').value = '';
+        }
+    };
+
+    window.handleProfileNameInput = () => {
+        const t = i18n[currentLang];
+        const nameVal = document.getElementById('profileNameInput').value.trim();
+        
+        if (!nameVal) {
+            document.getElementById('profileIdInput').value = '';
+            document.getElementById('profileLocation').value = '';
+            document.getElementById('profilePhone').value = '';
+            document.getElementById('profileContact').value = '';
+            document.getElementById('profileStatusMsg').style.display = 'none';
+            return;
+        }
+
+        const user = localDb.find(u => u.name === nameVal);
+        if (user) {
+            document.getElementById('profileIdInput').value = user.id;
+            showProfileStatus(t.statusFound + user.name, 'found');
+            // 載入現有個人資料
+            const profile = user.profile || {};
+            document.getElementById('profileLocation').value = profile.location || '';
+            document.getElementById('profilePhone').value = profile.phone || '';
+            document.getElementById('profileContact').value = profile.contact || '';
+        } else {
+            if (document.getElementById('profileIdInput').value === '') {
+                const newId = generateNewId();
+                showProfileStatus(t.statusNewId + newId, 'new');
+                document.getElementById('profileIdInput').value = newId; 
+            }
+        }
+    };
+
+    window.saveProfile = async () => {
+        if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
+        
+        const t = i18n[currentLang];
+        const id = document.getElementById('profileIdInput').value.trim();
+        const name = document.getElementById('profileNameInput').value.trim();
+        
+        if (!id) { 
+            alert(t.alertProfileIdRequired); 
+            return; 
+        }
+
+        const location = document.getElementById('profileLocation').value.trim();
+        const phone = document.getElementById('profilePhone').value.trim();
+        const contact = document.getElementById('profileContact').value.trim();
+
+        const userRef = doc(dbInstance, "missionary_data", id);
+        const existingUser = localDb.find(u => u.id === id);
+        
+        const profileData = { location, phone, contact };
+
+        if (existingUser) {
+            await updateDoc(userRef, { profile: profileData });
+        } else if (name) {
+            await setDoc(userRef, { id, name, logs: [], profile: profileData });
+        } else {
+            alert(t.alertIncomplete);
+            return;
+        }
+
+        alert(t.alertProfileSaved);
+    };
 
 </script>
 
