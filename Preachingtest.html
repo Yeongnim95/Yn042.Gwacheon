@@ -231,6 +231,33 @@
         transform: scale(0.95);
     }
     
+    /* 生日/年紀輸入框 */
+    .birthday-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .birthday-input-wrapper input {
+        text-align: center;
+    }
+    #profileBirthYear {
+        width: 70px;
+    }
+    #profileBirthMonth, #profileBirthDay {
+        width: 50px;
+    }
+    .birthday-separator {
+        color: #666;
+        font-weight: bold;
+    }
+    .age-input {
+        width: 55px;
+    }
+    .age-unit {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
     .status-bar {
         grid-column: 1 / -1; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 10px; display: none;
     }
@@ -612,6 +639,19 @@
             <label id="lbl-profile-contact-id">연락처 ID</label>
             <input type="text" id="profileContactId" placeholder="">
         </div>
+        <div class="form-group form-full-width">
+            <label id="lbl-profile-birthday">생일 / 나이</label>
+            <div class="birthday-input-wrapper">
+                <input type="text" id="profileBirthYear" placeholder="YYYY" maxlength="4" oninput="window.calculateAge()">
+                <span class="birthday-separator">/</span>
+                <input type="text" id="profileBirthMonth" placeholder="MM" maxlength="2" oninput="window.calculateAge()">
+                <span class="birthday-separator">/</span>
+                <input type="text" id="profileBirthDay" placeholder="DD" maxlength="2" oninput="window.calculateAge()">
+                <span class="birthday-separator">,</span>
+                <input type="text" id="profileAge" placeholder="나이" maxlength="3" class="age-input">
+                <span class="age-unit" id="age-unit">세</span>
+            </div>
+        </div>
     </div>
     <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
 </div>
@@ -854,10 +894,11 @@
             errNameConflict: "오류: 이 이름은 이미 다른 번호를 사용 중입니다.",
             headerProfile: "개인정보 등록", lblProfileId: "번호", lblProfileName: "이름",
             lblProfileLocation: "거주지", lblProfilePhone: "휴대폰", lblProfileContact: "연락 방법",
-            lblProfileContactId: "연락처 ID",
+            lblProfileContactId: "연락처 ID", lblProfileBirthday: "생일 / 나이", ageUnit: "세",
             btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
             alertProfileIdRequired: "번호를 먼저 입력해주세요.",
             popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법", popupContactId: "연락처 ID",
+            popupBirthday: "생일", popupAge: "나이",
             optContactNone: "선택하세요",
             // 線下登錄
             headerOfflineEntry: "오프라인 전도 등록", 
@@ -903,10 +944,11 @@
             errNameConflict: "錯誤：此姓名已經擁有另一個編號，請檢查。",
             headerProfile: "個人資料登錄", lblProfileId: "編號", lblProfileName: "姓名",
             lblProfileLocation: "居住地", lblProfilePhone: "手機", lblProfileContact: "聯絡方法",
-            lblProfileContactId: "聯絡方式ID",
+            lblProfileContactId: "聯絡方式ID", lblProfileBirthday: "生日 / 年紀", ageUnit: "歲",
             btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
             alertProfileIdRequired: "請先輸入編號。",
             popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法", popupContactId: "聯絡方式ID",
+            popupBirthday: "生日", popupAge: "年紀",
             optContactNone: "請選擇",
             // 線下登錄
             headerOfflineEntry: "線下傳道登錄", 
@@ -986,7 +1028,8 @@
             'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
             'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
             'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
-            'lbl-profile-contact-id': t.lblProfileContactId,
+            'lbl-profile-contact-id': t.lblProfileContactId, 'lbl-profile-birthday': t.lblProfileBirthday,
+            'age-unit': t.ageUnit,
             'btn-profile-save': t.btnProfileSave, 'opt-contact-none': t.optContactNone,
             // 線下登錄
             'txt-offline-entry-header': t.headerOfflineEntry,
@@ -1337,6 +1380,27 @@
             const phoneText = profile.phone || '-';
             const contactText = profile.contact || '-';
             const contactIdText = profile.contactId || '-';
+            
+            // 計算生日和年紀顯示
+            let birthdayText = '-';
+            let ageText = '-';
+            if (profile.birthYear && profile.birthMonth && profile.birthDay) {
+                birthdayText = `${profile.birthYear}/${profile.birthMonth.padStart(2,'0')}/${profile.birthDay.padStart(2,'0')}`;
+                // 重新計算年齡
+                const today = new Date();
+                const birthDate = new Date(parseInt(profile.birthYear), parseInt(profile.birthMonth) - 1, parseInt(profile.birthDay));
+                let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    calculatedAge--;
+                }
+                ageText = calculatedAge >= 0 ? calculatedAge + t.ageUnit : '-';
+            } else if (profile.birthMonth && profile.birthDay) {
+                birthdayText = `${profile.birthMonth.padStart(2,'0')}/${profile.birthDay.padStart(2,'0')}`;
+                ageText = profile.age ? profile.age + t.ageUnit : '-';
+            } else if (profile.age) {
+                ageText = profile.age + t.ageUnit;
+            }
 
             const summaryHtml = `
                 <div class="user-summary grid-row" onclick="window.toggleDetails('${user.id}')">
@@ -1361,6 +1425,14 @@
                             <div class="profile-popup-item">
                                 <span class="profile-popup-label">${t.popupContactId}</span>
                                 <span class="profile-popup-value">${contactIdText}</span>
+                            </div>
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupBirthday}</span>
+                                <span class="profile-popup-value">${birthdayText}</span>
+                            </div>
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupAge}</span>
+                                <span class="profile-popup-value">${ageText}</span>
                             </div>
                         </div>
                     </div>
@@ -1595,6 +1667,11 @@
             document.getElementById('profileLocation').value = '';
             document.getElementById('profilePhone').value = '';
             document.getElementById('profileContact').value = '';
+            document.getElementById('profileContactId').value = '';
+            document.getElementById('profileBirthYear').value = '';
+            document.getElementById('profileBirthMonth').value = '';
+            document.getElementById('profileBirthDay').value = '';
+            document.getElementById('profileAge').value = '';
             document.getElementById('profileStatusMsg').style.display = 'none';
             return;
         }
@@ -1609,6 +1686,15 @@
             document.getElementById('profilePhone').value = profile.phone || '';
             document.getElementById('profileContact').value = profile.contact || '';
             document.getElementById('profileContactId').value = profile.contactId || '';
+            document.getElementById('profileBirthYear').value = profile.birthYear || '';
+            document.getElementById('profileBirthMonth').value = profile.birthMonth || '';
+            document.getElementById('profileBirthDay').value = profile.birthDay || '';
+            // 如果有完整生日資料，重新計算年齡
+            if (profile.birthYear && profile.birthMonth && profile.birthDay) {
+                window.calculateAge();
+            } else {
+                document.getElementById('profileAge').value = profile.age || '';
+            }
         } else {
             if(idVal.length >= 4) showProfileStatus(t.statusNew, 'new');
             else document.getElementById('profileStatusMsg').style.display = 'none';
@@ -1616,6 +1702,10 @@
             document.getElementById('profilePhone').value = '';
             document.getElementById('profileContact').value = '';
             document.getElementById('profileContactId').value = '';
+            document.getElementById('profileBirthYear').value = '';
+            document.getElementById('profileBirthMonth').value = '';
+            document.getElementById('profileBirthDay').value = '';
+            document.getElementById('profileAge').value = '';
         }
     };
 
@@ -1629,6 +1719,10 @@
             document.getElementById('profilePhone').value = '';
             document.getElementById('profileContact').value = '';
             document.getElementById('profileContactId').value = '';
+            document.getElementById('profileBirthYear').value = '';
+            document.getElementById('profileBirthMonth').value = '';
+            document.getElementById('profileBirthDay').value = '';
+            document.getElementById('profileAge').value = '';
             document.getElementById('profileStatusMsg').style.display = 'none';
             return;
         }
@@ -1643,6 +1737,15 @@
             document.getElementById('profilePhone').value = profile.phone || '';
             document.getElementById('profileContact').value = profile.contact || '';
             document.getElementById('profileContactId').value = profile.contactId || '';
+            document.getElementById('profileBirthYear').value = profile.birthYear || '';
+            document.getElementById('profileBirthMonth').value = profile.birthMonth || '';
+            document.getElementById('profileBirthDay').value = profile.birthDay || '';
+            // 如果有完整生日資料，重新計算年齡
+            if (profile.birthYear && profile.birthMonth && profile.birthDay) {
+                window.calculateAge();
+            } else {
+                document.getElementById('profileAge').value = profile.age || '';
+            }
         } else {
             if (document.getElementById('profileIdInput').value === '') {
                 const newId = generateNewId();
@@ -1672,7 +1775,15 @@
         const userRef = doc(dbInstance, "missionary_data", id);
         const existingUser = localDb.find(u => u.id === id);
         
-        const profileData = { location, phone, contact, contactId };
+        const birthYear = document.getElementById('profileBirthYear').value.trim();
+        const birthMonth = document.getElementById('profileBirthMonth').value.trim();
+        const birthDay = document.getElementById('profileBirthDay').value.trim();
+        const age = document.getElementById('profileAge').value.trim();
+        
+        const profileData = { 
+            location, phone, contact, contactId,
+            birthYear, birthMonth, birthDay, age
+        };
 
         if (existingUser) {
             await updateDoc(userRef, { profile: profileData });
@@ -1684,6 +1795,41 @@
         }
 
         alert(t.alertProfileSaved);
+    };
+    
+    // 計算年齡
+    window.calculateAge = () => {
+        const yearInput = document.getElementById('profileBirthYear').value.trim();
+        const monthInput = document.getElementById('profileBirthMonth').value.trim();
+        const dayInput = document.getElementById('profileBirthDay').value.trim();
+        
+        // 只有年月日都填寫時才自動計算年齡
+        if (yearInput && monthInput && dayInput && 
+            yearInput.length === 4 && monthInput.length >= 1 && dayInput.length >= 1) {
+            
+            const year = parseInt(yearInput, 10);
+            const month = parseInt(monthInput, 10);
+            const day = parseInt(dayInput, 10);
+            
+            if (!isNaN(year) && !isNaN(month) && !isNaN(day) && 
+                month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                
+                const today = new Date();
+                const birthDate = new Date(year, month - 1, day);
+                
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                // 如果還沒過生日，年齡減1
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                if (age >= 0 && age < 150) {
+                    document.getElementById('profileAge').value = age;
+                }
+            }
+        }
     };
 
     // --- 線下登錄功能 ---
