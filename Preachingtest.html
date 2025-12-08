@@ -142,13 +142,20 @@
         /* --- 容器 --- */
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 20px auto;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 25px;
+            padding: 25px 40px;
             min-height: 600px;
+        }
+        
+        /* 大螢幕時進一步優化 */
+        @media (min-width: 1400px) {
+            .container {
+                padding: 30px 50px;
+            }
         }
 
         .page-section { display: none; animation: fadeIn 0.3s ease; }
@@ -517,9 +524,9 @@
         <div class="menu-dropdown" id="menuDropdown">
             <button class="menu-btn active" onclick="switchPage('entry')" id="btn-entry">온라인 등록</button>
             <button class="menu-btn" onclick="switchPage('offline-entry')" id="btn-offline-entry">오프라인 등록</button>
-            <button class="menu-btn" onclick="switchPage('profile')" id="btn-profile">개인정보</button>
             <button class="menu-btn" onclick="switchPage('backend')" id="btn-backend">온라인 데이터</button>
             <button class="menu-btn" onclick="switchPage('offline-backend')" id="btn-offline-backend">오프라인 데이터</button>
+            <button class="menu-btn" onclick="switchPage('profile')" id="btn-profile">개인정보</button>
         </div>
     </div>
     
