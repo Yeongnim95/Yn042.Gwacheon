@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
 
-```
+
 <title>Discourse dissemination Tracker</title>
 <style>
     :root {
@@ -50,29 +50,84 @@
         z-index: 100;
     }
 
-    .nav-left { display: flex; align-items: center; }
+    .nav-left { display: flex; align-items: center; position: relative; }
 
     .nav-title {
         font-weight: bold;
         color: var(--primary-green);
-        margin-right: 20px;
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         display: flex;
         align-items: center;
     }
-    .nav-title span { margin-left: 8px; }
 
-    .menu-items { display: flex; gap: 5px; }
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        background: #f5f5f5;
+        border-radius: 25px;
+        cursor: pointer;
+        margin-left: 15px;
+        transition: all 0.3s;
+    }
+    .menu-toggle:hover {
+        background: #e8f5e9;
+    }
+    .hamburger-icon {
+        font-size: 1.2rem;
+        color: var(--primary-green);
+    }
+    #current-page-title {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+    }
+    .dropdown-arrow {
+        font-size: 0.7rem;
+        color: #666;
+        transition: transform 0.3s;
+    }
+    .menu-toggle.open .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .menu-dropdown {
+        display: none;
+        position: absolute;
+        top: 50px;
+        left: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        padding: 10px;
+        z-index: 200;
+        min-width: 180px;
+        animation: dropdownFadeIn 0.2s ease;
+    }
+    .menu-dropdown.show {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    @keyframes dropdownFadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
     .menu-btn {
         background: transparent;
         border: none;
-        padding: 6px 12px;
-        border-radius: 20px;
+        padding: 10px 15px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 0.95rem;
         color: #666;
         transition: all 0.3s;
+        text-align: left;
+    }
+    .menu-btn:hover {
+        background: #e8f5e9;
     }
     .menu-btn.active { background-color: var(--primary-green); color: white; font-weight: bold; }
 
@@ -418,18 +473,20 @@
         }
     }
 </style>
-```
+
 
 </head>
 <body>
 
 <nav>
     <div class="nav-left">
-        <div class="nav-title">
-        <div class="nav-title">🌱
-        <span id="txt-app-title">전도 관리 시스템</span>
+        <div class="nav-title">🌱</div>
+        <div class="menu-toggle" onclick="window.toggleMenu()">
+            <span class="hamburger-icon">☰</span>
+            <span id="current-page-title">온라인 등록</span>
+            <span class="dropdown-arrow">▼</span>
         </div>
-        <div class="menu-items">
+        <div class="menu-dropdown" id="menuDropdown">
             <button class="menu-btn active" onclick="switchPage('entry')" id="btn-entry">온라인 등록</button>
             <button class="menu-btn" onclick="switchPage('offline-entry')" id="btn-offline-entry">오프라인 등록</button>
             <button class="menu-btn" onclick="switchPage('profile')" id="btn-profile">개인정보</button>
@@ -438,14 +495,14 @@
         </div>
     </div>
 
-```
+
 <div class="lang-switch">
     <select class="lang-select" onchange="window.setLanguage(this.value)">
         <option value="ko">한국어</option>
         <option value="zh">中文</option>
     </select>
 </div>
-```
+
 
 </nav>
 
@@ -454,7 +511,7 @@
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
         <div id="statusMsg" class="status-bar"></div>
 
-```
+
     <div class="form-grid">
         <div class="form-group">
             <label id="lbl-id">번호</label>
@@ -504,7 +561,7 @@
             <label id="lbl-profile-phone">휴대폰</label>
             <input type="tel" id="profilePhone" placeholder="">
         </div>
-        <div class="form-group form-full-width">
+        <div class="form-group">
             <label id="lbl-profile-contact">연락 방법</label>
             <select id="profileContact">
                 <option value="" id="opt-contact-none">선택하세요</option>
@@ -513,6 +570,10 @@
                 <option value="SLOWLY">SLOWLY</option>
                 <option value="LINE">LINE</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label id="lbl-profile-contact-id">연락처 ID</label>
+            <input type="text" id="profileContactId" placeholder="">
         </div>
     </div>
     <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
@@ -534,24 +595,6 @@
         <div class="form-group">
             <label id="lbl-offline-date">날짜</label>
             <input type="date" id="offlineRecordDate">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-phone">휴대폰</label>
-            <input type="tel" id="offlinePhone" placeholder="">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-contact-id">연락처 ID</label>
-            <input type="text" id="offlineContactId" placeholder="">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-contact-method">연락 방법</label>
-            <select id="offlineContactMethod">
-                <option value="" id="opt-offline-contact-none">선택하세요</option>
-                <option value="FACEBOOK">FACEBOOK</option>
-                <option value="IG">IG</option>
-                <option value="SLOWLY">SLOWLY</option>
-                <option value="LINE">LINE</option>
-            </select>
         </div>
         <div class="form-group">
             <label id="lbl-offline-location">장소</label>
@@ -649,7 +692,7 @@
         </div>
     </div>
 </div>
-```
+
 
 </div>
 
@@ -771,9 +814,10 @@
             errNameConflict: "오류: 이 이름은 이미 다른 번호를 사용 중입니다.",
             headerProfile: "개인정보 등록", lblProfileId: "번호", lblProfileName: "이름",
             lblProfileLocation: "거주지", lblProfilePhone: "휴대폰", lblProfileContact: "연락 방법",
+            lblProfileContactId: "연락처 ID",
             btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
             alertProfileIdRequired: "번호를 먼저 입력해주세요.",
-            popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법",
+            popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법", popupContactId: "연락처 ID",
             optContactNone: "선택하세요",
             // 線下登錄
             headerOfflineEntry: "오프라인 전도 등록", 
@@ -819,9 +863,10 @@
             errNameConflict: "錯誤：此姓名已經擁有另一個編號，請檢查。",
             headerProfile: "個人資料登錄", lblProfileId: "編號", lblProfileName: "姓名",
             lblProfileLocation: "居住地", lblProfilePhone: "手機", lblProfileContact: "聯絡方法",
+            lblProfileContactId: "聯絡方式ID",
             btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
             alertProfileIdRequired: "請先輸入編號。",
-            popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法",
+            popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法", popupContactId: "聯絡方式ID",
             optContactNone: "請選擇",
             // 線下登錄
             headerOfflineEntry: "線下傳道登錄", 
@@ -901,17 +946,15 @@
             'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
             'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
             'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
+            'lbl-profile-contact-id': t.lblProfileContactId,
             'btn-profile-save': t.btnProfileSave, 'opt-contact-none': t.optContactNone,
             // 線下登錄
             'txt-offline-entry-header': t.headerOfflineEntry,
             'lbl-offline-id': t.lblOfflineId, 'lbl-offline-name': t.lblOfflineName,
-            'lbl-offline-date': t.lblOfflineDate, 'lbl-offline-phone': t.lblOfflinePhone,
-            'lbl-offline-contact-id': t.lblOfflineContactId, 
-            'lbl-offline-contact-method': t.lblOfflineContactMethod,
+            'lbl-offline-date': t.lblOfflineDate,
             'lbl-offline-location': t.lblOfflineLocation,
             'lbl-offline-activity': t.lblOfflineActivity, 'lbl-offline-content': t.lblOfflineContent,
             'btn-offline-submit': t.btnOfflineSubmit,
-            'opt-offline-contact-none': t.optOfflineContactNone,
             // 線下後台
             'txt-offline-backend-header': t.headerOfflineBackend,
             'txt-offline-select-all': t.txtSelectAll, 'btn-offline-delete': t.btnDelete,
@@ -938,6 +981,18 @@
         if(offlineIdInput) offlineIdInput.placeholder = t.phOfflineId;
         const offlineContent = document.getElementById('offlineContent');
         if(offlineContent) offlineContent.placeholder = t.phOfflineContent;
+        
+        // 更新當前頁面標題
+        const pageTitleEl = document.getElementById('current-page-title');
+        const activeSection = document.querySelector('.page-section.active-section');
+        if (pageTitleEl && activeSection) {
+            const sectionId = activeSection.id;
+            if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
+            else if (sectionId === 'offlineEntrySection') pageTitleEl.textContent = t.btnOfflineEntry;
+            else if (sectionId === 'profileSection') pageTitleEl.textContent = t.btnProfile;
+            else if (sectionId === 'backendSection') pageTitleEl.textContent = t.btnBackend;
+            else if (sectionId === 'offlineBackendSection') pageTitleEl.textContent = t.btnOfflineBackend;
+        }
         
         updateCounter();
         updateOfflineCounter();
@@ -1241,6 +1296,7 @@
             const locationText = profile.location || '-';
             const phoneText = profile.phone || '-';
             const contactText = profile.contact || '-';
+            const contactIdText = profile.contactId || '-';
 
             const summaryHtml = `
                 <div class="user-summary grid-row" onclick="window.toggleDetails('${user.id}')">
@@ -1261,6 +1317,10 @@
                             <div class="profile-popup-item">
                                 <span class="profile-popup-label">${t.popupContact}</span>
                                 <span class="profile-popup-value">${contactText}</span>
+                            </div>
+                            <div class="profile-popup-item">
+                                <span class="profile-popup-label">${t.popupContactId}</span>
+                                <span class="profile-popup-value">${contactIdText}</span>
                             </div>
                         </div>
                     </div>
@@ -1367,25 +1427,57 @@
     window.toggleOfflineSort = () => { offlineSortDesc = !offlineSortDesc; document.getElementById('offlineSortIcon').textContent = offlineSortDesc ? '▼' : '▲'; renderOfflineBackend(); };
     window.toggleSelectAll = () => { const m = document.getElementById('selectAll'); document.getElementsByName('selectUser').forEach(c => c.checked = m.checked); };
     window.toggleOfflineSelectAll = () => { const m = document.getElementById('offlineSelectAll'); document.getElementsByName('selectOfflineUser').forEach(c => c.checked = m.checked); };
+    
+    window.toggleMenu = () => {
+        const dropdown = document.getElementById('menuDropdown');
+        const toggle = document.querySelector('.menu-toggle');
+        dropdown.classList.toggle('show');
+        toggle.classList.toggle('open');
+    };
+    
+    // 點擊其他地方關閉選單
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('menuDropdown');
+        const toggle = document.querySelector('.menu-toggle');
+        if (!toggle.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+            toggle.classList.remove('open');
+        }
+    });
+    
     window.switchPage = (page) => {
+        const t = i18n[currentLang];
         document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+        
+        // 關閉選單
+        document.getElementById('menuDropdown').classList.remove('show');
+        document.querySelector('.menu-toggle').classList.remove('open');
+        
+        // 更新當前頁面標題
+        const pageTitleEl = document.getElementById('current-page-title');
+        
         if (page === 'entry') { 
             document.getElementById('entrySection').classList.add('active-section'); 
-            document.getElementById('btn-entry').classList.add('active'); 
+            document.getElementById('btn-entry').classList.add('active');
+            pageTitleEl.textContent = t.btnEntry;
         } else if (page === 'offline-entry') {
             document.getElementById('offlineEntrySection').classList.add('active-section'); 
-            document.getElementById('btn-offline-entry').classList.add('active'); 
+            document.getElementById('btn-offline-entry').classList.add('active');
+            pageTitleEl.textContent = t.btnOfflineEntry;
         } else if (page === 'profile') {
             document.getElementById('profileSection').classList.add('active-section'); 
-            document.getElementById('btn-profile').classList.add('active'); 
+            document.getElementById('btn-profile').classList.add('active');
+            pageTitleEl.textContent = t.btnProfile;
         } else if (page === 'backend') { 
             document.getElementById('backendSection').classList.add('active-section'); 
             document.getElementById('btn-backend').classList.add('active'); 
+            pageTitleEl.textContent = t.btnBackend;
             renderBackend(); 
         } else if (page === 'offline-backend') {
             document.getElementById('offlineBackendSection').classList.add('active-section'); 
-            document.getElementById('btn-offline-backend').classList.add('active'); 
+            document.getElementById('btn-offline-backend').classList.add('active');
+            pageTitleEl.textContent = t.btnOfflineBackend;
             renderOfflineBackend(); 
         }
     };
@@ -1476,12 +1568,14 @@
             document.getElementById('profileLocation').value = profile.location || '';
             document.getElementById('profilePhone').value = profile.phone || '';
             document.getElementById('profileContact').value = profile.contact || '';
+            document.getElementById('profileContactId').value = profile.contactId || '';
         } else {
             if(idVal.length >= 4) showProfileStatus(t.statusNew, 'new');
             else document.getElementById('profileStatusMsg').style.display = 'none';
             document.getElementById('profileLocation').value = '';
             document.getElementById('profilePhone').value = '';
             document.getElementById('profileContact').value = '';
+            document.getElementById('profileContactId').value = '';
         }
     };
 
@@ -1494,6 +1588,7 @@
             document.getElementById('profileLocation').value = '';
             document.getElementById('profilePhone').value = '';
             document.getElementById('profileContact').value = '';
+            document.getElementById('profileContactId').value = '';
             document.getElementById('profileStatusMsg').style.display = 'none';
             return;
         }
@@ -1507,6 +1602,7 @@
             document.getElementById('profileLocation').value = profile.location || '';
             document.getElementById('profilePhone').value = profile.phone || '';
             document.getElementById('profileContact').value = profile.contact || '';
+            document.getElementById('profileContactId').value = profile.contactId || '';
         } else {
             if (document.getElementById('profileIdInput').value === '') {
                 const newId = generateNewId();
@@ -1530,12 +1626,13 @@
 
         const location = document.getElementById('profileLocation').value.trim();
         const phone = document.getElementById('profilePhone').value.trim();
-        const contact = document.getElementById('profileContact').value.trim();
+        const contact = document.getElementById('profileContact').value;
+        const contactId = document.getElementById('profileContactId').value.trim();
 
         const userRef = doc(dbInstance, "missionary_data", id);
         const existingUser = localDb.find(u => u.id === id);
         
-        const profileData = { location, phone, contact };
+        const profileData = { location, phone, contact, contactId };
 
         if (existingUser) {
             await updateDoc(userRef, { profile: profileData });
@@ -1612,9 +1709,6 @@
         const id = document.getElementById('offlineIdInput').value.trim();
         const name = document.getElementById('offlineNameInput').value.trim();
         const date = document.getElementById('offlineRecordDate').value;
-        const phone = document.getElementById('offlinePhone').value.trim();
-        const contactId = document.getElementById('offlineContactId').value.trim();
-        const contactMethod = document.getElementById('offlineContactMethod').value;
         const location = document.getElementById('offlineLocation').value.trim();
         const activity = document.getElementById('offlineActivity').value.trim();
         const content = document.getElementById('offlineContent').value.trim();
@@ -1641,7 +1735,7 @@
 
         const userRef = doc(dbInstance, "offline_missionary_data", id);
         const timestamp = new Date().getTime();
-        const newLogEntry = { date, phone, contactId, contactMethod, location, activity, content, createdAt: timestamp };
+        const newLogEntry = { date, location, activity, content, createdAt: timestamp };
 
         let updatedLogs = [];
         
@@ -1656,9 +1750,6 @@
         }
 
         // 清空表單
-        document.getElementById('offlinePhone').value = '';
-        document.getElementById('offlineContactId').value = '';
-        document.getElementById('offlineContactMethod').value = '';
         document.getElementById('offlineLocation').value = '';
         document.getElementById('offlineActivity').value = '';
         document.getElementById('offlineContent').value = '';
