@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
 
+```
 <title>Discourse dissemination Tracker</title>
 <style>
     :root {
@@ -217,8 +218,10 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         padding: 15px;
         min-width: 200px;
+        max-width: 280px;
         z-index: 50;
         animation: popupFadeIn 0.2s ease;
+        word-break: break-all;
     }
     .profile-popup.show {
         display: block;
@@ -366,9 +369,11 @@
         }
 
         .profile-popup {
-            left: auto;
-            right: 0;
-            min-width: 180px;
+            left: 0;
+            right: auto;
+            min-width: 160px;
+            max-width: calc(100vw - 40px);
+            word-break: break-all;
         }
 
         .activity-badge {
@@ -390,6 +395,7 @@
         }
     }
 </style>
+```
 
 </head>
 <body>
@@ -407,12 +413,14 @@
         </div>
     </div>
 
+```
 <div class="lang-switch">
     <select class="lang-select" onchange="window.setLanguage(this.value)">
         <option value="ko">한국어</option>
         <option value="zh">中文</option>
     </select>
 </div>
+```
 
 </nav>
 
@@ -421,6 +429,7 @@
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
         <div id="statusMsg" class="status-bar"></div>
 
+```
     <div class="form-grid">
         <div class="form-group">
             <label id="lbl-id">번호</label>
@@ -472,7 +481,13 @@
         </div>
         <div class="form-group form-full-width">
             <label id="lbl-profile-contact">연락 방법</label>
-            <input type="text" id="profileContact" placeholder="">
+            <select id="profileContact">
+                <option value="" id="opt-contact-none">선택하세요</option>
+                <option value="FACEBOOK">FACEBOOK</option>
+                <option value="IG">IG</option>
+                <option value="SLOWLY">SLOWLY</option>
+                <option value="LINE">LINE</option>
+            </select>
         </div>
     </div>
     <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
@@ -517,6 +532,7 @@
         </div>
     </div>
 </div>
+```
 
 </div>
 
@@ -630,7 +646,8 @@
             lblProfileLocation: "거주지", lblProfilePhone: "휴대폰", lblProfileContact: "연락 방법",
             btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
             alertProfileIdRequired: "번호를 먼저 입력해주세요.",
-            popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법"
+            popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법",
+            optContactNone: "선택하세요"
         },
         zh: {
             appTitle: "傳道整理系統", btnEntry: "傳道登錄", btnProfile: "個人資料", btnBackend: "後台資料",
@@ -659,7 +676,8 @@
             lblProfileLocation: "居住地", lblProfilePhone: "手機", lblProfileContact: "聯絡方法",
             btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
             alertProfileIdRequired: "請先輸入編號。",
-            popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法"
+            popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法",
+            optContactNone: "請選擇"
         }
     };
 
@@ -706,7 +724,7 @@
             'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
             'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
             'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
-            'btn-profile-save': t.btnProfileSave
+            'btn-profile-save': t.btnProfileSave, 'opt-contact-none': t.optContactNone
         };
         for (const [id, text] of Object.entries(map)) {
             const el = document.getElementById(id);
