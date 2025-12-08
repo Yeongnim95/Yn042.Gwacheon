@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
 
+```
 <title>Discourse dissemination Tracker</title>
 <style>
     :root {
@@ -266,7 +267,7 @@
         background: #1e88e5;
     }
 
-    /* Grid System */
+    /* Grid System - 線上後台 */
     .grid-row {
         display: grid;
         grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 0px; 
@@ -274,6 +275,16 @@
     }
     .list-container.edit-mode .grid-row {
         grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 40px; 
+    }
+
+    /* Grid System - 線下後台 */
+    .offline-grid-row {
+        display: grid;
+        grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 0px; 
+        align-items: center; padding: 15px; transition: all 0.3s ease;
+    }
+    .list-container.edit-mode .offline-grid-row {
+        grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 40px; 
     }
 
     .list-header-row {
@@ -345,15 +356,27 @@
             appearance: none;
         }
 
-        .grid-row, .list-container.edit-mode .grid-row {
+        .grid-row, .list-container.edit-mode .grid-row,
+        .offline-grid-row, .list-container.edit-mode .offline-grid-row {
             display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; position: relative;
             padding-left: 15px; padding-right: 15px;
         }
-        .list-container.edit-mode .grid-row { padding-left: 45px; } 
+        .list-container.edit-mode .grid-row,
+        .list-container.edit-mode .offline-grid-row { padding-left: 45px; } 
 
-        .user-summary.grid-row {
+        .user-summary.grid-row,
+        .user-summary.offline-grid-row {
             padding-top: 12px;
             padding-bottom: 12px;
+        }
+
+        .menu-items {
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        .menu-btn {
+            font-size: 0.8rem;
+            padding: 4px 8px;
         }
 
         .avatar-cell {
@@ -389,11 +412,13 @@
         .col-date { font-size: 0.85rem; color: #666; }
         .col-content { width: 100%; white-space: pre-wrap; }
 
-        .detail-row.grid-row {
+        .detail-row.grid-row,
+        .detail-row.offline-grid-row {
             padding-left: 50px;
         }
     }
 </style>
+```
 
 </head>
 <body>
@@ -405,19 +430,22 @@
         <span id="txt-app-title">전도 관리 시스템</span>
         </div>
         <div class="menu-items">
-            <button class="menu-btn active" onclick="switchPage('entry')" id="btn-entry">등록</button>
+            <button class="menu-btn active" onclick="switchPage('entry')" id="btn-entry">온라인 등록</button>
+            <button class="menu-btn" onclick="switchPage('offline-entry')" id="btn-offline-entry">오프라인 등록</button>
             <button class="menu-btn" onclick="switchPage('profile')" id="btn-profile">개인정보</button>
-            <button class="menu-btn" onclick="switchPage('backend')" id="btn-backend">데이터</button>
+            <button class="menu-btn" onclick="switchPage('backend')" id="btn-backend">온라인 데이터</button>
+            <button class="menu-btn" onclick="switchPage('offline-backend')" id="btn-offline-backend">오프라인 데이터</button>
         </div>
     </div>
 
+```
 <div class="lang-switch">
     <select class="lang-select" onchange="window.setLanguage(this.value)">
         <option value="ko">한국어</option>
         <option value="zh">中文</option>
     </select>
 </div>
-
+```
 
 </nav>
 
@@ -426,7 +454,7 @@
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
         <div id="statusMsg" class="status-bar"></div>
 
-
+```
     <div class="form-grid">
         <div class="form-group">
             <label id="lbl-id">번호</label>
@@ -490,8 +518,59 @@
     <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
 </div>
 
+<div id="offlineEntrySection" class="page-section">
+    <h2 id="txt-offline-entry-header">오프라인 전도 등록</h2>
+    <div id="offlineStatusMsg" class="status-bar"></div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label id="lbl-offline-id">번호</label>
+            <input type="text" id="offlineIdInput" placeholder="5000" oninput="window.handleOfflineIdInput()">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-name">이름</label>
+            <input type="text" id="offlineNameInput" placeholder="이름 입력" oninput="window.handleOfflineNameInput()">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-date">날짜</label>
+            <input type="date" id="offlineRecordDate">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-phone">휴대폰</label>
+            <input type="tel" id="offlinePhone" placeholder="">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-contact-id">연락처 ID</label>
+            <input type="text" id="offlineContactId" placeholder="">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-contact-method">연락 방법</label>
+            <select id="offlineContactMethod">
+                <option value="" id="opt-offline-contact-none">선택하세요</option>
+                <option value="FACEBOOK">FACEBOOK</option>
+                <option value="IG">IG</option>
+                <option value="SLOWLY">SLOWLY</option>
+                <option value="LINE">LINE</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-location">장소</label>
+            <input type="text" id="offlineLocation" placeholder="">
+        </div>
+        <div class="form-group">
+            <label id="lbl-offline-activity">활동</label>
+            <input type="text" id="offlineActivity" placeholder="">
+        </div>
+        <div class="form-group form-full-width">
+            <label id="lbl-offline-content">섭외 내용</label>
+            <textarea id="offlineContent" rows="5" placeholder="섭외 내용을 입력하세요..."></textarea>
+        </div>
+    </div>
+    <button class="submit-btn" onclick="window.submitOfflineData()" id="btn-offline-submit">등록하기</button>
+</div>
+
 <div id="backendSection" class="page-section">
-    <h2 id="txt-backend-header">데이터 관리</h2>
+    <h2 id="txt-backend-header">온라인 데이터 관리</h2>
     
     <div class="backend-toolbar">
         <div class="toolbar-left">
@@ -530,6 +609,47 @@
     </div>
 </div>
 
+<div id="offlineBackendSection" class="page-section">
+    <h2 id="txt-offline-backend-header">오프라인 데이터 관리</h2>
+    
+    <div class="backend-toolbar">
+        <div class="toolbar-left">
+            <span class="stat-item" id="txt-offline-total-count">섭외자: 0명</span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item highlight-stat" id="txt-offline-interaction-count">주간 교류: 0명</span>
+
+            <div class="edit-controls" id="offlineEditControls">
+                <span class="stat-divider">|</span>
+                <label style="display:flex; align-items:center; cursor:pointer;">
+                    <input type="checkbox" id="offlineSelectAll" onclick="window.toggleOfflineSelectAll()" style="width:18px; height:18px; margin-right:5px;">
+                    <span id="txt-offline-select-all">전체 선택</span>
+                </label>
+                <button class="delete-btn" onclick="window.deleteOfflineSelected()" id="btn-offline-delete">선택 삭제</button>
+            </div>
+        </div>
+        <button class="toggle-edit-btn" onclick="window.toggleOfflineEditMode()" id="btn-offline-toggle-edit">편집</button>
+    </div>
+
+    <div class="list-container" id="offlineDataListContainer">
+        <div class="list-header-row offline-grid-row">
+            <div class="check-cell"></div>
+            <div></div>
+            <div id="col-offline-id">번호</div>
+            <div id="col-offline-activity">활동</div>
+            <div id="col-offline-name">이름</div>
+            <div class="sortable" onclick="window.toggleOfflineSort()">
+                <span id="col-offline-date">최근 날짜</span> <span id="offlineSortIcon">▼</span>
+            </div>
+            <div id="col-offline-location">장소</div>
+            <div id="col-offline-event">활동</div>
+            <div class="action-cell"></div>
+        </div>
+        <div id="offlineDataList">
+            <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
+        </div>
+    </div>
+</div>
+```
 
 </div>
 
@@ -570,8 +690,11 @@
     // --- 全域變數與邏輯 ---
     let currentLang = localStorage.getItem('app_lang') || 'ko'; 
     let localDb = [];
+    let offlineDb = [];
     let sortDesc = true; 
+    let offlineSortDesc = true;
     let isEditMode = false;
+    let isOfflineEditMode = false;
 
     // --- 日期自動更新功能 ---
     function getTodayDateString() {
@@ -586,6 +709,10 @@
         const dateInput = document.getElementById('recordDate');
         if (dateInput) {
             dateInput.value = getTodayDateString();
+        }
+        const offlineDateInput = document.getElementById('offlineRecordDate');
+        if (offlineDateInput) {
+            offlineDateInput.value = getTodayDateString();
         }
     }
 
@@ -617,12 +744,15 @@
 
     const i18n = {
         ko: {
-            appTitle: "전도 관리 시스템", btnEntry: "등록", btnProfile: "개인정보", btnBackend: "데이터",
-            headerEntry: "전도 섭외자 등록", lblId: "번호", lblName: "이름",
+            appTitle: "전도 관리 시스템", 
+            btnEntry: "온라인 등록", btnOfflineEntry: "오프라인 등록", 
+            btnProfile: "개인정보", 
+            btnBackend: "온라인 데이터", btnOfflineBackend: "오프라인 데이터",
+            headerEntry: "온라인 전도 등록", lblId: "번호", lblName: "이름",
             lblDate: "날짜", lblType: "회신 유형", lblContent: "내용",
             optMe: "내가 회신", optOther: "상대방 회신",
             phId: "예: 9999", phName: "예: 김철수", phContent: "대화 내용이나 기도 제목 입력...",
-            btnSubmit: "등록하기", headerBackend: "데이터 관리",
+            btnSubmit: "등록하기", headerBackend: "온라인 데이터 관리",
             txtSelectAll: "전체 선택", txtTotal: "섭외자: ", txtPerson: "명",
             txtWeeklyInteraction: "주간 교류: ",
             btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
@@ -644,15 +774,33 @@
             btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
             alertProfileIdRequired: "번호를 먼저 입력해주세요.",
             popupLocation: "거주지", popupPhone: "휴대폰", popupContact: "연락 방법",
-            optContactNone: "선택하세요"
+            optContactNone: "선택하세요",
+            // 線下登錄
+            headerOfflineEntry: "오프라인 전도 등록", 
+            lblOfflineId: "번호", lblOfflineName: "이름", lblOfflineDate: "날짜",
+            lblOfflinePhone: "휴대폰", lblOfflineContactId: "연락처 ID", 
+            lblOfflineContactMethod: "연락 방법",
+            lblOfflineLocation: "장소", lblOfflineActivity: "활동", lblOfflineContent: "섭외 내용",
+            phOfflineId: "예: 5000", phOfflineContent: "섭외 내용 입력...",
+            btnOfflineSubmit: "등록하기",
+            errOfflineIdTooLow: "오류: 오프라인 번호는 5000 이상이어야 합니다.",
+            statusOfflineNewId: "✚ 새 섭외자! 추천 번호: ",
+            optOfflineContactNone: "선택하세요",
+            // 線下後台
+            headerOfflineBackend: "오프라인 데이터 관리",
+            colOfflineId: "번호", colOfflineName: "이름", colOfflineDate: "최근 날짜",
+            colOfflineLocation: "장소", colOfflineEvent: "활동", colOfflineActivity: "활동"
         },
         zh: {
-            appTitle: "傳道整理系統", btnEntry: "傳道登錄", btnProfile: "個人資料", btnBackend: "後台資料",
-            headerEntry: "傳道登錄表", lblId: "編號", lblName: "姓名",
+            appTitle: "傳道整理系統", 
+            btnEntry: "線上登錄", btnOfflineEntry: "線下登錄", 
+            btnProfile: "個人資料", 
+            btnBackend: "線上後台", btnOfflineBackend: "線下後台",
+            headerEntry: "線上傳道登錄", lblId: "編號", lblName: "姓名",
             lblDate: "日期", lblType: "回覆類型", lblContent: "回覆內容",
             optMe: "我回覆", optOther: "對方回覆",
             phId: "例: 9999", phName: "例: 金大中", phContent: "請輸入對話重點或備忘...",
-            btnSubmit: "登錄資料", headerBackend: "後台登錄資料",
+            btnSubmit: "登錄資料", headerBackend: "線上後台資料",
             txtSelectAll: "全選", txtTotal: "涉外者人數: ", txtPerson: " 人",
             txtWeeklyInteraction: "週間交流: ",
             btnDelete: "刪除選取", btnEdit: "編輯", btnDone: "完成",
@@ -674,7 +822,22 @@
             btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
             alertProfileIdRequired: "請先輸入編號。",
             popupLocation: "居住地", popupPhone: "手機", popupContact: "聯絡方法",
-            optContactNone: "請選擇"
+            optContactNone: "請選擇",
+            // 線下登錄
+            headerOfflineEntry: "線下傳道登錄", 
+            lblOfflineId: "編號", lblOfflineName: "姓名", lblOfflineDate: "日期",
+            lblOfflinePhone: "手機", lblOfflineContactId: "聯絡方式ID", 
+            lblOfflineContactMethod: "聯絡方法",
+            lblOfflineLocation: "地點", lblOfflineActivity: "活動", lblOfflineContent: "涉外內容",
+            phOfflineId: "例: 5000", phOfflineContent: "請輸入涉外內容...",
+            btnOfflineSubmit: "登錄資料",
+            errOfflineIdTooLow: "錯誤：線下編號必須為5000以上。",
+            statusOfflineNewId: "✚ 新朋友！系統建議編號：",
+            optOfflineContactNone: "請選擇",
+            // 線下後台
+            headerOfflineBackend: "線下後台資料",
+            colOfflineId: "編號", colOfflineName: "姓名", colOfflineDate: "最近日期",
+            colOfflineLocation: "地點", colOfflineEvent: "活動", colOfflineActivity: "活躍度"
         }
     };
 
@@ -689,8 +852,21 @@
             const activeId = document.getElementById('idInput').value;
             if(activeId) window.handleIdInput();
         });
+        
+        // 監聽線下資料
+        const offlineQ = collection(dbInstance, "offline_missionary_data");
+        onSnapshot(offlineQ, (snapshot) => {
+            offlineDb = [];
+            snapshot.forEach((doc) => {
+                offlineDb.push(doc.data());
+            });
+            renderOfflineBackend();
+            const offlineActiveId = document.getElementById('offlineIdInput');
+            if(offlineActiveId && offlineActiveId.value) window.handleOfflineIdInput();
+        });
     } else {
         document.getElementById('dataList').innerHTML = `<div style="padding:20px; text-align:center; color:red;">${i18n[currentLang].msgCloudError}</div>`;
+        document.getElementById('offlineDataList').innerHTML = `<div style="padding:20px; text-align:center; color:red;">${i18n[currentLang].msgCloudError}</div>`;
     }
 
     window.onload = function() {
@@ -704,6 +880,7 @@
         localStorage.setItem('app_lang', lang);
         applyLanguage();
         renderBackend();
+        renderOfflineBackend();
         const nameVal = document.getElementById('nameInput').value;
         window.updateReplyOption(nameVal);
     };
@@ -711,7 +888,10 @@
     function applyLanguage() {
         const t = i18n[currentLang];
         const map = {
-            'txt-app-title': t.appTitle, 'btn-entry': t.btnEntry, 'btn-profile': t.btnProfile, 'btn-backend': t.btnBackend,
+            'txt-app-title': t.appTitle, 
+            'btn-entry': t.btnEntry, 'btn-offline-entry': t.btnOfflineEntry,
+            'btn-profile': t.btnProfile, 
+            'btn-backend': t.btnBackend, 'btn-offline-backend': t.btnOfflineBackend,
             'txt-entry-header': t.headerEntry, 'lbl-id': t.lblId, 'lbl-name': t.lblName,
             'lbl-date': t.lblDate, 'lbl-type': t.lblType, 'lbl-content': t.lblContent,
             'opt-me': t.optMe, 'opt-other': t.optOther, 'btn-submit': t.btnSubmit,
@@ -721,7 +901,23 @@
             'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
             'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
             'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
-            'btn-profile-save': t.btnProfileSave, 'opt-contact-none': t.optContactNone
+            'btn-profile-save': t.btnProfileSave, 'opt-contact-none': t.optContactNone,
+            // 線下登錄
+            'txt-offline-entry-header': t.headerOfflineEntry,
+            'lbl-offline-id': t.lblOfflineId, 'lbl-offline-name': t.lblOfflineName,
+            'lbl-offline-date': t.lblOfflineDate, 'lbl-offline-phone': t.lblOfflinePhone,
+            'lbl-offline-contact-id': t.lblOfflineContactId, 
+            'lbl-offline-contact-method': t.lblOfflineContactMethod,
+            'lbl-offline-location': t.lblOfflineLocation,
+            'lbl-offline-activity': t.lblOfflineActivity, 'lbl-offline-content': t.lblOfflineContent,
+            'btn-offline-submit': t.btnOfflineSubmit,
+            'opt-offline-contact-none': t.optOfflineContactNone,
+            // 線下後台
+            'txt-offline-backend-header': t.headerOfflineBackend,
+            'txt-offline-select-all': t.txtSelectAll, 'btn-offline-delete': t.btnDelete,
+            'col-offline-id': t.colOfflineId, 'col-offline-name': t.colOfflineName,
+            'col-offline-date': t.colOfflineDate, 'col-offline-location': t.colOfflineLocation,
+            'col-offline-event': t.colOfflineEvent, 'col-offline-activity': t.colOfflineActivity
         };
         for (const [id, text] of Object.entries(map)) {
             const el = document.getElementById(id);
@@ -729,11 +925,22 @@
         }
         const editBtn = document.getElementById('btn-toggle-edit');
         if(editBtn) editBtn.textContent = isEditMode ? t.btnDone : t.btnEdit;
+        
+        const offlineEditBtn = document.getElementById('btn-offline-toggle-edit');
+        if(offlineEditBtn) offlineEditBtn.textContent = isOfflineEditMode ? t.btnDone : t.btnEdit;
 
         document.getElementById('idInput').placeholder = t.phId;
         document.getElementById('nameInput').placeholder = t.phName;
         document.getElementById('content').placeholder = t.phContent;
+        
+        // 線下登錄 placeholder
+        const offlineIdInput = document.getElementById('offlineIdInput');
+        if(offlineIdInput) offlineIdInput.placeholder = t.phOfflineId;
+        const offlineContent = document.getElementById('offlineContent');
+        if(offlineContent) offlineContent.placeholder = t.phOfflineContent;
+        
         updateCounter();
+        updateOfflineCounter();
     }
 
     // --- 邏輯修正區塊 ---
@@ -1157,20 +1364,29 @@
     }
 
     window.toggleSort = () => { sortDesc = !sortDesc; document.getElementById('sortIcon').textContent = sortDesc ? '▼' : '▲'; renderBackend(); };
+    window.toggleOfflineSort = () => { offlineSortDesc = !offlineSortDesc; document.getElementById('offlineSortIcon').textContent = offlineSortDesc ? '▼' : '▲'; renderOfflineBackend(); };
     window.toggleSelectAll = () => { const m = document.getElementById('selectAll'); document.getElementsByName('selectUser').forEach(c => c.checked = m.checked); };
+    window.toggleOfflineSelectAll = () => { const m = document.getElementById('offlineSelectAll'); document.getElementsByName('selectOfflineUser').forEach(c => c.checked = m.checked); };
     window.switchPage = (page) => {
         document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
         document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
         if (page === 'entry') { 
             document.getElementById('entrySection').classList.add('active-section'); 
             document.getElementById('btn-entry').classList.add('active'); 
+        } else if (page === 'offline-entry') {
+            document.getElementById('offlineEntrySection').classList.add('active-section'); 
+            document.getElementById('btn-offline-entry').classList.add('active'); 
         } else if (page === 'profile') {
             document.getElementById('profileSection').classList.add('active-section'); 
             document.getElementById('btn-profile').classList.add('active'); 
-        } else { 
+        } else if (page === 'backend') { 
             document.getElementById('backendSection').classList.add('active-section'); 
             document.getElementById('btn-backend').classList.add('active'); 
             renderBackend(); 
+        } else if (page === 'offline-backend') {
+            document.getElementById('offlineBackendSection').classList.add('active-section'); 
+            document.getElementById('btn-offline-backend').classList.add('active'); 
+            renderOfflineBackend(); 
         }
     };
     
@@ -1193,10 +1409,41 @@
         document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
     }
     
+    function updateOfflineCounter() {
+        const t = i18n[currentLang];
+        const offlineTotalEl = document.getElementById('txt-offline-total-count');
+        if (offlineTotalEl) {
+            offlineTotalEl.textContent = t.txtTotal + offlineDb.length + t.txtPerson;
+        }
+        
+        // 計算週間交流人數
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        const weeklyInteractionCount = offlineDb.filter(user => {
+            if (!user.logs || user.logs.length === 0) return false;
+            return user.logs.some(log => {
+                const logDate = new Date(log.date);
+                return logDate >= oneWeekAgo;
+            });
+        }).length;
+        
+        const offlineInteractionEl = document.getElementById('txt-offline-interaction-count');
+        if (offlineInteractionEl) {
+            offlineInteractionEl.textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
+        }
+    }
+    
     function generateNewId() {
         if (localDb.length === 0) return '0001';
         const maxId = localDb.reduce((max, u) => Math.max(max, parseInt(u.id, 10)), 0);
         return String(maxId + 1).padStart(4, '0');
+    }
+    
+    function generateNewOfflineId() {
+        if (offlineDb.length === 0) return '5000';
+        const maxId = offlineDb.reduce((max, u) => Math.max(max, parseInt(u.id, 10)), 5000);
+        return String(maxId + 1);
     }
 
     // --- 個人資料頁面功能 ---
@@ -1300,6 +1547,303 @@
         }
 
         alert(t.alertProfileSaved);
+    };
+
+    // --- 線下登錄功能 ---
+    function showOfflineStatus(msg, type) {
+        const el = document.getElementById('offlineStatusMsg');
+        el.textContent = msg;
+        el.className = `status-bar status-${type}`;
+        el.style.display = 'block';
+    }
+
+    window.handleOfflineIdInput = () => {
+        const t = i18n[currentLang];
+        const idVal = document.getElementById('offlineIdInput').value.trim();
+        
+        if (!idVal) {
+            document.getElementById('offlineNameInput').value = '';
+            document.getElementById('offlineStatusMsg').style.display = 'none';
+            return;
+        }
+
+        const idNum = parseInt(idVal, 10);
+        if (idNum < 5000) {
+            showOfflineStatus(t.errOfflineIdTooLow, 'new');
+            return;
+        }
+
+        const user = offlineDb.find(u => u.id === idVal);
+        if (user) {
+            document.getElementById('offlineNameInput').value = user.name;
+            showOfflineStatus(t.statusFound + user.name, 'found');
+        } else {
+            showOfflineStatus(t.statusNew, 'new');
+        }
+    };
+
+    window.handleOfflineNameInput = () => {
+        const t = i18n[currentLang];
+        const nameVal = document.getElementById('offlineNameInput').value.trim();
+        
+        if (!nameVal) {
+            document.getElementById('offlineIdInput').value = '';
+            document.getElementById('offlineStatusMsg').style.display = 'none';
+            return;
+        }
+
+        const user = offlineDb.find(u => u.name === nameVal);
+        if (user) {
+            document.getElementById('offlineIdInput').value = user.id;
+            showOfflineStatus(t.statusFound + user.id, 'found');
+        } else {
+            if (document.getElementById('offlineIdInput').value === '') {
+                const newId = generateNewOfflineId();
+                showOfflineStatus(t.statusOfflineNewId + newId, 'new');
+                document.getElementById('offlineIdInput').value = newId; 
+            }
+        }
+    };
+
+    window.submitOfflineData = async () => {
+        if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
+
+        const t = i18n[currentLang];
+        const id = document.getElementById('offlineIdInput').value.trim();
+        const name = document.getElementById('offlineNameInput').value.trim();
+        const date = document.getElementById('offlineRecordDate').value;
+        const phone = document.getElementById('offlinePhone').value.trim();
+        const contactId = document.getElementById('offlineContactId').value.trim();
+        const contactMethod = document.getElementById('offlineContactMethod').value;
+        const location = document.getElementById('offlineLocation').value.trim();
+        const activity = document.getElementById('offlineActivity').value.trim();
+        const content = document.getElementById('offlineContent').value.trim();
+
+        if (!id || !name || !date) { alert(t.alertIncomplete); return; }
+
+        const idNum = parseInt(id, 10);
+        if (idNum < 5000) {
+            alert(t.errOfflineIdTooLow);
+            return;
+        }
+
+        const existingUserById = offlineDb.find(u => u.id === id);
+        if (existingUserById && existingUserById.name !== name) {
+            alert(t.errIdConflict + `\n(ID: ${id} -> ${existingUserById.name})`);
+            return;
+        }
+
+        const existingUserByName = offlineDb.find(u => u.name === name);
+        if (existingUserByName && existingUserByName.id !== id) {
+            alert(t.errNameConflict + `\n(${name} -> ID: ${existingUserByName.id})`);
+            return;
+        }
+
+        const userRef = doc(dbInstance, "offline_missionary_data", id);
+        const timestamp = new Date().getTime();
+        const newLogEntry = { date, phone, contactId, contactMethod, location, activity, content, createdAt: timestamp };
+
+        let updatedLogs = [];
+        
+        if (existingUserById) {
+            updatedLogs = [...existingUserById.logs, newLogEntry];
+            await setDoc(userRef, { id, name, logs: updatedLogs }, { merge: true });
+            alert(t.alertUpdate + name);
+        } else {
+            updatedLogs = [newLogEntry];
+            await setDoc(userRef, { id, name, logs: updatedLogs });
+            alert(t.alertCreate + name);
+        }
+
+        // 清空表單
+        document.getElementById('offlinePhone').value = '';
+        document.getElementById('offlineContactId').value = '';
+        document.getElementById('offlineContactMethod').value = '';
+        document.getElementById('offlineLocation').value = '';
+        document.getElementById('offlineActivity').value = '';
+        document.getElementById('offlineContent').value = '';
+    };
+
+    // --- 線下後台功能 ---
+    function renderOfflineBackend() {
+        if (!cloudEnabled) return;
+        const t = i18n[currentLang];
+        const listContainer = document.getElementById('offlineDataList');
+        if (!listContainer) return;
+        listContainer.innerHTML = '';
+
+        // 排序輔助函數：主要以選擇的日期排序，同一天則以 createdAt (秒級) 排序
+        const sortByDateThenTime = (a, b) => {
+            const dateA = a.date || '0000-00-00';
+            const dateB = b.date || '0000-00-00';
+            if (dateA !== dateB) {
+                return dateB.localeCompare(dateA);
+            }
+            const timeA = a.createdAt || 0;
+            const timeB = b.createdAt || 0;
+            return timeB - timeA;
+        };
+
+        const processedUsers = offlineDb.map(user => {
+            const sortedLogs = [...user.logs].sort(sortByDateThenTime);
+            const lastLog = sortedLogs[0] || { date: '0000-00-00', content: t.msgEmpty, createdAt: 0 };
+            return { ...user, logs: sortedLogs, lastLog };
+        });
+
+        processedUsers.sort((a, b) => {
+            const dateA = a.lastLog.date || '0000-00-00';
+            const dateB = b.lastLog.date || '0000-00-00';
+            const timeA = a.lastLog.createdAt || 0;
+            const timeB = b.lastLog.createdAt || 0;
+            
+            if (offlineSortDesc) {
+                if (dateA !== dateB) return dateB.localeCompare(dateA);
+                return timeB - timeA;
+            } else {
+                if (dateA !== dateB) return dateA.localeCompare(dateB);
+                return timeA - timeB;
+            }
+        });
+
+        processedUsers.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            const displayDate = user.lastLog.date === '0000-00-00' ? '-' : user.lastLog.date;
+
+            // 計算活躍度
+            const now = new Date();
+            const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
+            let activityText = t.activityLow;
+            let activityClass = 'activity-low';
+            
+            if (lastLogDate) {
+                const daysDiff = Math.floor((now - lastLogDate) / (1000 * 60 * 60 * 24));
+                if (daysDiff <= 3) {
+                    activityText = t.activityHigh;
+                    activityClass = 'activity-high';
+                } else if (daysDiff <= 7) {
+                    activityText = t.activityNormal;
+                    activityClass = 'activity-normal';
+                }
+            }
+
+            const avatarLetter = user.name ? user.name.charAt(0).toUpperCase() : '?';
+            const locationText = user.lastLog.location || '-';
+
+            const summaryHtml = `
+                <div class="user-summary offline-grid-row" onclick="window.toggleOfflineDetails('${user.id}')">
+                    <div class="check-cell" onclick="event.stopPropagation()">
+                        <input type="checkbox" name="selectOfflineUser" value="${user.id}">
+                    </div>
+                    <div class="avatar-cell" style="position:relative;">
+                        <div class="user-avatar">${avatarLetter}</div>
+                    </div>
+                    <div style="font-weight:bold; color:#666;">${user.id}</div>
+                    <div><span class="activity-badge ${activityClass}">${activityText}</span></div>
+                    <div style="font-weight:bold; font-size:1.05rem;">${user.name}</div>
+                    <div style="color:#2e7d32;">${displayDate}</div>
+                    <div style="color:#555;">${locationText}</div>
+                    <div class="action-cell"></div>
+                </div>`;
+
+            let logsHtml = '';
+            user.logs.forEach((log, idx) => {
+                logsHtml += `
+                    <div class="detail-row offline-grid-row">
+                        <div class="check-cell"></div>
+                        <div></div>
+                        <div></div>
+                        <div style="font-size:0.85rem; color:#888;">${log.contactMethod || '-'}</div>
+                        <div style="font-size:0.85rem; color:#888;">${log.activity || '-'}</div>
+                        <div style="color:#1565c0;">${log.date}</div>
+                        <div style="white-space:pre-wrap; word-break:break-word;">${log.content || '-'}</div>
+                        <div class="action-cell">
+                            <button class="btn-remove-log" onclick="window.deleteOfflineSingleLog(event, '${user.id}', ${idx})">✕</button>
+                        </div>
+                    </div>`;
+            });
+
+            card.innerHTML = summaryHtml + `<div class="user-details" id="offline-details-${user.id}">${logsHtml}</div>`;
+            listContainer.appendChild(card);
+        });
+
+        if (isOfflineEditMode) {
+            document.getElementById('offlineDataListContainer').classList.add('edit-mode');
+        }
+        updateOfflineCounter();
+    }
+
+    window.toggleOfflineEditMode = () => {
+        isOfflineEditMode = !isOfflineEditMode;
+        const container = document.getElementById('offlineDataListContainer');
+        const controls = document.getElementById('offlineEditControls');
+        const btn = document.getElementById('btn-offline-toggle-edit');
+        const t = i18n[currentLang];
+
+        if (isOfflineEditMode) {
+            container.classList.add('edit-mode');
+            controls.style.display = 'flex';
+            btn.textContent = t.btnDone;
+            btn.classList.add('editing');
+        } else {
+            container.classList.remove('edit-mode');
+            controls.style.display = 'none';
+            btn.textContent = t.btnEdit;
+            btn.classList.remove('editing');
+            const checks = document.getElementsByName('selectOfflineUser');
+            checks.forEach(c => c.checked = false);
+            document.getElementById('offlineSelectAll').checked = false;
+        }
+    };
+
+    window.toggleOfflineDetails = (uid) => {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+        const details = document.getElementById(`offline-details-${uid}`);
+        const summary = details.previousElementSibling;
+        if (details.style.display === 'block') {
+            details.style.display = 'none';
+            summary.classList.remove('expanded');
+        } else {
+            details.style.display = 'block';
+            summary.classList.add('expanded');
+        }
+    };
+
+    window.deleteOfflineSelected = async () => {
+        if (!cloudEnabled) return;
+        const t = i18n[currentLang];
+        const checked = [...document.getElementsByName('selectOfflineUser')].filter(c => c.checked).map(c => c.value);
+        if (checked.length === 0) return;
+        if (confirm(t.alertConfirmDelete)) {
+            for (const uid of checked) {
+                await deleteDoc(doc(dbInstance, "offline_missionary_data", uid));
+            }
+            alert(t.alertDeleted);
+        }
+    };
+
+    window.deleteOfflineSingleLog = async (event, uid, logIndex) => {
+        if (!cloudEnabled) return;
+        event.stopPropagation();
+        const t = i18n[currentLang];
+        if(confirm(t.alertDeleteLog)) {
+            const user = offlineDb.find(u => u.id === uid);
+            if(user) {
+                const sortedLogs = [...user.logs].sort((a, b) => {
+                    const dateA = a.date || '0000-00-00';
+                    const dateB = b.date || '0000-00-00';
+                    if (dateA !== dateB) return dateB.localeCompare(dateA);
+                    const timeA = a.createdAt || 0;
+                    const timeB = b.createdAt || 0;
+                    return timeB - timeA;
+                });
+                sortedLogs.splice(logIndex, 1);
+                
+                await updateDoc(doc(dbInstance, "offline_missionary_data", uid), {
+                    logs: sortedLogs
+                });
+            }
+        }
     };
 
 </script>
