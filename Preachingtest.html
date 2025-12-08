@@ -502,35 +502,6 @@
                 padding-left: 50px;
             }
         }
-        
-        /* Google Places Autocomplete 樣式覆蓋 */
-        .pac-container {
-            z-index: 10000 !important;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border: none;
-            font-family: inherit;
-            margin-top: 5px;
-        }
-        .pac-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-        .pac-item:hover {
-            background-color: #e8f5e9;
-        }
-        .pac-item-query {
-            font-size: 14px;
-            color: #333;
-        }
-        .pac-matched {
-            font-weight: bold;
-            color: var(--primary-green);
-        }
-        .pac-icon {
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
@@ -1774,28 +1745,6 @@
         // 在新視窗打開 Google Maps
         window.open(mapsUrl, '_blank');
     };
-    
-    // Google Places Autocomplete 初始化
-    let placesAutocomplete = null;
-    
-    window.initGooglePlaces = () => {
-        const locationInput = document.getElementById('offlineLocation');
-        if (locationInput && window.google && window.google.maps && window.google.maps.places) {
-            placesAutocomplete = new google.maps.places.Autocomplete(locationInput, {
-                types: ['establishment', 'geocode'],
-                fields: ['name', 'formatted_address', 'geometry']
-            });
-            
-            placesAutocomplete.addListener('place_changed', () => {
-                const place = placesAutocomplete.getPlace();
-                if (place && place.name) {
-                    // 使用地點名稱，如果沒有則使用格式化地址
-                    locationInput.value = place.name || place.formatted_address || '';
-                }
-            });
-            console.log('Google Places Autocomplete 已啟用');
-        }
-    };
 
     window.submitOfflineData = async () => {
         if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
@@ -2032,33 +1981,6 @@
         }
     };
 
-</script>
-
-<!-- Google Maps Places API -->
-<!-- 請將 YOUR_API_KEY 替換為您的 Google Maps API 金鑰 -->
-<!-- 如需取得 API 金鑰，請前往: https://console.cloud.google.com/google/maps-apis -->
-<script>
-    // ====================================
-    // API 金鑰設定區
-    // 請在下方填入您的 Google Maps API 金鑰
-    // ====================================
-    const GOOGLE_MAPS_API_KEY = '';  // 在此填入您的 API 金鑰
-    
-    if (GOOGLE_MAPS_API_KEY) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGooglePlaces&language=zh-TW`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    } else {
-        console.log('📍 Google Maps API 金鑰未設定');
-        console.log('   地點自動完成功能已停用，但您仍可使用 📍 按鈕開啟 Google Maps 搜尋。');
-        console.log('   如需啟用自動完成功能，請：');
-        console.log('   1. 前往 https://console.cloud.google.com/google/maps-apis');
-        console.log('   2. 建立專案並啟用 Places API');
-        console.log('   3. 取得 API 金鑰');
-        console.log('   4. 將金鑰填入 GOOGLE_MAPS_API_KEY 變數中');
-    }
 </script>
 </body>
 </html>
