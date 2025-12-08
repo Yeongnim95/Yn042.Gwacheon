@@ -418,12 +418,14 @@
     </select>
 </div>
 
+
 </nav>
 
 <div class="container">
     <div id="entrySection" class="page-section active-section">
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
         <div id="statusMsg" class="status-bar"></div>
+
 
     <div class="form-grid">
         <div class="form-group">
@@ -528,6 +530,7 @@
     </div>
 </div>
 
+
 </div>
 
 <script type="module">
@@ -621,7 +624,7 @@
             phId: "예: 9999", phName: "예: 김철수", phContent: "대화 내용이나 기도 제목 입력...",
             btnSubmit: "등록하기", headerBackend: "데이터 관리",
             txtSelectAll: "전체 선택", txtTotal: "섭외자: ", txtPerson: "명",
-            txtInteraction: "실제 교류 (대화): ",
+            txtWeeklyInteraction: "주간 교류: ",
             btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
             colId: "번호", colName: "이름", colDate: "최근 날짜", colContent: "최신 내용",
             colActivity: "활동",
@@ -651,7 +654,7 @@
             phId: "例: 9999", phName: "例: 金大中", phContent: "請輸入對話重點或備忘...",
             btnSubmit: "登錄資料", headerBackend: "後台登錄資料",
             txtSelectAll: "全選", txtTotal: "涉外者人數: ", txtPerson: " 人",
-            txtInteraction: "實際交流 (有對話): ",
+            txtWeeklyInteraction: "週間交流: ",
             btnDelete: "刪除選取", btnEdit: "編輯", btnDone: "完成",
             colId: "編號", colName: "姓名", colDate: "最近日期", colContent: "最新內容",
             colActivity: "活躍度",
@@ -1003,7 +1006,7 @@
             card.className = 'user-card';
             const displayDate = user.lastLog.date === '0000-00-00' ? '-' : user.lastLog.date;
 
-            // 計算活躍度
+            // 計算活躍度（3天內活躍、3-7天一般、7天以上低活躍）
             const now = new Date();
             const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
             let activityLevel = 'low';
@@ -1012,11 +1015,11 @@
             
             if (lastLogDate) {
                 const daysDiff = Math.floor((now - lastLogDate) / (1000 * 60 * 60 * 24));
-                if (daysDiff <= 7) {
+                if (daysDiff <= 3) {
                     activityLevel = 'high';
                     activityText = t.activityHigh;
                     activityClass = 'activity-high';
-                } else if (daysDiff <= 30) {
+                } else if (daysDiff <= 7) {
                     activityLevel = 'normal';
                     activityText = t.activityNormal;
                     activityClass = 'activity-normal';
@@ -1175,13 +1178,19 @@
         const t = i18n[currentLang];
         document.getElementById('txt-total-count').textContent = t.txtTotal + localDb.length + t.txtPerson;
         
-        const interactionCount = localDb.filter(user => {
-            const hasMe = user.logs.some(log => log.type === 'me');
-            const hasOther = user.logs.some(log => log.type === 'other');
-            return hasMe && hasOther;
+        // 計算週間交流人數（最近7天內有記錄的人數）
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        const weeklyInteractionCount = localDb.filter(user => {
+            if (!user.logs || user.logs.length === 0) return false;
+            return user.logs.some(log => {
+                const logDate = new Date(log.date);
+                return logDate >= oneWeekAgo;
+            });
         }).length;
         
-        document.getElementById('txt-interaction-count').textContent = t.txtInteraction + interactionCount + t.txtPerson;
+        document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
     }
     
     function generateNewId() {
