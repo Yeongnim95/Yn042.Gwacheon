@@ -142,20 +142,18 @@
         /* --- 容器 --- */
         .container {
             width: 100%;
-            max-width: 1600px;
+            max-width: 1350px;
             margin: 20px auto;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 25px 40px;
+            padding: 25px 30px;
             min-height: 600px;
         }
         
-        /* 大螢幕時進一步優化 */
-        @media (min-width: 1400px) {
-            .container {
-                padding: 30px 50px;
-            }
+        /* 自適應字體大小 */
+        html {
+            font-size: clamp(14px, 1.5vw, 18px);
         }
 
         .page-section { display: none; animation: fadeIn 0.3s ease; }
