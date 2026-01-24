@@ -1,623 +1,619 @@
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-
-
-<title>Discourse dissemination Tracker</title>
-<style>
-    :root {
-        --primary-green: #43a047;
-        --dark-green: #2e7d32;
-        --light-green-bg: #f1f8e9;
-        --border-color: #c5e1a5;
-        --text-color: #333;
-        --danger-red: #e53935;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-        /* 修改點：新增 Emoji 字體支援 
-           "Apple Color Emoji" -> iOS/macOS
-           "Segoe UI Emoji", "Segoe UI Symbol" -> Windows
-           "Noto Color Emoji" -> Android/Linux
-        */
-        font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", 
-                     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 
-                     sans-serif;
-        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        color: var(--text-color);
-    }
-
-    /* --- 導航列 --- */
-    nav {
-        background: white;
-        padding: 0 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 60px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .nav-left { display: flex; align-items: center; position: relative; }
-
-    .nav-title {
-        font-weight: bold;
-        color: var(--primary-green);
-        font-size: 1.3rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .menu-toggle {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 15px;
-        background: #f5f5f5;
-        border-radius: 25px;
-        cursor: pointer;
-        margin-left: 15px;
-        transition: all 0.3s;
-    }
-    .menu-toggle:hover {
-        background: #e8f5e9;
-    }
-    .hamburger-icon {
-        font-size: 1.2rem;
-        color: var(--primary-green);
-    }
-    #current-page-title {
-        font-size: 0.95rem;
-        font-weight: 500;
-        color: #333;
-    }
-    .dropdown-arrow {
-        font-size: 0.7rem;
-        color: #666;
-        transition: transform 0.3s;
-    }
-    .menu-toggle.open .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-
-    .menu-dropdown {
-        display: none;
-        position: absolute;
-        top: 50px;
-        left: 40px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        padding: 10px;
-        z-index: 200;
-        min-width: 220px;
-        animation: dropdownFadeIn 0.2s ease;
-    }
-    .menu-dropdown.show {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-    @keyframes dropdownFadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
     
-    /* 選單分類標題 */
-    .menu-category {
-        border-bottom: 1px solid #eee;
-        padding-bottom: 8px;
-        margin-bottom: 5px;
-    }
-    .menu-category:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-        margin-bottom: 0;
-    }
-    .menu-category-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        font-weight: 600;
-        color: var(--primary-green);
-        cursor: pointer;
-        border-radius: 8px;
-        transition: background 0.2s;
-    }
-    .menu-category-title:hover {
-        background: #e8f5e9;
-    }
-    .submenu-arrow {
-        font-size: 0.7rem;
-        transition: transform 0.3s;
-    }
-    .menu-category.open .submenu-arrow {
-        transform: rotate(90deg);
-    }
-    
-    /* 子選單 */
-    .menu-submenu {
-        display: none;
-        flex-direction: column;
-        gap: 3px;
-        padding-left: 10px;
-        margin-top: 5px;
-    }
-    .menu-category.open .menu-submenu {
-        display: flex;
-    }
+    <title>Discourse dissemination Tracker</title>
+    <style>
+        :root {
+            --primary-green: #43a047;
+            --dark-green: #2e7d32;
+            --light-green-bg: #f1f8e9;
+            --border-color: #c5e1a5;
+            --text-color: #333;
+            --danger-red: #e53935;
+        }
 
-    .menu-btn {
-        background: transparent;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1.15rem;
-        color: #666;
-        transition: all 0.3s;
-        text-align: left;
-    }
-    .menu-btn:hover {
-        background: #e8f5e9;
-    }
-    .menu-btn.active { background-color: var(--primary-green); color: white; font-weight: bold; }
+        * { box-sizing: border-box; }
 
-    .lang-select {
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        background: white;
-        font-size: 0.9rem;
-        color: #555;
-        outline: none;
-    }
+        body {
+            /* 修改點：新增 Emoji 字體支援 
+               "Apple Color Emoji" -> iOS/macOS
+               "Segoe UI Emoji", "Segoe UI Symbol" -> Windows
+               "Noto Color Emoji" -> Android/Linux
+            */
+            font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Segoe UI", 
+                         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 
+                         sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
 
-    /* --- 容器 --- */
-    .container {
-        width: 100%;
-        max-width: 1280px;
-        margin: 20px auto;
-        background: rgba(255, 255, 255, 0.98);
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        padding: 25px 25px;
-        min-height: 600px;
-    }
-    
-    /* 自適應字體大小 */
-    html {
-        font-size: clamp(15px, 1.5vw, 17px);
-    }
+        /* --- 導航列 --- */
+        nav {
+            background: white;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    .page-section { display: none; animation: fadeIn 0.3s ease; }
-    .page-section.active-section { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-left { display: flex; align-items: center; position: relative; }
 
-    h2 {
-        color: var(--dark-green);
-        border-bottom: 3px solid #a8e063;
-        padding-bottom: 10px;
-        margin-top: 0;
-    }
+        .nav-title {
+            font-weight: bold;
+            color: var(--primary-green);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
 
-    /* --- 表單 --- */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .form-full-width { grid-column: 1 / -1; }
-    .form-group { margin-bottom: 5px; min-width: 0; }
-    
-    label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--dark-green); font-size: 0.9rem; }
-    
-    input, select, textarea {
-        width: 100%; 
-        max-width: 100%; 
-        padding: 10px; 
-        border: 1px solid var(--border-color);
-        border-radius: 6px; 
-        font-size: 15px; 
-        outline: none;
-        box-sizing: border-box; 
-        min-width: 0;
-        /* 確保輸入框內也能正確顯示 Emoji */
-        font-family: inherit;
-    }
-    
-    /* 日期輸入框特別處理 - 防止超出容器 */
-    input[type="date"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        min-height: 44px;
-    }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary-green); box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.15); }
-    
-    /* 地點輸入框包裝器 */
-    .location-input-wrapper {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-    .location-input-wrapper input {
-        flex: 1;
-    }
-    .maps-btn {
-        background: #4285f4;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 10px 12px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 44px;
-        height: 44px;
-    }
-    .maps-btn:hover {
-        background: #3367d6;
-        transform: scale(1.05);
-    }
-    .maps-btn:active {
-        transform: scale(0.95);
-    }
-    
-    /* 生日/年紀輸入框 */
-    .birthday-input-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .birthday-input-wrapper input {
-        text-align: center;
-    }
-    #profileBirthYear {
-        width: 70px;
-    }
-    #profileBirthMonth, #profileBirthDay {
-        width: 50px;
-    }
-    .birthday-separator {
-        color: #666;
-        font-weight: bold;
-    }
-    .age-input {
-        width: 55px;
-    }
-    .age-unit {
-        color: #666;
-        font-size: 0.9rem;
-    }
-    
-    .status-bar {
-        grid-column: 1 / -1; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 10px; display: none;
-    }
-    .status-found { background: #e8f5e9; color: #2e7d32; }
-    .status-new { background: #fff3e0; color: #ef6c00; }
-    .status-loading { background: #e3f2fd; color: #1565c0; text-align: center; }
+        .menu-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f5f5f5;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        .menu-toggle:hover {
+            background: #e8f5e9;
+        }
+        .hamburger-icon {
+            font-size: 1.2rem;
+            color: var(--primary-green);
+        }
+        #current-page-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            color: #666;
+            transition: transform 0.3s;
+        }
+        .menu-toggle.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
 
-    button.submit-btn {
-        width: 100%; padding: 14px; margin-top: 20px;
-        background: var(--primary-green); color: white; border: none; border-radius: 8px;
-        font-size: 1rem; font-weight: bold; cursor: pointer;
-    }
-    button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-    /* --- 後台列表 --- */
-    .backend-toolbar {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 15px; padding: 10px; background: #fafafa; border-radius: 8px; flex-wrap: wrap; gap: 10px;
-        min-height: 50px;
-    }
-    
-    .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: #555; flex-wrap: wrap; }
-    
-    .stat-item { display: flex; align-items: center; white-space: nowrap; }
-    .stat-divider { margin: 0 8px; color: #ccc; }
-    .highlight-stat { color: #2e7d32; }
-
-    .edit-controls { display: none; align-items: center; gap: 10px; }
-    .show-edit .edit-controls { display: flex; } 
-    
-    .toggle-edit-btn {
-        background: #2196f3; color: white; border: none; padding: 8px 16px; 
-        border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
-        transition: background 0.3s;
-    }
-    .toggle-edit-btn.editing { background: var(--primary-green); }
-
-    .delete-btn {
-        background: #ffebee; color: #c62828; border: 1px solid #ffcdd2;
-        padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
-    }
-
-    /* 頭像樣式 */
-    .avatar-cell {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .user-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 14px;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        position: relative;
-    }
-    .user-avatar:hover {
-        transform: scale(1.1);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    /* 個人資訊彈出框 */
-    .profile-popup {
-        display: none;
-        position: absolute;
-        top: 45px;
-        left: 0;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        padding: 15px;
-        min-width: 200px;
-        max-width: 280px;
-        z-index: 50;
-        animation: popupFadeIn 0.2s ease;
-        word-break: break-all;
-    }
-    .profile-popup.show {
-        display: block;
-    }
-    @keyframes popupFadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .profile-popup-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-        border-bottom: 1px solid #eee;
-        font-size: 0.9rem;
-    }
-    .profile-popup-item:last-child {
-        border-bottom: none;
-    }
-    .profile-popup-label {
-        color: #888;
-        font-weight: bold;
-    }
-    .profile-popup-value {
-        color: #333;
-    }
-
-    /* 活躍度標籤 */
-    .activity-badge {
-        padding: 3px 8px;
-        border-radius: 10px;
-        font-size: 0.75rem;
-        font-weight: bold;
-        color: white;
-        display: inline-block;
-    }
-    .activity-high {
-        background: #e53935;
-    }
-    .activity-normal {
-        background: #43a047;
-    }
-    .activity-low {
-        background: #1e88e5;
-    }
-
-    /* Grid System - 線上後台 */
-    .grid-row {
-        display: grid;
-        grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 0px; 
-        align-items: center; padding: 15px; transition: all 0.3s ease;
-    }
-    .list-container.edit-mode .grid-row {
-        grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 40px; 
-    }
-
-    /* Grid System - 線下後台 */
-    .offline-grid-row {
-        display: grid;
-        grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 0px; 
-        align-items: center; padding: 15px; transition: all 0.3s ease;
-    }
-    .list-container.edit-mode .offline-grid-row {
-        grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 40px; 
-    }
-
-    .list-header-row {
-        background: var(--primary-green); color: white; font-weight: bold;
-        border-radius: 8px 8px 0 0; margin-top: 10px;
-        padding: 10px 15px; 
-    }
-    
-    .sortable { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
-
-    .user-card { border: 1px solid #eee; border-top: none; background: white; }
-    .user-card:last-child { border-radius: 0 0 8px 8px; }
-
-    .user-summary { cursor: pointer; font-size: 1rem; }
-    .user-summary:hover { background: #f9fbe7; }
-    .user-summary.expanded { background: #f1f8e9; border-bottom: 1px solid #e0e0e0; }
-
-    .user-details { display: none; background: #fafafa; }
-    .user-details.show { display: block; }
-
-    .detail-row { border-bottom: 1px solid #eee; background: #fff; color: #555; font-size: 1rem; }
-    .detail-row:last-child { border-bottom: none; }
-
-    .check-cell { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-    .list-container.edit-mode .check-cell { opacity: 1; }
-
-    .action-cell { overflow: hidden; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-    .list-container.edit-mode .action-cell { opacity: 1; }
-
-    /* 內容換行顯示設定 */
-    .col-content, .detail-row .editable {
-        white-space: pre-wrap; 
-        word-break: break-word; 
-    }
-
-    .editable { cursor: default; }
-    .list-container.edit-mode .editable { 
-        cursor: pointer; border: 1px dashed #ccc; border-radius: 4px; padding: 2px 4px; background: #fff;
-    }
-    .list-container.edit-mode .editable:hover { border-color: #2196f3; background: #e3f2fd; }
-
-    .btn-remove-log {
-        background: #ffcdd2; color: #b71c1c; border: none; width: 24px; height: 24px;
-        border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
-    }
-
-    .tag { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; color: white; display: inline-block; }
-    .tag-me { background: #26a69a; }
-    .tag-other { background: #ef5350; }
-    
-    /* 複製成功提示 */
-    .copy-toast {
-        position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%) translateY(20px);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 25px;
-        font-size: 0.9rem;
-        z-index: 9999;
-        opacity: 0;
-        transition: all 0.3s ease;
-        pointer-events: none;
-    }
-    .copy-toast.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-    
-    /* 可複製的內容 */
-    .copyable {
-        cursor: pointer;
-    }
-
-    /* RWD 響應式調整 */
-    @media (max-width: 700px) {
-        .container { padding: 20px 15px; margin: 10px auto; width: 95%; }
-        .form-grid { grid-template-columns: 1fr; }
-        .nav-title span { display: none; }
-        .list-header-row { display: none; } 
-        
-        input, select, textarea {
-            width: 100% !important;
-            max-width: 100% !important;
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            left: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 10px;
+            z-index: 200;
+            min-width: 220px;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+        .menu-dropdown.show {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 修正日期輸入框超出邊界問題 */
+        /* 選單分類標題 */
+        .menu-category {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 5px;
+        }
+        .menu-category:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        .menu-category-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            font-weight: 600;
+            color: var(--primary-green);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .menu-category-title:hover {
+            background: #e8f5e9;
+        }
+        .submenu-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.3s;
+        }
+        .menu-category.open .submenu-arrow {
+            transform: rotate(90deg);
+        }
+        
+        /* 子選單 */
+        .menu-submenu {
+            display: none;
+            flex-direction: column;
+            gap: 3px;
+            padding-left: 10px;
+            margin-top: 5px;
+        }
+        .menu-category.open .menu-submenu {
+            display: flex;
+        }
+
+        .menu-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.15rem;
+            color: #666;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .menu-btn:hover {
+            background: #e8f5e9;
+        }
+        .menu-btn.active { background-color: var(--primary-green); color: white; font-weight: bold; }
+
+        .lang-select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 0.9rem;
+            color: #555;
+            outline: none;
+        }
+
+        /* --- 容器 --- */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px 25px;
+            min-height: 600px;
+        }
+        
+        /* 自適應字體大小 */
+        html {
+            font-size: clamp(15px, 1.5vw, 17px);
+        }
+
+        .page-section { display: none; animation: fadeIn 0.3s ease; }
+        .page-section.active-section { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 {
+            color: var(--dark-green);
+            border-bottom: 3px solid #a8e063;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* --- 表單 --- */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-full-width { grid-column: 1 / -1; }
+        .form-group { margin-bottom: 5px; min-width: 0; }
+        
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--dark-green); font-size: 0.9rem; }
+        
+        input, select, textarea {
+            width: 100%; 
+            max-width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px; 
+            font-size: 15px; 
+            outline: none;
+            box-sizing: border-box; 
+            min-width: 0;
+            /* 確保輸入框內也能正確顯示 Emoji */
+            font-family: inherit;
+        }
+        
+        /* 日期輸入框特別處理 - 防止超出容器 */
         input[type="date"] {
-            width: 100% !important;
-            max-width: 100% !important;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+            min-height: 44px;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-green); box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.15); }
+        
+        /* 地點輸入框包裝器 */
+        .location-input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .location-input-wrapper input {
+            flex: 1;
+        }
+        .maps-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+        .maps-btn:hover {
+            background: #3367d6;
+            transform: scale(1.05);
+        }
+        .maps-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 生日/年紀輸入框 */
+        .birthday-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .birthday-input-wrapper input {
+            text-align: center;
+        }
+        #profileBirthYear {
+            width: 70px;
+        }
+        #profileBirthMonth, #profileBirthDay {
+            width: 50px;
+        }
+        .birthday-separator {
+            color: #666;
+            font-weight: bold;
+        }
+        .age-input {
+            width: 55px;
+        }
+        .age-unit {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .status-bar {
+            grid-column: 1 / -1; padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 10px; display: none;
+        }
+        .status-found { background: #e8f5e9; color: #2e7d32; }
+        .status-new { background: #fff3e0; color: #ef6c00; }
+        .status-loading { background: #e3f2fd; color: #1565c0; text-align: center; }
+
+        button.submit-btn {
+            width: 100%; padding: 14px; margin-top: 20px;
+            background: var(--primary-green); color: white; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+        }
+        button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* --- 後台列表 --- */
+        .backend-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding: 10px; background: #fafafa; border-radius: 8px; flex-wrap: wrap; gap: 10px;
+            min-height: 50px;
+        }
+        
+        .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: #555; flex-wrap: wrap; }
+        
+        .stat-item { display: flex; align-items: center; white-space: nowrap; }
+        .stat-divider { margin: 0 8px; color: #ccc; }
+        .highlight-stat { color: #2e7d32; }
+
+        .edit-controls { display: none; align-items: center; gap: 10px; }
+        .show-edit .edit-controls { display: flex; } 
+        
+        .toggle-edit-btn {
+            background: #2196f3; color: white; border: none; padding: 8px 16px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        .toggle-edit-btn.editing { background: var(--primary-green); }
+
+        .delete-btn {
+            background: #ffebee; color: #c62828; border: 1px solid #ffcdd2;
+            padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
         }
 
-        .grid-row, .list-container.edit-mode .grid-row,
-        .offline-grid-row, .list-container.edit-mode .offline-grid-row {
-            display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; position: relative;
-            padding-left: 15px; padding-right: 15px;
-        }
-        .list-container.edit-mode .grid-row,
-        .list-container.edit-mode .offline-grid-row { padding-left: 45px; } 
-
-        .user-summary.grid-row,
-        .user-summary.offline-grid-row {
-            padding-top: 12px;
-            padding-bottom: 12px;
-        }
-
-        .menu-items {
-            flex-wrap: wrap;
-            gap: 3px;
-        }
-        .menu-btn {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-        }
-
+        /* 頭像樣式 */
         .avatar-cell {
-            position: relative;
-            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            font-size: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
+        /* 個人資訊彈出框 */
         .profile-popup {
+            display: none;
+            position: absolute;
+            top: 45px;
             left: 0;
-            right: auto;
-            min-width: 160px;
-            max-width: calc(100vw - 40px);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 15px;
+            min-width: 200px;
+            max-width: 280px;
+            z-index: 50;
+            animation: popupFadeIn 0.2s ease;
             word-break: break-all;
         }
+        .profile-popup.show {
+            display: block;
+        }
+        @keyframes popupFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .profile-popup-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .profile-popup-item:last-child {
+            border-bottom: none;
+        }
+        .profile-popup-label {
+            color: #888;
+            font-weight: bold;
+        }
+        .profile-popup-value {
+            color: #333;
+        }
 
+        /* 活躍度標籤 */
         .activity-badge {
-            font-size: 0.7rem;
-            padding: 2px 6px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
         }
-        
-        .check-cell { position: absolute; left: 10px; top: 15px; width: auto; opacity: 0; pointer-events: none;}
-        .list-container.edit-mode .check-cell { opacity: 1; pointer-events: auto; }
-        
-        .action-cell { position: absolute; right: 10px; top: 10px; width: auto; opacity: 0; pointer-events: none;}
-        .list-container.edit-mode .action-cell { opacity: 1; pointer-events: auto; }
-        
-        .col-date { font-size: 0.85rem; color: #666; }
-        .col-content { width: 100%; white-space: pre-wrap; }
-        
-        /* 手機版後台：讓日期換行顯示 */
-        .user-summary.grid-row .col-date,
-        .user-summary.offline-grid-row .col-date {
-            width: 100%;
-            order: 10;
-            margin-top: 5px;
+        .activity-high {
+            background: #e53935;
+        }
+        .activity-normal {
+            background: #43a047;
+        }
+        .activity-low {
+            background: #1e88e5;
         }
 
-        .detail-row.grid-row,
-        .detail-row.offline-grid-row {
-            padding-left: 50px;
+        /* Grid System - 線上後台 */
+        .grid-row {
+            display: grid;
+            grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 0px; 
+            align-items: center; padding: 15px; transition: all 0.3s ease;
         }
-    }
-</style>
+        .list-container.edit-mode .grid-row {
+            grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 40px; 
+        }
 
+        /* Grid System - 線下後台 */
+        .offline-grid-row {
+            display: grid;
+            grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 0px; 
+            align-items: center; padding: 15px; transition: all 0.3s ease;
+        }
+        .list-container.edit-mode .offline-grid-row {
+            grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1fr 0.8fr 0.8fr 40px; 
+        }
 
+        .list-header-row {
+            background: var(--primary-green); color: white; font-weight: bold;
+            border-radius: 8px 8px 0 0; margin-top: 10px;
+            padding: 10px 15px; 
+        }
+        
+        .sortable { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
+
+        .user-card { border: 1px solid #eee; border-top: none; background: white; }
+        .user-card:last-child { border-radius: 0 0 8px 8px; }
+
+        .user-summary { cursor: pointer; font-size: 1rem; }
+        .user-summary:hover { background: #f9fbe7; }
+        .user-summary.expanded { background: #f1f8e9; border-bottom: 1px solid #e0e0e0; }
+
+        .user-details { display: none; background: #fafafa; }
+        .user-details.show { display: block; }
+
+        .detail-row { border-bottom: 1px solid #eee; background: #fff; color: #555; font-size: 1rem; }
+        .detail-row:last-child { border-bottom: none; }
+
+        .check-cell { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .list-container.edit-mode .check-cell { opacity: 1; }
+
+        .action-cell { overflow: hidden; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .list-container.edit-mode .action-cell { opacity: 1; }
+
+        /* 內容換行顯示設定 */
+        .col-content, .detail-row .editable {
+            white-space: pre-wrap; 
+            word-break: break-word; 
+        }
+
+        .editable { cursor: default; }
+        .list-container.edit-mode .editable { 
+            cursor: pointer; border: 1px dashed #ccc; border-radius: 4px; padding: 2px 4px; background: #fff;
+        }
+        .list-container.edit-mode .editable:hover { border-color: #2196f3; background: #e3f2fd; }
+
+        .btn-remove-log {
+            background: #ffcdd2; color: #b71c1c; border: none; width: 24px; height: 24px;
+            border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+
+        .tag { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; color: white; display: inline-block; }
+        .tag-me { background: #26a69a; }
+        .tag-other { background: #ef5350; }
+        
+        /* 複製成功提示 */
+        .copy-toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* 可複製的內容 */
+        .copyable {
+            cursor: pointer;
+        }
+
+        /* RWD 響應式調整 */
+        @media (max-width: 700px) {
+            .container { padding: 20px 15px; margin: 10px auto; width: 95%; }
+            .form-grid { grid-template-columns: 1fr; }
+            .nav-title span { display: none; }
+            .list-header-row { display: none; } 
+            
+            input, select, textarea {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* 修正日期輸入框超出邊界問題 */
+            input[type="date"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+
+            .grid-row, .list-container.edit-mode .grid-row,
+            .offline-grid-row, .list-container.edit-mode .offline-grid-row {
+                display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; position: relative;
+                padding-left: 15px; padding-right: 15px;
+            }
+            .list-container.edit-mode .grid-row,
+            .list-container.edit-mode .offline-grid-row { padding-left: 45px; } 
+
+            .user-summary.grid-row,
+            .user-summary.offline-grid-row {
+                padding-top: 12px;
+                padding-bottom: 12px;
+            }
+
+            .menu-items {
+                flex-wrap: wrap;
+                gap: 3px;
+            }
+            .menu-btn {
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+
+            .avatar-cell {
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .profile-popup {
+                left: 0;
+                right: auto;
+                min-width: 160px;
+                max-width: calc(100vw - 40px);
+                word-break: break-all;
+            }
+
+            .activity-badge {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+            
+            .check-cell { position: absolute; left: 10px; top: 15px; width: auto; opacity: 0; pointer-events: none;}
+            .list-container.edit-mode .check-cell { opacity: 1; pointer-events: auto; }
+            
+            .action-cell { position: absolute; right: 10px; top: 10px; width: auto; opacity: 0; pointer-events: none;}
+            .list-container.edit-mode .action-cell { opacity: 1; pointer-events: auto; }
+            
+            .col-date { font-size: 0.85rem; color: #666; }
+            .col-content { width: 100%; white-space: pre-wrap; }
+            
+            /* 手機版後台：讓日期換行顯示 */
+            .user-summary.grid-row .col-date,
+            .user-summary.offline-grid-row .col-date {
+                width: 100%;
+                order: 10;
+                margin-top: 5px;
+            }
+
+            .detail-row.grid-row,
+            .detail-row.offline-grid-row {
+                padding-left: 50px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -657,16 +653,13 @@
             </div>
         </div>
     </div>
-
-
-<div class="lang-switch">
-    <select class="lang-select" onchange="window.setLanguage(this.value)">
-        <option value="ko">한국어</option>
-        <option value="zh">中文</option>
-    </select>
-</div>
-
-
+    
+    <div class="lang-switch">
+        <select class="lang-select" onchange="window.setLanguage(this.value)">
+            <option value="ko">한국어</option>
+            <option value="zh">中文</option>
+        </select>
+    </div>
 </nav>
 
 <div class="container">
@@ -678,227 +671,224 @@
             <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
         </div>
     </div>
-
-
-<!-- 信仰記錄圖 -->
-<div id="faithChartSection" class="page-section">
-    <h2 id="txt-faith-chart-header">신앙 기록 차트</h2>
-    <div class="faith-content">
-        <p id="txt-faith-chart-desc">이 페이지에서 신앙 기록의 통계 차트를 볼 수 있습니다.</p>
-        <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
-    </div>
-</div>
-
-<div id="entrySection" class="page-section">
-    <h2 id="txt-entry-header">전도 섭외자 등록</h2>
-    <div id="statusMsg" class="status-bar"></div>
-
-    <div class="form-grid">
-        <div class="form-group">
-            <label id="lbl-id">번호</label>
-            <input type="text" id="idInput" placeholder="9999" oninput="window.handleIdInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-name">이름</label>
-            <input type="text" id="nameInput" placeholder="이름 입력" oninput="window.handleNameInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-date">날짜</label>
-            <input type="date" id="recordDate">
-        </div>
-        <div class="form-group">
-            <label id="lbl-type">회신 유형</label>
-            <select id="replyType">
-                <option value="me" id="opt-me">내가 회신</option>
-                <option value="other" id="opt-other">상대방 회신</option>
-            </select>
-        </div>
-        <div class="form-group form-full-width">
-            <label id="lbl-content">내용</label>
-            <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
-        </div>
-    </div>
-    <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
-</div>
-
-<div id="profileSection" class="page-section">
-    <h2 id="txt-profile-header">개인정보 등록</h2>
-    <div id="profileStatusMsg" class="status-bar"></div>
-
-    <div class="form-grid">
-        <div class="form-group">
-            <label id="lbl-profile-id">번호</label>
-            <input type="text" id="profileIdInput" placeholder="9999" oninput="window.handleProfileIdInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-name">이름</label>
-            <input type="text" id="profileNameInput" placeholder="이름 입력" oninput="window.handleProfileNameInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-location">거주지</label>
-            <input type="text" id="profileLocation" placeholder="">
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-phone">휴대폰</label>
-            <input type="tel" id="profilePhone" placeholder="">
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-contact">연락 방법</label>
-            <select id="profileContact">
-                <option value="" id="opt-contact-none">선택하세요</option>
-                <option value="FACEBOOK">FACEBOOK</option>
-                <option value="IG">IG</option>
-                <option value="SLOWLY">SLOWLY</option>
-                <option value="LINE">LINE</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-contact-id">연락처 ID</label>
-            <input type="text" id="profileContactId" placeholder="">
-        </div>
-        <div class="form-group form-full-width">
-            <label id="lbl-profile-birthday">생일 / 나이</label>
-            <div class="birthday-input-wrapper">
-                <input type="text" id="profileBirthYear" placeholder="YYYY" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthYearInput(this)">
-                <span class="birthday-separator">/</span>
-                <input type="text" id="profileBirthMonth" placeholder="MM" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthMonthInput(this)">
-                <span class="birthday-separator">/</span>
-                <input type="text" id="profileBirthDay" placeholder="DD" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthDayInput(this)">
-                <span class="birthday-separator">,</span>
-                <input type="text" id="profileAge" placeholder="나이" maxlength="3" inputmode="numeric" pattern="[0-9]*" class="age-input">
-                <span class="age-unit" id="age-unit">세</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-mbti">MBTI</label>
-            <input type="text" id="profileMbti" placeholder="MBTI" maxlength="4" style="text-transform: uppercase;">
-        </div>
-        <div class="form-group">
-            <label id="lbl-profile-job">직업</label>
-            <input type="text" id="profileJob" placeholder="">
-        </div>
-    </div>
-    <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
-</div>
-
-<div id="offlineEntrySection" class="page-section">
-    <h2 id="txt-offline-entry-header">오프라인 전도 등록</h2>
-    <div id="offlineStatusMsg" class="status-bar"></div>
-
-    <div class="form-grid">
-        <div class="form-group">
-            <label id="lbl-offline-id">번호</label>
-            <input type="text" id="offlineIdInput" placeholder="5000" oninput="window.handleOfflineIdInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-name">이름</label>
-            <input type="text" id="offlineNameInput" placeholder="이름 입력" oninput="window.handleOfflineNameInput()">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-date">날짜</label>
-            <input type="date" id="offlineRecordDate">
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-location">장소</label>
-            <div class="location-input-wrapper">
-                <input type="text" id="offlineLocation" placeholder="">
-                <button type="button" class="maps-btn" onclick="window.openGoogleMaps()" title="Google Maps에서 검색">📍</button>
-            </div>
-        </div>
-        <div class="form-group">
-            <label id="lbl-offline-activity">활동</label>
-            <input type="text" id="offlineActivity" placeholder="">
-        </div>
-        <div class="form-group form-full-width">
-            <label id="lbl-offline-content">섭외 내용</label>
-            <textarea id="offlineContent" rows="5" placeholder="섭외 내용을 입력하세요..."></textarea>
-        </div>
-    </div>
-    <button class="submit-btn" onclick="window.submitOfflineData()" id="btn-offline-submit">등록하기</button>
-</div>
-
-<div id="backendSection" class="page-section">
-    <h2 id="txt-backend-header">온라인 데이터 관리</h2>
     
-    <div class="backend-toolbar">
-        <div class="toolbar-left">
-            <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
-            <span class="stat-divider">|</span>
-            <span class="stat-item highlight-stat" id="txt-interaction-count">실제 교류 (대화): 0명</span>
+    <!-- 信仰記錄圖 -->
+    <div id="faithChartSection" class="page-section">
+        <h2 id="txt-faith-chart-header">신앙 기록 차트</h2>
+        <div class="faith-content">
+            <p id="txt-faith-chart-desc">이 페이지에서 신앙 기록의 통계 차트를 볼 수 있습니다.</p>
+            <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
+        </div>
+    </div>
 
-            <div class="edit-controls" id="editControls">
+    <div id="entrySection" class="page-section">
+        <h2 id="txt-entry-header">전도 섭외자 등록</h2>
+        <div id="statusMsg" class="status-bar"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-id">번호</label>
+                <input type="text" id="idInput" placeholder="9999" oninput="window.handleIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-name">이름</label>
+                <input type="text" id="nameInput" placeholder="이름 입력" oninput="window.handleNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-date">날짜</label>
+                <input type="date" id="recordDate">
+            </div>
+            <div class="form-group">
+                <label id="lbl-type">회신 유형</label>
+                <select id="replyType">
+                    <option value="me" id="opt-me">내가 회신</option>
+                    <option value="other" id="opt-other">상대방 회신</option>
+                </select>
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-content">내용</label>
+                <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
+            </div>
+        </div>
+        <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
+    </div>
+
+    <div id="profileSection" class="page-section">
+        <h2 id="txt-profile-header">개인정보 등록</h2>
+        <div id="profileStatusMsg" class="status-bar"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-profile-id">번호</label>
+                <input type="text" id="profileIdInput" placeholder="9999" oninput="window.handleProfileIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-name">이름</label>
+                <input type="text" id="profileNameInput" placeholder="이름 입력" oninput="window.handleProfileNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-location">거주지</label>
+                <input type="text" id="profileLocation" placeholder="">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-phone">휴대폰</label>
+                <input type="tel" id="profilePhone" placeholder="">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-contact">연락 방법</label>
+                <select id="profileContact">
+                    <option value="" id="opt-contact-none">선택하세요</option>
+                    <option value="FACEBOOK">FACEBOOK</option>
+                    <option value="IG">IG</option>
+                    <option value="SLOWLY">SLOWLY</option>
+                    <option value="LINE">LINE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-contact-id">연락처 ID</label>
+                <input type="text" id="profileContactId" placeholder="">
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-profile-birthday">생일 / 나이</label>
+                <div class="birthday-input-wrapper">
+                    <input type="text" id="profileBirthYear" placeholder="YYYY" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthYearInput(this)">
+                    <span class="birthday-separator">/</span>
+                    <input type="text" id="profileBirthMonth" placeholder="MM" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthMonthInput(this)">
+                    <span class="birthday-separator">/</span>
+                    <input type="text" id="profileBirthDay" placeholder="DD" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthDayInput(this)">
+                    <span class="birthday-separator">,</span>
+                    <input type="text" id="profileAge" placeholder="나이" maxlength="3" inputmode="numeric" pattern="[0-9]*" class="age-input">
+                    <span class="age-unit" id="age-unit">세</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-mbti">MBTI</label>
+                <input type="text" id="profileMbti" placeholder="MBTI" maxlength="4" style="text-transform: uppercase;">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-job">직업</label>
+                <input type="text" id="profileJob" placeholder="">
+            </div>
+        </div>
+        <button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
+    </div>
+
+    <div id="offlineEntrySection" class="page-section">
+        <h2 id="txt-offline-entry-header">오프라인 전도 등록</h2>
+        <div id="offlineStatusMsg" class="status-bar"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-offline-id">번호</label>
+                <input type="text" id="offlineIdInput" placeholder="5000" oninput="window.handleOfflineIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-offline-name">이름</label>
+                <input type="text" id="offlineNameInput" placeholder="이름 입력" oninput="window.handleOfflineNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-offline-date">날짜</label>
+                <input type="date" id="offlineRecordDate">
+            </div>
+            <div class="form-group">
+                <label id="lbl-offline-location">장소</label>
+                <div class="location-input-wrapper">
+                    <input type="text" id="offlineLocation" placeholder="">
+                    <button type="button" class="maps-btn" onclick="window.openGoogleMaps()" title="Google Maps에서 검색">📍</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lbl-offline-activity">활동</label>
+                <input type="text" id="offlineActivity" placeholder="">
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-offline-content">섭외 내용</label>
+                <textarea id="offlineContent" rows="5" placeholder="섭외 내용을 입력하세요..."></textarea>
+            </div>
+        </div>
+        <button class="submit-btn" onclick="window.submitOfflineData()" id="btn-offline-submit">등록하기</button>
+    </div>
+
+    <div id="backendSection" class="page-section">
+        <h2 id="txt-backend-header">온라인 데이터 관리</h2>
+        
+        <div class="backend-toolbar">
+            <div class="toolbar-left">
+                <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
                 <span class="stat-divider">|</span>
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" id="selectAll" onclick="window.toggleSelectAll()" style="width:18px; height:18px; margin-right:5px;">
-                    <span id="txt-select-all">전체 선택</span>
-                </label>
-                <button class="delete-btn" onclick="window.deleteSelected()" id="btn-delete">선택 삭제</button>
+                <span class="stat-item highlight-stat" id="txt-interaction-count">실제 교류 (대화): 0명</span>
+
+                <div class="edit-controls" id="editControls">
+                    <span class="stat-divider">|</span>
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="selectAll" onclick="window.toggleSelectAll()" style="width:18px; height:18px; margin-right:5px;">
+                        <span id="txt-select-all">전체 선택</span>
+                    </label>
+                    <button class="delete-btn" onclick="window.deleteSelected()" id="btn-delete">선택 삭제</button>
+                </div>
+            </div>
+            <button class="toggle-edit-btn" onclick="window.toggleEditMode()" id="btn-toggle-edit">편집</button>
+        </div>
+
+        <div class="list-container" id="dataListContainer">
+            <div class="list-header-row grid-row">
+                <div class="check-cell"></div>
+                <div></div>
+                <div id="col-id">번호</div>
+                <div id="col-activity">활동</div>
+                <div id="col-name">이름</div>
+                <div class="sortable" onclick="window.toggleSort()">
+                    <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
+                </div>
+                <div id="col-content">최신 내용</div>
+                <div class="action-cell"></div>
+            </div>
+            <div id="dataList">
+                <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
             </div>
         </div>
-        <button class="toggle-edit-btn" onclick="window.toggleEditMode()" id="btn-toggle-edit">편집</button>
     </div>
 
-    <div class="list-container" id="dataListContainer">
-        <div class="list-header-row grid-row">
-            <div class="check-cell"></div>
-            <div></div>
-            <div id="col-id">번호</div>
-            <div id="col-activity">활동</div>
-            <div id="col-name">이름</div>
-            <div class="sortable" onclick="window.toggleSort()">
-                <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
-            </div>
-            <div id="col-content">최신 내용</div>
-            <div class="action-cell"></div>
-        </div>
-        <div id="dataList">
-            <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
-        </div>
-    </div>
-</div>
-
-<div id="offlineBackendSection" class="page-section">
-    <h2 id="txt-offline-backend-header">오프라인 데이터 관리</h2>
-    
-    <div class="backend-toolbar">
-        <div class="toolbar-left">
-            <span class="stat-item" id="txt-offline-total-count">섭외자: 0명</span>
-            <span class="stat-divider">|</span>
-            <span class="stat-item highlight-stat" id="txt-offline-interaction-count">주간 교류: 0명</span>
-
-            <div class="edit-controls" id="offlineEditControls">
+    <div id="offlineBackendSection" class="page-section">
+        <h2 id="txt-offline-backend-header">오프라인 데이터 관리</h2>
+        
+        <div class="backend-toolbar">
+            <div class="toolbar-left">
+                <span class="stat-item" id="txt-offline-total-count">섭외자: 0명</span>
                 <span class="stat-divider">|</span>
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" id="offlineSelectAll" onclick="window.toggleOfflineSelectAll()" style="width:18px; height:18px; margin-right:5px;">
-                    <span id="txt-offline-select-all">전체 선택</span>
-                </label>
-                <button class="delete-btn" onclick="window.deleteOfflineSelected()" id="btn-offline-delete">선택 삭제</button>
+                <span class="stat-item highlight-stat" id="txt-offline-interaction-count">주간 교류: 0명</span>
+
+                <div class="edit-controls" id="offlineEditControls">
+                    <span class="stat-divider">|</span>
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="offlineSelectAll" onclick="window.toggleOfflineSelectAll()" style="width:18px; height:18px; margin-right:5px;">
+                        <span id="txt-offline-select-all">전체 선택</span>
+                    </label>
+                    <button class="delete-btn" onclick="window.deleteOfflineSelected()" id="btn-offline-delete">선택 삭제</button>
+                </div>
+            </div>
+            <button class="toggle-edit-btn" onclick="window.toggleOfflineEditMode()" id="btn-offline-toggle-edit">편집</button>
+        </div>
+
+        <div class="list-container" id="offlineDataListContainer">
+            <div class="list-header-row offline-grid-row">
+                <div class="check-cell"></div>
+                <div></div>
+                <div id="col-offline-id">번호</div>
+                <div id="col-offline-activity">활동</div>
+                <div id="col-offline-name">이름</div>
+                <div class="sortable" onclick="window.toggleOfflineSort()">
+                    <span id="col-offline-date">최근 날짜</span> <span id="offlineSortIcon">▼</span>
+                </div>
+                <div id="col-offline-location">장소</div>
+                <div id="col-offline-event">활동</div>
+                <div class="action-cell"></div>
+            </div>
+            <div id="offlineDataList">
+                <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
             </div>
         </div>
-        <button class="toggle-edit-btn" onclick="window.toggleOfflineEditMode()" id="btn-offline-toggle-edit">편집</button>
     </div>
-
-    <div class="list-container" id="offlineDataListContainer">
-        <div class="list-header-row offline-grid-row">
-            <div class="check-cell"></div>
-            <div></div>
-            <div id="col-offline-id">번호</div>
-            <div id="col-offline-activity">활동</div>
-            <div id="col-offline-name">이름</div>
-            <div class="sortable" onclick="window.toggleOfflineSort()">
-                <span id="col-offline-date">최근 날짜</span> <span id="offlineSortIcon">▼</span>
-            </div>
-            <div id="col-offline-location">장소</div>
-            <div id="col-offline-event">활동</div>
-            <div class="action-cell"></div>
-        </div>
-        <div id="offlineDataList">
-            <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
-        </div>
-    </div>
-</div>
-
-
 </div>
 
 <script type="module">
@@ -1139,11 +1129,46 @@
         document.getElementById('offlineDataList').innerHTML = `<div style="padding:20px; text-align:center; color:red;">${i18n[currentLang].msgCloudError}</div>`;
     }
 
+    // 頁面記憶超時設定（12小時 = 12 * 60 * 60 * 1000 毫秒）
+    const PAGE_MEMORY_TIMEOUT = 12 * 60 * 60 * 1000;
+    
+    // 儲存頁面和時間戳
+    function saveCurrentPage(page) {
+        const data = {
+            page: page,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('app_current_page', JSON.stringify(data));
+    }
+    
+    // 載入儲存的頁面（檢查是否超時）
+    function loadSavedPage() {
+        const saved = localStorage.getItem('app_current_page');
+        if (!saved) return null;
+        
+        try {
+            const data = JSON.parse(saved);
+            const elapsed = Date.now() - data.timestamp;
+            
+            // 檢查是否超過12小時
+            if (elapsed > PAGE_MEMORY_TIMEOUT) {
+                localStorage.removeItem('app_current_page');
+                return null; // 超時，返回首頁
+            }
+            
+            return data.page;
+        } catch (e) {
+            // 如果解析失敗（舊格式），清除並返回null
+            localStorage.removeItem('app_current_page');
+            return null;
+        }
+    }
+
     window.onload = function() {
         document.querySelector('.lang-select').value = currentLang;
         
-        // 載入儲存的頁面
-        const savedPage = localStorage.getItem('app_current_page');
+        // 載入儲存的頁面（帶超時檢查）
+        const savedPage = loadSavedPage();
         if (savedPage) {
             switchPage(savedPage);
         }
@@ -1154,7 +1179,7 @@
 
     window.setLanguage = (lang) => {
         currentLang = lang;
-        localStorage.setItem('app_lang', lang);
+        localStorage.setItem('app_lang', lang); // 永久儲存語言設定
         applyLanguage();
         renderBackend();
         renderOfflineBackend();
@@ -1793,8 +1818,8 @@
         document.getElementById('menuDropdown').classList.remove('show');
         document.querySelector('.menu-toggle').classList.remove('open');
         
-        // 儲存當前頁面到 localStorage
-        localStorage.setItem('app_current_page', page);
+        // 儲存當前頁面到 localStorage（帶時間戳，12小時後過期）
+        saveCurrentPage(page);
         
         // 更新當前頁面標題
         const pageTitleEl = document.getElementById('current-page-title');
@@ -2452,6 +2477,5 @@
     };
 
 </script>
-
 </body>
 </html>
