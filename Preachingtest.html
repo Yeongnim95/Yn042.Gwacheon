@@ -616,6 +616,230 @@
                 padding-left: 50px;
             }
         }
+        
+        /* ===== 聖經頁面樣式 ===== */
+        .bible-container {
+            padding: 10px;
+        }
+        
+        .bible-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            padding: 15px 0 10px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+        
+        .bible-books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .bible-book-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .bible-book-btn:hover {
+            background: var(--light-green-bg);
+            border-color: var(--primary-green);
+        }
+        
+        .bible-book-btn.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+        
+        .bible-book-btn .ko { display: block; font-weight: 600; }
+        .bible-book-btn .zh { display: block; font-size: 0.75rem; color: #666; margin-top: 2px; }
+        .bible-book-btn.active .zh { color: rgba(255,255,255,0.8); }
+        
+        /* 章節選擇區 */
+        .bible-chapters-container {
+            display: none;
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .bible-chapters-container.show {
+            display: block;
+        }
+        
+        .bible-chapters-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .bible-chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 6px;
+        }
+        
+        .bible-chapter-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .bible-chapter-btn:hover {
+            background: var(--light-green-bg);
+            border-color: var(--primary-green);
+        }
+        
+        /* 聖經內容頁 */
+        .bible-content-view {
+            display: none;
+        }
+        
+        .bible-content-view.show {
+            display: block;
+        }
+        
+        .bible-content-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+        
+        .bible-back-btn {
+            background: var(--light-green-bg);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .bible-back-btn:hover {
+            background: var(--border-color);
+        }
+        
+        .bible-content-title {
+            flex: 1;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .bible-content-title .ko { display: block; }
+        .bible-content-title .zh { display: block; font-size: 0.9rem; color: #666; }
+        
+        .bible-verses {
+            line-height: 1.9;
+            font-size: 1rem;
+        }
+        
+        .bible-verse {
+            margin-bottom: 8px;
+        }
+        
+        .bible-verse .verse-num {
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-right: 5px;
+        }
+        
+        .bible-verse .verse-text-ko {
+            display: block;
+            color: #888;
+            font-size: 0.95rem;
+            margin-left: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .bible-verse .verse-text-zh {
+            display: block;
+        }
+        
+        /* 段落標題 */
+        .bible-section-heading {
+            margin: 20px 0 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .bible-section-heading:first-child {
+            margin-top: 0;
+        }
+        
+        .bible-section-heading .heading-ko {
+            display: block;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+        
+        .bible-section-heading .heading-zh {
+            display: block;
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        /* 返回頂部按鈕 */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .scroll-top-btn.show {
+            display: flex;
+        }
+        
+        .scroll-top-btn:hover {
+            background: var(--dark-green);
+            transform: scale(1.1);
+        }
+        
+        .bible-copyright {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #999;
+            padding: 20px 10px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -638,6 +862,16 @@
                 <div class="menu-submenu" id="submenu-faith">
                     <button class="menu-btn active" onclick="switchPage('daily-faith')" id="btn-daily-faith">매일 신앙 기록</button>
                     <button class="menu-btn" onclick="switchPage('faith-chart')" id="btn-faith-chart">신앙 기록 차트</button>
+                </div>
+            </div>
+            <!-- 書籍 子選單 -->
+            <div class="menu-category" id="menu-category-books">
+                <div class="menu-category-title" onclick="window.toggleSubMenu('books')">
+                    <span id="menu-books-title">서적</span>
+                    <span class="submenu-arrow">▶</span>
+                </div>
+                <div class="menu-submenu" id="submenu-books">
+                    <button class="menu-btn" onclick="switchPage('bible')" id="btn-bible">성경</button>
                 </div>
             </div>
             <!-- 果子資訊 子選單 -->
@@ -683,6 +917,61 @@
             <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
         </div>
     </div>
+    
+    <!-- 聖經頁面 -->
+    <div id="bibleSection" class="page-section">
+        <div class="bible-container">
+            <!-- 書卷列表視圖 -->
+            <div id="bibleBooksList" class="bible-books-list">
+                <!-- 舊約 -->
+                <div class="bible-section-title" id="txt-old-testament">구약성경 / 舊約聖經</div>
+                <div class="bible-books-grid" id="oldTestamentBooks">
+                    <!-- 舊約書卷將由JavaScript動態生成 -->
+                </div>
+                
+                <!-- 新約 -->
+                <div class="bible-section-title" id="txt-new-testament">신약성경 / 新約聖經</div>
+                <div class="bible-books-grid" id="newTestamentBooks">
+                    <!-- 新約書卷將由JavaScript動態生成 -->
+                </div>
+                
+                <!-- 章節選擇區 -->
+                <div class="bible-chapters-container" id="bibleChaptersContainer">
+                    <div class="bible-chapters-title" id="bibleChaptersTitle"></div>
+                    <div class="bible-chapters-grid" id="bibleChaptersGrid">
+                        <!-- 章節按鈕將由JavaScript動態生成 -->
+                    </div>
+                </div>
+                
+                <div class="bible-copyright">
+                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會
+                </div>
+            </div>
+            
+            <!-- 聖經內容視圖 -->
+            <div id="bibleContentView" class="bible-content-view">
+                <div class="bible-content-header">
+                    <button class="bible-back-btn" onclick="window.closeBibleContent()">
+                        ← <span id="txt-bible-back">뒤로</span>
+                    </button>
+                    <div class="bible-content-title" id="bibleContentTitle">
+                        <span class="ko"></span>
+                        <span class="zh"></span>
+                    </div>
+                    <div style="width: 70px;"></div>
+                </div>
+                <div class="bible-verses" id="bibleVerses">
+                    <!-- 經文內容將由JavaScript動態生成 -->
+                </div>
+                <div class="bible-copyright">
+                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 返回頂部按鈕 -->
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollToTop()">↑</button>
 
     <div id="entrySection" class="page-section">
         <h2 id="txt-entry-header">전도 섭외자 등록</h2>
@@ -993,6 +1282,10 @@
             headerDailyFaith: "매일 신앙 기록", headerFaithChart: "신앙 기록 차트",
             txtDailyFaithDesc: "이 페이지에서 매일의 신앙 생활을 기록할 수 있습니다.",
             txtFaithChartDesc: "이 페이지에서 신앙 기록의 통계 차트를 볼 수 있습니다.",
+            // 書籍
+            menuBooks: "서적", btnBible: "성경",
+            txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
+            txtBibleBack: "뒤로",
             // 果子資訊
             btnEntry: "온라인 등록", btnOfflineEntry: "오프라인 등록", 
             btnProfile: "개인정보", 
@@ -1052,6 +1345,10 @@
             headerDailyFaith: "每日信仰記錄", headerFaithChart: "信仰記錄圖",
             txtDailyFaithDesc: "在此頁面記錄每日的信仰生活。",
             txtFaithChartDesc: "在此頁面查看信仰記錄的統計圖表。",
+            // 書籍
+            menuBooks: "書籍", btnBible: "聖經",
+            txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
+            txtBibleBack: "返回",
             // 果子資訊
             btnEntry: "線上登錄", btnOfflineEntry: "線下登錄", 
             btnProfile: "個人資料", 
@@ -1196,10 +1493,15 @@
             'txt-app-title': t.appTitle, 
             // 主選單
             'menu-faith-title': t.menuFaith, 'menu-fruit-title': t.menuFruit,
+            'menu-books-title': t.menuBooks,
             // 我的信仰
             'btn-daily-faith': t.btnDailyFaith, 'btn-faith-chart': t.btnFaithChart,
             'txt-daily-faith-header': t.headerDailyFaith, 'txt-faith-chart-header': t.headerFaithChart,
             'txt-daily-faith-desc': t.txtDailyFaithDesc, 'txt-faith-chart-desc': t.txtFaithChartDesc,
+            // 書籍
+            'btn-bible': t.btnBible,
+            'txt-old-testament': t.txtOldTestament, 'txt-new-testament': t.txtNewTestament,
+            'txt-bible-back': t.txtBibleBack,
             // 果子資訊
             'btn-entry': t.btnEntry, 'btn-offline-entry': t.btnOfflineEntry,
             'btn-profile': t.btnProfile, 
@@ -1257,6 +1559,7 @@
             const sectionId = activeSection.id;
             if (sectionId === 'dailyFaithSection') pageTitleEl.textContent = t.btnDailyFaith;
             else if (sectionId === 'faithChartSection') pageTitleEl.textContent = t.btnFaithChart;
+            else if (sectionId === 'bibleSection') pageTitleEl.textContent = t.btnBible;
             else if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
             else if (sectionId === 'offlineEntrySection') pageTitleEl.textContent = t.btnOfflineEntry;
             else if (sectionId === 'profileSection') pageTitleEl.textContent = t.btnProfile;
@@ -1840,6 +2143,14 @@
             document.getElementById('btn-faith-chart').classList.add('active');
             document.getElementById('menu-category-faith').classList.add('open');
             pageTitleEl.textContent = t.btnFaithChart;
+        } else if (page === 'bible') {
+            document.getElementById('bibleSection').classList.add('active-section');
+            document.getElementById('btn-bible').classList.add('active');
+            document.getElementById('menu-category-books').classList.add('open');
+            pageTitleEl.textContent = t.btnBible;
+            // 重置聖經頁面到書卷列表
+            document.getElementById('bibleBooksList').style.display = 'block';
+            document.getElementById('bibleContentView').classList.remove('show');
         } else if (page === 'entry') { 
             document.getElementById('entrySection').classList.add('active-section'); 
             document.getElementById('btn-entry').classList.add('active');
@@ -2478,6 +2789,271 @@
             }
         }
     };
+
+    // ===== 聖經功能 =====
+    
+    // 聖經書卷資料 (韓文/中文名稱, 章數)
+    const bibleBooks = {
+        oldTestament: [
+            { id: 'gen', ko: '창세기', zh: '創世記', chapters: 50 },
+            { id: 'exo', ko: '출애굽기', zh: '出埃及記', chapters: 40 },
+            { id: 'lev', ko: '레위기', zh: '利未記', chapters: 27 },
+            { id: 'num', ko: '민수기', zh: '民數記', chapters: 36 },
+            { id: 'deu', ko: '신명기', zh: '申命記', chapters: 34 },
+            { id: 'jos', ko: '여호수아', zh: '約書亞記', chapters: 24 },
+            { id: 'jdg', ko: '사사기', zh: '士師記', chapters: 21 },
+            { id: 'rut', ko: '룻기', zh: '路得記', chapters: 4 },
+            { id: '1sa', ko: '사무엘상', zh: '撒母耳記上', chapters: 31 },
+            { id: '2sa', ko: '사무엘하', zh: '撒母耳記下', chapters: 24 },
+            { id: '1ki', ko: '열왕기상', zh: '列王紀上', chapters: 22 },
+            { id: '2ki', ko: '열왕기하', zh: '列王紀下', chapters: 25 },
+            { id: '1ch', ko: '역대상', zh: '歷代志上', chapters: 29 },
+            { id: '2ch', ko: '역대하', zh: '歷代志下', chapters: 36 },
+            { id: 'ezr', ko: '에스라', zh: '以斯拉記', chapters: 10 },
+            { id: 'neh', ko: '느헤미야', zh: '尼希米記', chapters: 13 },
+            { id: 'est', ko: '에스더', zh: '以斯帖記', chapters: 10 },
+            { id: 'job', ko: '욥기', zh: '約伯記', chapters: 42 },
+            { id: 'psa', ko: '시편', zh: '詩篇', chapters: 150 },
+            { id: 'pro', ko: '잠언', zh: '箴言', chapters: 31 },
+            { id: 'ecc', ko: '전도서', zh: '傳道書', chapters: 12 },
+            { id: 'sng', ko: '아가', zh: '雅歌', chapters: 8 },
+            { id: 'isa', ko: '이사야', zh: '以賽亞書', chapters: 66 },
+            { id: 'jer', ko: '예레미야', zh: '耶利米書', chapters: 52 },
+            { id: 'lam', ko: '예레미야애가', zh: '耶利米哀歌', chapters: 5 },
+            { id: 'ezk', ko: '에스겔', zh: '以西結書', chapters: 48 },
+            { id: 'dan', ko: '다니엘', zh: '但以理書', chapters: 12 },
+            { id: 'hos', ko: '호세아', zh: '何西阿書', chapters: 14 },
+            { id: 'jol', ko: '요엘', zh: '約珥書', chapters: 3 },
+            { id: 'amo', ko: '아모스', zh: '阿摩司書', chapters: 9 },
+            { id: 'oba', ko: '오바댜', zh: '俄巴底亞書', chapters: 1 },
+            { id: 'jon', ko: '요나', zh: '約拿書', chapters: 4 },
+            { id: 'mic', ko: '미가', zh: '彌迦書', chapters: 7 },
+            { id: 'nam', ko: '나훔', zh: '那鴻書', chapters: 3 },
+            { id: 'hab', ko: '하박국', zh: '哈巴谷書', chapters: 3 },
+            { id: 'zep', ko: '스바냐', zh: '西番雅書', chapters: 3 },
+            { id: 'hag', ko: '학개', zh: '哈該書', chapters: 2 },
+            { id: 'zec', ko: '스가랴', zh: '撒迦利亞書', chapters: 14 },
+            { id: 'mal', ko: '말라기', zh: '瑪拉基書', chapters: 4 }
+        ],
+        newTestament: [
+            { id: 'mat', ko: '마태복음', zh: '馬太福音', chapters: 28 },
+            { id: 'mrk', ko: '마가복음', zh: '馬可福音', chapters: 16 },
+            { id: 'luk', ko: '누가복음', zh: '路加福音', chapters: 24 },
+            { id: 'jhn', ko: '요한복음', zh: '約翰福音', chapters: 21 },
+            { id: 'act', ko: '사도행전', zh: '使徒行傳', chapters: 28 },
+            { id: 'rom', ko: '로마서', zh: '羅馬書', chapters: 16 },
+            { id: '1co', ko: '고린도전서', zh: '哥林多前書', chapters: 16 },
+            { id: '2co', ko: '고린도후서', zh: '哥林多後書', chapters: 13 },
+            { id: 'gal', ko: '갈라디아서', zh: '加拉太書', chapters: 6 },
+            { id: 'eph', ko: '에베소서', zh: '以弗所書', chapters: 6 },
+            { id: 'php', ko: '빌립보서', zh: '腓立比書', chapters: 4 },
+            { id: 'col', ko: '골로새서', zh: '歌羅西書', chapters: 4 },
+            { id: '1th', ko: '데살로니가전서', zh: '帖撒羅尼迦前書', chapters: 5 },
+            { id: '2th', ko: '데살로니가후서', zh: '帖撒羅尼迦後書', chapters: 3 },
+            { id: '1ti', ko: '디모데전서', zh: '提摩太前書', chapters: 6 },
+            { id: '2ti', ko: '디모데후서', zh: '提摩太後書', chapters: 4 },
+            { id: 'tit', ko: '디도서', zh: '提多書', chapters: 3 },
+            { id: 'phm', ko: '빌레몬서', zh: '腓利門書', chapters: 1 },
+            { id: 'heb', ko: '히브리서', zh: '希伯來書', chapters: 13 },
+            { id: 'jas', ko: '야고보서', zh: '雅各書', chapters: 5 },
+            { id: '1pe', ko: '베드로전서', zh: '彼得前書', chapters: 5 },
+            { id: '2pe', ko: '베드로후서', zh: '彼得後書', chapters: 3 },
+            { id: '1jn', ko: '요한일서', zh: '約翰一書', chapters: 5 },
+            { id: '2jn', ko: '요한이서', zh: '約翰二書', chapters: 1 },
+            { id: '3jn', ko: '요한삼서', zh: '約翰三書', chapters: 1 },
+            { id: 'jud', ko: '유다서', zh: '猶大書', chapters: 1 },
+            { id: 'rev', ko: '요한계시록', zh: '啟示錄', chapters: 22 }
+        ]
+    };
+    
+    // 聖經經文內容資料庫
+    // 格式: bibleContent['書卷id']['章數'] = [ {verse: 節數, ko: '韓文', zh: '中文'}, ... ]
+    const bibleContent = {
+        'gen': {
+            1: [
+                { type: 'heading', ko: '천지 창조', zh: '神的創造' },
+                { verse: 1, ko: '태초에 하나님이 천지를 창조하시니라', zh: '起初，神創造天地。' },
+                { verse: 2, ko: '땅이 혼돈하고 공허하며 흑암이 깊음 위에 있고 하나님의 영은 수면 위에 운행하시니라', zh: '地是空虛混沌，淵面黑暗；神的靈運行在水面上。' },
+                { verse: 3, ko: '하나님이 이르시되 빛이 있으라 하시니 빛이 있었고', zh: '神說：「要有光」，就有了光。' },
+                { verse: 4, ko: '빛이 하나님이 보시기에 좋았더라 하나님이 빛과 어둠을 나누사', zh: '神看光是好的，就把光暗分開了。' },
+                { verse: 5, ko: '하나님이 빛을 낮이라 부르시고 어둠을 밤이라 부르시니라 저녁이 되고 아침이 되니 이는 첫째 날이니라', zh: '神稱光為「晝」，稱暗為「夜」。有晚上，有早晨，這是頭一日。' },
+                { verse: 6, ko: '하나님이 이르시되 물 가운데에 궁창이 있어 물과 물로 나뉘라 하시고', zh: '神說：「諸水之間要有空氣，將水分為上下。」' },
+                { verse: 7, ko: '하나님이 궁창을 만드사 궁창 아래의 물과 궁창 위의 물로 나뉘게 하시니 그대로 되니라', zh: '神就造出空氣，將空氣以下的水、空氣以上的水分開了。事就這樣成了。' },
+                { verse: 8, ko: '하나님이 궁창을 하늘이라 부르시니라 저녁이 되고 아침이 되니 이는 둘째 날이니라', zh: '神稱空氣為「天」。有晚上，有早晨，是第二日。' },
+                { verse: 9, ko: '하나님이 이르시되 천하의 물이 한 곳으로 모이고 뭍이 드러나라 하시니 그대로 되니라', zh: '神說：「天下的水要聚在一處，使旱地露出來。」事就這樣成了。' },
+                { verse: 10, ko: '하나님이 뭍을 땅이라 부르시고 모인 물을 바다라 부르시니 하나님이 보시기에 좋았더라', zh: '神稱旱地為「地」，稱水的聚處為「海」。神看著是好的。' },
+                { verse: 11, ko: '하나님이 이르시되 땅은 풀과 씨 맺는 채소와 각기 종류대로 씨 가진 열매 맺는 나무를 내라 하시니 그대로 되어', zh: '神說：「地要發生青草和結種子的菜蔬，並結果子的樹木，各從其類，果子都包著核。」事就這樣成了。' },
+                { verse: 12, ko: '땅이 풀과 각기 종류대로 씨 맺는 채소와 각기 종류대로 씨 가진 열매 맺는 나무를 내니 하나님이 보시기에 좋았더라', zh: '於是地發生了青草和結種子的菜蔬，各從其類；並結果子的樹木，各從其類；果子都包著核。神看著是好的。' },
+                { verse: 13, ko: '저녁이 되고 아침이 되니 이는 셋째 날이니라', zh: '有晚上，有早晨，是第三日。' },
+                { verse: 14, ko: '하나님이 이르시되 하늘의 궁창에 광명체들이 있어 낮과 밤을 나뉘게 하고 그것들로 징조와 계절과 날과 해를 이루게 하라', zh: '神說：「天上要有光體，可以分晝夜，作記號，定節令、日子、年歲，' },
+                { verse: 15, ko: '또 광명체들이 하늘의 궁창에 있어 땅을 비추라 하시니 그대로 되니라', zh: '並要發光在天空，普照在地上。」事就這樣成了。' },
+                { verse: 16, ko: '하나님이 두 큰 광명체를 만드사 큰 광명체로 낮을 주관하게 하시고 작은 광명체로 밤을 주관하게 하시며 또 별들을 만드시고', zh: '於是神造了兩個大光，大的管晝，小的管夜，又造眾星，' },
+                { verse: 17, ko: '하나님이 그것들을 하늘의 궁창에 두어 땅을 비추게 하시며', zh: '就把這些光擺列在天空，普照在地上，' },
+                { verse: 18, ko: '낮과 밤을 주관하게 하시고 빛과 어둠을 나뉘게 하시니 하나님이 보시기에 좋았더라', zh: '管理晝夜，分別明暗。神看著是好的。' },
+                { verse: 19, ko: '저녁이 되고 아침이 되니 이는 넷째 날이니라', zh: '有晚上，有早晨，是第四日。' },
+                { verse: 20, ko: '하나님이 이르시되 물들은 생물을 번성하게 하고 땅 위 하늘의 궁창에는 새가 날으라 하시고', zh: '神說：「水要多多滋生有生命的物；要有雀鳥飛在地面以上，天空之中。」' },
+                { verse: 21, ko: '하나님이 큰 바다 생물들과 물에서 번성하여 움직이는 모든 생물을 그 종류대로, 날개 있는 모든 새를 그 종류대로 창조하시니 하나님이 보시기에 좋았더라', zh: '神就造出大魚和水中所滋生各樣有生命的動物，各從其類；又造出各樣飛鳥，各從其類。神看著是好的。' },
+                { verse: 22, ko: '하나님이 그들에게 복을 주시며 이르시되 생육하고 번성하여 여러 바닷물에 충만하라 새들도 땅에 번성하라 하시니라', zh: '神就賜福給這一切，說：「滋生繁多，充滿海中的水；雀鳥也要多生在地上。」' },
+                { verse: 23, ko: '저녁이 되고 아침이 되니 이는 다섯째 날이니라', zh: '有晚上，有早晨，是第五日。' },
+                { verse: 24, ko: '하나님이 이르시되 땅은 생물을 그 종류대로 내되 가축과 기는 것과 땅의 짐승을 종류대로 내라 하시니 그대로 되니라', zh: '神說：「地要生出活物來，各從其類；牲畜、昆蟲、野獸，各從其類。」事就這樣成了。' },
+                { verse: 25, ko: '하나님이 땅의 짐승을 그 종류대로, 가축을 그 종류대로, 땅에 기는 모든 것을 그 종류대로 만드시니 하나님이 보시기에 좋았더라', zh: '於是神造出野獸，各從其類；牲畜，各從其類；地上一切昆蟲，各從其類。神看著是好的。' },
+                { verse: 26, ko: '하나님이 이르시되 우리의 형상을 따라 우리의 모양대로 우리가 사람을 만들고 그들로 바다의 물고기와 하늘의 새와 가축과 온 땅과 땅에 기는 모든 것을 다스리게 하자 하시고', zh: '神說：「我們要照著我們的形像、按著我們的樣式造人，使他們管理海裏的魚、空中的鳥、地上的牲畜，和全地，並地上所爬的一切昆蟲。」' },
+                { verse: 27, ko: '하나님이 자기 형상 곧 하나님의 형상대로 사람을 창조하시되 남자와 여자를 창조하시고', zh: '神就照著自己的形像造人，乃是照著他的形像造男造女。' },
+                { verse: 28, ko: '하나님이 그들에게 복을 주시며 하나님이 그들에게 이르시되 생육하고 번성하여 땅에 충만하라, 땅을 정복하라, 바다의 물고기와 하늘의 새와 땅에 움직이는 모든 생물을 다스리라 하시니라', zh: '神就賜福給他們，又對他們說：「要生養眾多，遍滿地面，治理這地，也要管理海裏的魚、空中的鳥，和地上各樣行動的活物。」' },
+                { verse: 29, ko: '하나님이 이르시되 내가 온 지면의 씨 맺는 모든 채소와 씨 가진 열매 맺는 모든 나무를 너희에게 주노니 너희의 먹을거리가 되리라', zh: '神說：「看哪，我將遍地上一切結種子的菜蔬和一切樹上所結有核的果子全賜給你們作食物。' },
+                { verse: 30, ko: '또 땅의 모든 짐승과 하늘의 모든 새와 생명이 있어 땅에 기는 모든 것에게는 내가 모든 푸른 풀을 먹을거리로 주노라 하시니 그대로 되니라', zh: '至於地上的走獸和空中的飛鳥，並各樣爬在地上有生命的物，我將青草賜給牠們作食物。」事就這樣成了。' },
+                { verse: 31, ko: '하나님이 지으신 그 모든 것을 보시니 보시기에 심히 좋았더라 저녁이 되고 아침이 되니 이는 여섯째 날이니라', zh: '神看著一切所造的都甚好。有晚上，有早晨，是第六日。' }
+            ]
+            // 其他章節請按照此格式添加：
+            // 2: [ { verse: 1, ko: '韓文', zh: '中文' }, ... ],
+            // 3: [ ... ],
+        }
+        // 其他書卷請按照此格式添加：
+        // 'exo': { 1: [...], 2: [...] },
+    };
+    
+    let currentBibleBook = null;
+    
+    // 初始化聖經頁面
+    function initBiblePage() {
+        renderBibleBooks('oldTestament', 'oldTestamentBooks');
+        renderBibleBooks('newTestament', 'newTestamentBooks');
+    }
+    
+    // 渲染書卷列表
+    function renderBibleBooks(testament, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        bibleBooks[testament].forEach(book => {
+            const btn = document.createElement('div');
+            btn.className = 'bible-book-btn';
+            btn.id = `bible-book-${book.id}`;
+            btn.innerHTML = `<span class="ko">${book.ko}</span><span class="zh">${book.zh}</span>`;
+            btn.onclick = () => selectBibleBook(book);
+            container.appendChild(btn);
+        });
+    }
+    
+    // 選擇書卷
+    function selectBibleBook(book) {
+        // 移除其他書卷的選中狀態
+        document.querySelectorAll('.bible-book-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // 選中當前書卷
+        const currentBtn = document.getElementById(`bible-book-${book.id}`);
+        if (currentBtn) currentBtn.classList.add('active');
+        
+        currentBibleBook = book;
+        
+        // 顯示章節選擇
+        const chaptersContainer = document.getElementById('bibleChaptersContainer');
+        const chaptersTitle = document.getElementById('bibleChaptersTitle');
+        const chaptersGrid = document.getElementById('bibleChaptersGrid');
+        
+        chaptersTitle.innerHTML = `${book.ko} / ${book.zh}`;
+        chaptersGrid.innerHTML = '';
+        
+        for (let i = 1; i <= book.chapters; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'bible-chapter-btn';
+            btn.textContent = i;
+            btn.onclick = () => openBibleChapter(book, i);
+            chaptersGrid.appendChild(btn);
+        }
+        
+        chaptersContainer.classList.add('show');
+        
+        // 滾動到章節選擇區
+        chaptersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // 開啟聖經章節
+    function openBibleChapter(book, chapter) {
+        const booksList = document.getElementById('bibleBooksList');
+        const contentView = document.getElementById('bibleContentView');
+        const contentTitle = document.getElementById('bibleContentTitle');
+        const versesContainer = document.getElementById('bibleVerses');
+        
+        // 設定標題
+        contentTitle.querySelector('.ko').textContent = `${book.ko} ${chapter}장`;
+        contentTitle.querySelector('.zh').textContent = `${book.zh} 第${chapter}章`;
+        
+        // 載入經文內容
+        const verses = bibleContent[book.id]?.[chapter];
+        
+        if (verses && verses.length > 0) {
+            versesContainer.innerHTML = verses.map(v => {
+                // 如果是段落標題
+                if (v.type === 'heading') {
+                    return `
+                        <div class="bible-section-heading">
+                            <span class="heading-ko">${v.ko}</span>
+                            <span class="heading-zh">${v.zh}</span>
+                        </div>
+                    `;
+                }
+                // 一般經文
+                return `
+                    <div class="bible-verse">
+                        <span class="verse-num">${v.verse}</span>
+                        <span class="verse-text-ko">${v.ko}</span>
+                        <span class="verse-text-zh">${v.zh}</span>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            versesContainer.innerHTML = `
+                <div style="text-align: center; padding: 50px; color: #888;">
+                    <p>이 장의 내용이 아직 추가되지 않았습니다.</p>
+                    <p>此章節內容尚未添加。</p>
+                </div>
+            `;
+        }
+        
+        // 切換視圖
+        booksList.style.display = 'none';
+        contentView.classList.add('show');
+        
+        // 滾動到頂部
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // 關閉聖經內容，返回書卷列表
+    window.closeBibleContent = () => {
+        const booksList = document.getElementById('bibleBooksList');
+        const contentView = document.getElementById('bibleContentView');
+        
+        contentView.classList.remove('show');
+        booksList.style.display = 'block';
+        
+        // 滾動到之前選中的書卷
+        if (currentBibleBook) {
+            const currentBtn = document.getElementById(`bible-book-${currentBibleBook.id}`);
+            if (currentBtn) {
+                currentBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    };
+    
+    // 返回頂部
+    window.scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    // 監聽滾動事件，顯示/隱藏返回頂部按鈕
+    window.addEventListener('scroll', () => {
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        if (window.scrollY > 300) {
+            scrollTopBtn.classList.add('show');
+        } else {
+            scrollTopBtn.classList.remove('show');
+        }
+    });
+    
+    // 頁面載入時初始化聖經
+    initBiblePage();
 
 </script>
 </body>
