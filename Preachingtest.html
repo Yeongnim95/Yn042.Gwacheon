@@ -2913,6 +2913,7 @@
     };
     
     let currentBibleBook = null;
+    let currentBibleChapter = null;
     
     // 初始化聖經頁面
     function initBiblePage() {
@@ -2976,6 +2977,9 @@
         const contentTitle = document.getElementById('bibleContentTitle');
         const versesContainer = document.getElementById('bibleVerses');
         
+        // 記錄當前章節
+        currentBibleChapter = chapter;
+        
         // 設定標題
         contentTitle.querySelector('.ko').textContent = `${book.ko} ${chapter}장`;
         contentTitle.querySelector('.zh').textContent = `${book.zh} 第${chapter}章`;
@@ -3028,12 +3032,12 @@
         contentView.classList.remove('show');
         booksList.style.display = 'block';
         
-        // 滾動到之前選中的書卷
-        if (currentBibleBook) {
-            const currentBtn = document.getElementById(`bible-book-${currentBibleBook.id}`);
-            if (currentBtn) {
-                currentBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        // 滾動到章節選擇區
+        const chaptersContainer = document.getElementById('bibleChaptersContainer');
+        if (chaptersContainer && chaptersContainer.classList.contains('show')) {
+            setTimeout(() => {
+                chaptersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
     };
     
