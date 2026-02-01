@@ -904,6 +904,16 @@
         .bible-verse:active {
             background: var(--light-green-bg);
         }
+        
+        /* 第一次點擊等待狀態 */
+        .bible-verse.first-click {
+            background: #e8f5e9;
+        }
+        
+        /* 雙擊成功反饋 */
+        .bible-verse.double-clicked {
+            background: var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -3208,7 +3218,19 @@
     // ===== 雙擊複製功能 =====
     let lastClickTime = 0;
     let lastClickElement = null;
+    let firstClickTimer = null;
     const DOUBLE_CLICK_DELAY = 300; // 雙擊間隔時間 300ms
+    
+    // 清除第一次點擊狀態
+    function clearFirstClickState() {
+        if (lastClickElement) {
+            lastClickElement.classList.remove('first-click');
+        }
+        if (firstClickTimer) {
+            clearTimeout(firstClickTimer);
+            firstClickTimer = null;
+        }
+    }
     
     // 處理經文點擊（雙擊觸發複製選單）
     window.handleVerseClick = (event, element) => {
@@ -3216,15 +3238,42 @@
         
         // 檢查是否為雙擊（同一元素且間隔小於300ms）
         if (lastClickElement === element && (currentTime - lastClickTime) < DOUBLE_CLICK_DELAY) {
-            // 雙擊 - 顯示複製選單
-            event.preventDefault();
-            showCopyMenu(event, element);
+            // 雙擊成功 - 清除第一次點擊狀態
+            clearFirstClickState();
+            
+            // 添加雙擊成功反饋
+            element.classList.add('double-clicked');
+            
+            // 震動反饋（如果支援）
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // 短暫延遲後顯示選單並移除反饋樣式
+            setTimeout(() => {
+                element.classList.remove('double-clicked');
+                showCopyMenu(event, element);
+            }, 100);
+            
             lastClickTime = 0;
             lastClickElement = null;
         } else {
-            // 第一次點擊 - 記錄時間和元素
+            // 第一次點擊 - 清除之前的狀態
+            clearFirstClickState();
+            
+            // 記錄時間和元素
             lastClickTime = currentTime;
             lastClickElement = element;
+            
+            // 添加第一次點擊視覺反饋
+            element.classList.add('first-click');
+            
+            // 設定計時器，超時後清除反饋狀態
+            firstClickTimer = setTimeout(() => {
+                element.classList.remove('first-click');
+                lastClickElement = null;
+                lastClickTime = 0;
+            }, DOUBLE_CLICK_DELAY);
         }
     };
     
@@ -3274,11 +3323,6 @@
         
         menu.classList.add('show');
         overlay.classList.add('show');
-        
-        // 震動反饋（如果支援）
-        if (navigator.vibrate) {
-            navigator.vibrate(50);
-        }
     }
     
     // 根據當前語言更新複製選單文字
