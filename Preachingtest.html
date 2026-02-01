@@ -897,14 +897,12 @@
             margin: 0 -5px;
             border-radius: 8px;
             transition: background 0.2s;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .bible-verse:active {
             background: var(--light-green-bg);
-        }
-        
-        .bible-verse.long-press {
-            background: #e8f5e9;
         }
     </style>
 </head>
@@ -1010,7 +1008,8 @@
                 </div>
                 
                 <div class="bible-copyright">
-                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會
+                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
+                    개역한글 © 1961 대한성서공회 (Korean Bible Society)
                 </div>
             </div>
             
@@ -1030,7 +1029,8 @@
                     <!-- 經文內容將由JavaScript動態生成 -->
                 </div>
                 <div class="bible-copyright">
-                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會
+                    CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
+                    개역한글 © 1961 대한성서공회 (Korean Bible Society)
                 </div>
             </div>
         </div>
@@ -1042,9 +1042,9 @@
     <!-- 長按複製選單 -->
     <div class="bible-copy-overlay" id="bibleCopyOverlay" onclick="window.closeCopyMenu()"></div>
     <div class="bible-copy-menu" id="bibleCopyMenu">
-        <div class="bible-copy-menu-item" onclick="window.copyVerse('zh')">📋 複製中文</div>
-        <div class="bible-copy-menu-item" onclick="window.copyVerse('ko')">📋 한국어 복사</div>
-        <div class="bible-copy-menu-item" onclick="window.copyVerse('both')">📋 複製雙語</div>
+        <div class="bible-copy-menu-item" id="copyMenuZh" onclick="window.copyVerse('zh')">📋 複製中文</div>
+        <div class="bible-copy-menu-item" id="copyMenuKo" onclick="window.copyVerse('ko')">📋 한국어 복사</div>
+        <div class="bible-copy-menu-item" id="copyMenuBoth" onclick="window.copyVerse('both')">📋 複製雙語</div>
     </div>
 
     <div id="entrySection" class="page-section">
@@ -2945,7 +2945,7 @@
     const bibleContent = {
         'gen': {
             1: [
-                { type: 'heading', zh: '神的創造' },
+                { type: 'heading', ko: '천지의 창조', zh: '天地的創造' },
                 { verse: 1, ko: '태초에 하나님이 천지를 창조하시니라', zh: '起初，神創造天地。' },
                 { verse: 2, ko: '땅이 혼돈하고 공허하며 흑암이 깊음 위에 있고 하나님의 신은 수면에 운행하시니라', zh: '地是空虛混沌，淵面黑暗；神的靈運行在水面上。' },
                 { verse: 3, ko: '하나님이 가라사대 빛이 있으라 하시매 빛이 있었고', zh: '神說：「要有光」，就有了光。' },
@@ -3059,7 +3059,6 @@
     let currentBibleBook = null;
     let currentBibleChapter = null;
     let selectedVerseData = null;
-    let longPressTimer = null;
     
     // 初始化聖經頁面
     function initBiblePage() {
@@ -3144,18 +3143,13 @@
                         </div>
                     `;
                 }
-                // 一般經文 - 加入長按事件
+                // 一般經文 - 雙擊觸發複製選單
                 return `
                     <div class="bible-verse" 
                          data-verse="${v.verse}" 
                          data-ko="${encodeURIComponent(v.ko)}" 
                          data-zh="${encodeURIComponent(v.zh)}"
-                         ontouchstart="window.handleVerseTouch(event, this)"
-                         ontouchend="window.handleVerseTouchEnd(event, this)"
-                         ontouchcancel="window.handleVerseTouchEnd(event, this)"
-                         onmousedown="window.handleVerseMouseDown(event, this)"
-                         onmouseup="window.handleVerseMouseUp(event, this)"
-                         onmouseleave="window.handleVerseMouseUp(event, this)">
+                         onclick="window.handleVerseClick(event, this)">
                         <span class="verse-num">${v.verse}</span>
                         <span class="verse-text-ko">${v.ko}</span>
                         <span class="verse-text-zh">${v.zh}</span>
@@ -3211,47 +3205,31 @@
         }
     });
     
-    // ===== 長按複製功能 =====
-    const LONG_PRESS_DURATION = 500; // 長按時間 500ms
+    // ===== 雙擊複製功能 =====
+    let lastClickTime = 0;
+    let lastClickElement = null;
+    const DOUBLE_CLICK_DELAY = 300; // 雙擊間隔時間 300ms
     
-    // 觸控開始（手機）
-    window.handleVerseTouch = (event, element) => {
-        element.classList.add('long-press');
-        longPressTimer = setTimeout(() => {
+    // 處理經文點擊（雙擊觸發複製選單）
+    window.handleVerseClick = (event, element) => {
+        const currentTime = new Date().getTime();
+        
+        // 檢查是否為雙擊（同一元素且間隔小於300ms）
+        if (lastClickElement === element && (currentTime - lastClickTime) < DOUBLE_CLICK_DELAY) {
+            // 雙擊 - 顯示複製選單
+            event.preventDefault();
             showCopyMenu(event, element);
-        }, LONG_PRESS_DURATION);
-    };
-    
-    // 觸控結束（手機）
-    window.handleVerseTouchEnd = (event, element) => {
-        element.classList.remove('long-press');
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-        }
-    };
-    
-    // 滑鼠按下（電腦）
-    window.handleVerseMouseDown = (event, element) => {
-        element.classList.add('long-press');
-        longPressTimer = setTimeout(() => {
-            showCopyMenu(event, element);
-        }, LONG_PRESS_DURATION);
-    };
-    
-    // 滑鼠放開（電腦）
-    window.handleVerseMouseUp = (event, element) => {
-        element.classList.remove('long-press');
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
+            lastClickTime = 0;
+            lastClickElement = null;
+        } else {
+            // 第一次點擊 - 記錄時間和元素
+            lastClickTime = currentTime;
+            lastClickElement = element;
         }
     };
     
     // 顯示複製選單
     function showCopyMenu(event, element) {
-        event.preventDefault();
-        
         const verse = element.dataset.verse;
         const ko = decodeURIComponent(element.dataset.ko);
         const zh = decodeURIComponent(element.dataset.zh);
@@ -3267,9 +3245,12 @@
         const menu = document.getElementById('bibleCopyMenu');
         const overlay = document.getElementById('bibleCopyOverlay');
         
+        // 根據當前語言更新選單文字
+        updateCopyMenuLanguage();
+        
         // 計算選單位置
         let x, y;
-        if (event.touches) {
+        if (event.touches && event.touches.length > 0) {
             x = event.touches[0].clientX;
             y = event.touches[0].clientY;
         } else {
@@ -3297,6 +3278,23 @@
         // 震動反饋（如果支援）
         if (navigator.vibrate) {
             navigator.vibrate(50);
+        }
+    }
+    
+    // 根據當前語言更新複製選單文字
+    function updateCopyMenuLanguage() {
+        const copyMenuZh = document.getElementById('copyMenuZh');
+        const copyMenuKo = document.getElementById('copyMenuKo');
+        const copyMenuBoth = document.getElementById('copyMenuBoth');
+        
+        if (currentLang === 'ko') {
+            copyMenuZh.textContent = '📋 중국어 복사';
+            copyMenuKo.textContent = '📋 한국어 복사';
+            copyMenuBoth.textContent = '📋 둘 다 복사';
+        } else {
+            copyMenuZh.textContent = '📋 複製中文';
+            copyMenuKo.textContent = '📋 複製韓文';
+            copyMenuBoth.textContent = '📋 複製雙語';
         }
     }
     
