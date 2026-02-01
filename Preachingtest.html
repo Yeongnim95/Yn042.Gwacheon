@@ -914,6 +914,267 @@
         .bible-verse.double-clicked {
             background: var(--border-color);
         }
+        
+        /* ===== 聖經搜尋功能 ===== */
+        .bible-search-btn {
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            width: 42px;
+            height: 42px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 90;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .bible-search-btn.show {
+            display: flex;
+        }
+        
+        .bible-search-btn:hover {
+            background: var(--dark-green);
+            transform: scale(1.05);
+        }
+        
+        /* 搜尋面板 */
+        .bible-search-panel {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            z-index: 200;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .bible-search-panel.show {
+            right: 0;
+        }
+        
+        .bible-search-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 199;
+        }
+        
+        .bible-search-overlay.show {
+            display: block;
+        }
+        
+        .bible-search-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+        
+        .bible-search-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+        }
+        
+        .bible-search-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+        
+        .bible-search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .bible-search-input:focus {
+            border-color: var(--primary-green);
+        }
+        
+        .bible-search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #999;
+            display: none;
+        }
+        
+        .bible-search-clear.show {
+            display: block;
+        }
+        
+        .bible-search-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+        }
+        
+        .bible-search-section-title {
+            font-size: 0.85rem;
+            color: #888;
+            margin: 15px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bible-search-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .bible-search-history-item {
+            background: #f5f5f5;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .bible-search-history-item:hover {
+            background: var(--light-green-bg);
+        }
+        
+        .bible-search-results {
+            margin-top: 10px;
+        }
+        
+        .bible-search-result-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .bible-search-result-item:hover {
+            background: var(--light-green-bg);
+        }
+        
+        .bible-search-result-item:active {
+            background: var(--border-color);
+        }
+        
+        .bible-search-result-ref {
+            font-weight: 600;
+            color: var(--primary-green);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .bible-search-result-text {
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .bible-search-result-text mark {
+            background: #fff3cd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        .bible-search-no-result {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        .bible-search-hint {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* 搜尋結果預覽頁 */
+        .bible-search-preview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 201;
+            flex-direction: column;
+        }
+        
+        .bible-search-preview.show {
+            display: flex;
+        }
+        
+        .bible-search-preview-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            gap: 10px;
+        }
+        
+        .bible-search-preview-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .bible-search-preview-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .bible-search-preview-verse {
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .bible-search-preview-verse:active {
+            background: var(--light-green-bg);
+        }
+        
+        .bible-search-preview-verse.first-click {
+            background: #e8f5e9;
+        }
+        
+        .bible-search-preview-verse.double-clicked {
+            background: var(--border-color);
+        }
     </style>
 </head>
 <body>
@@ -1048,6 +1309,50 @@
     
     <!-- 返回頂部按鈕 -->
     <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollToTop()">↑</button>
+    
+    <!-- 聖經搜尋按鈕 -->
+    <button class="bible-search-btn" id="bibleSearchBtn" onclick="window.openBibleSearch()">🔍</button>
+    
+    <!-- 聖經搜尋面板 -->
+    <div class="bible-search-overlay" id="bibleSearchOverlay" onclick="window.closeBibleSearch()"></div>
+    <div class="bible-search-panel" id="bibleSearchPanel">
+        <div class="bible-search-header">
+            <button class="bible-search-close" onclick="window.closeBibleSearch()">✕</button>
+            <div class="bible-search-input-wrap">
+                <input type="text" class="bible-search-input" id="bibleSearchInput" 
+                       placeholder="搜尋經文..." oninput="window.handleSearchInput(this.value)">
+                <button class="bible-search-clear" id="bibleSearchClear" onclick="window.clearSearchInput()">✕</button>
+            </div>
+        </div>
+        <div class="bible-search-body">
+            <!-- 搜尋歷史 -->
+            <div id="bibleSearchHistorySection">
+                <div class="bible-search-section-title" id="txtSearchHistory">최근 검색 / 近期搜尋</div>
+                <div class="bible-search-history" id="bibleSearchHistory">
+                    <!-- 歷史記錄由JS動態生成 -->
+                </div>
+            </div>
+            <!-- 搜尋提示 -->
+            <div class="bible-search-hint" id="bibleSearchHint">
+                <span id="txtSearchHint">2자 이상 입력하세요<br>請輸入2個字以上</span>
+            </div>
+            <!-- 搜尋結果 -->
+            <div class="bible-search-results" id="bibleSearchResults" style="display: none;">
+                <!-- 搜尋結果由JS動態生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 搜尋結果預覽頁 -->
+    <div class="bible-search-preview" id="bibleSearchPreview">
+        <div class="bible-search-preview-header">
+            <button class="bible-search-close" onclick="window.closeSearchPreview()">←</button>
+            <div class="bible-search-preview-title" id="bibleSearchPreviewTitle"></div>
+        </div>
+        <div class="bible-search-preview-body" id="bibleSearchPreviewBody">
+            <!-- 預覽內容由JS動態生成 -->
+        </div>
+    </div>
     
     <!-- 長按複製選單 -->
     <div class="bible-copy-overlay" id="bibleCopyOverlay" onclick="window.closeCopyMenu()"></div>
@@ -2217,6 +2522,9 @@
         // 根據頁面自動展開對應的子選單
         document.querySelectorAll('.menu-category').forEach(c => c.classList.remove('open'));
         
+        // 隱藏搜尋按鈕（預設）
+        document.getElementById('bibleSearchBtn').classList.remove('show');
+        
         if (page === 'daily-faith') {
             document.getElementById('dailyFaithSection').classList.add('active-section');
             document.getElementById('btn-daily-faith').classList.add('active');
@@ -2235,6 +2543,8 @@
             // 重置聖經頁面到書卷列表
             document.getElementById('bibleBooksList').style.display = 'block';
             document.getElementById('bibleContentView').classList.remove('show');
+            // 顯示搜尋按鈕
+            document.getElementById('bibleSearchBtn').classList.add('show');
         } else if (page === 'entry') { 
             document.getElementById('entrySection').classList.add('active-section'); 
             document.getElementById('btn-entry').classList.add('active');
@@ -3391,8 +3701,364 @@
         closeCopyMenu();
     };
     
+    // ===== 滑動時關閉複製選單 =====
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        const touchMoveY = e.touches[0].clientY;
+        const diff = Math.abs(touchMoveY - touchStartY);
+        if (diff > 10) {
+            closeCopyMenu();
+        }
+    }, { passive: true });
+    
+    // 滾動時關閉複製選單
+    window.addEventListener('scroll', () => {
+        closeCopyMenu();
+    }, { passive: true });
+    
+    // ===== 聖經搜尋功能 =====
+    const SEARCH_HISTORY_KEY = 'bible_search_history';
+    const MAX_HISTORY_ITEMS = 5;
+    let searchHistory = [];
+    
+    // 載入搜尋歷史
+    function loadSearchHistory() {
+        try {
+            const saved = localStorage.getItem(SEARCH_HISTORY_KEY);
+            if (saved) {
+                searchHistory = JSON.parse(saved);
+            }
+        } catch (e) {
+            searchHistory = [];
+        }
+        renderSearchHistory();
+    }
+    
+    // 儲存搜尋歷史
+    function saveSearchHistory() {
+        try {
+            localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+        } catch (e) {}
+    }
+    
+    // 新增搜尋歷史
+    function addSearchHistory(keyword) {
+        if (!keyword || keyword.length < 2) return;
+        
+        // 移除重複的
+        searchHistory = searchHistory.filter(k => k !== keyword);
+        // 加到最前面
+        searchHistory.unshift(keyword);
+        // 保留最多5個
+        if (searchHistory.length > MAX_HISTORY_ITEMS) {
+            searchHistory = searchHistory.slice(0, MAX_HISTORY_ITEMS);
+        }
+        saveSearchHistory();
+        renderSearchHistory();
+    }
+    
+    // 渲染搜尋歷史
+    function renderSearchHistory() {
+        const container = document.getElementById('bibleSearchHistory');
+        const section = document.getElementById('bibleSearchHistorySection');
+        
+        if (searchHistory.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+        
+        section.style.display = 'block';
+        container.innerHTML = searchHistory.map(keyword => 
+            `<button class="bible-search-history-item" onclick="window.searchFromHistory('${keyword}')">${keyword}</button>`
+        ).join('');
+    }
+    
+    // 從歷史搜尋
+    window.searchFromHistory = (keyword) => {
+        document.getElementById('bibleSearchInput').value = keyword;
+        handleSearchInput(keyword);
+    };
+    
+    // 開啟搜尋面板
+    window.openBibleSearch = () => {
+        document.getElementById('bibleSearchPanel').classList.add('show');
+        document.getElementById('bibleSearchOverlay').classList.add('show');
+        document.getElementById('bibleSearchInput').focus();
+        
+        // 更新搜尋提示語言
+        updateSearchLanguage();
+        loadSearchHistory();
+    };
+    
+    // 關閉搜尋面板
+    window.closeBibleSearch = () => {
+        document.getElementById('bibleSearchPanel').classList.remove('show');
+        document.getElementById('bibleSearchOverlay').classList.remove('show');
+        clearSearchInput();
+    };
+    
+    // 更新搜尋面板語言
+    function updateSearchLanguage() {
+        const input = document.getElementById('bibleSearchInput');
+        const hint = document.getElementById('txtSearchHint');
+        const historyTitle = document.getElementById('txtSearchHistory');
+        
+        if (currentLang === 'ko') {
+            input.placeholder = '성경 검색...';
+            hint.innerHTML = '2자 이상 입력하세요';
+            historyTitle.textContent = '최근 검색';
+        } else {
+            input.placeholder = '搜尋經文...';
+            hint.innerHTML = '請輸入2個字以上';
+            historyTitle.textContent = '近期搜尋';
+        }
+    }
+    
+    // 清除搜尋輸入
+    window.clearSearchInput = () => {
+        document.getElementById('bibleSearchInput').value = '';
+        document.getElementById('bibleSearchClear').classList.remove('show');
+        document.getElementById('bibleSearchResults').style.display = 'none';
+        document.getElementById('bibleSearchHint').style.display = 'block';
+        document.getElementById('bibleSearchHistorySection').style.display = searchHistory.length > 0 ? 'block' : 'none';
+    };
+    
+    // 處理搜尋輸入
+    window.handleSearchInput = (value) => {
+        const clearBtn = document.getElementById('bibleSearchClear');
+        const results = document.getElementById('bibleSearchResults');
+        const hint = document.getElementById('bibleSearchHint');
+        const historySection = document.getElementById('bibleSearchHistorySection');
+        
+        if (value.length > 0) {
+            clearBtn.classList.add('show');
+        } else {
+            clearBtn.classList.remove('show');
+        }
+        
+        if (value.length >= 2) {
+            // 執行搜尋
+            const searchResults = searchBible(value);
+            renderSearchResults(searchResults, value);
+            results.style.display = 'block';
+            hint.style.display = 'none';
+            historySection.style.display = 'none';
+            
+            // 加入搜尋歷史
+            addSearchHistory(value);
+        } else {
+            results.style.display = 'none';
+            hint.style.display = 'block';
+            historySection.style.display = searchHistory.length > 0 ? 'block' : 'none';
+        }
+    };
+    
+    // 搜尋聖經
+    function searchBible(keyword) {
+        const results = [];
+        const lowerKeyword = keyword.toLowerCase();
+        
+        // 遍歷所有書卷和章節
+        for (const bookId in bibleContent) {
+            const book = [...bibleBooks.oldTestament, ...bibleBooks.newTestament].find(b => b.id === bookId);
+            if (!book) continue;
+            
+            for (const chapter in bibleContent[bookId]) {
+                const verses = bibleContent[bookId][chapter];
+                for (const verse of verses) {
+                    if (verse.type === 'heading') continue;
+                    
+                    // 搜尋中文和韓文
+                    if (verse.zh.includes(keyword) || verse.ko.includes(keyword)) {
+                        results.push({
+                            bookId: bookId,
+                            bookKo: book.ko,
+                            bookZh: book.zh,
+                            chapter: parseInt(chapter),
+                            verse: verse.verse,
+                            ko: verse.ko,
+                            zh: verse.zh
+                        });
+                    }
+                }
+            }
+        }
+        
+        return results;
+    }
+    
+    // 渲染搜尋結果
+    function renderSearchResults(results, keyword) {
+        const container = document.getElementById('bibleSearchResults');
+        
+        if (results.length === 0) {
+            container.innerHTML = `
+                <div class="bible-search-no-result">
+                    ${currentLang === 'ko' ? '검색 결과가 없습니다' : '找不到相關結果'}
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = results.slice(0, 50).map((r, index) => {
+            const abbr = bookAbbreviations[r.bookId];
+            const ref = currentLang === 'ko' 
+                ? `${abbr.ko} ${r.chapter}:${r.verse}` 
+                : `${abbr.zh} ${r.chapter}:${r.verse}`;
+            
+            // 高亮關鍵字
+            const highlightedZh = r.zh.replace(new RegExp(keyword, 'g'), `<mark>${keyword}</mark>`);
+            const highlightedKo = r.ko.replace(new RegExp(keyword, 'g'), `<mark>${keyword}</mark>`);
+            
+            return `
+                <div class="bible-search-result-item" onclick="window.openSearchPreview(${index}, '${keyword}')">
+                    <div class="bible-search-result-ref">${ref}</div>
+                    <div class="bible-search-result-text">${currentLang === 'ko' ? highlightedKo : highlightedZh}</div>
+                </div>
+            `;
+        }).join('');
+        
+        // 儲存結果供預覽使用
+        window.currentSearchResults = results;
+    }
+    
+    // 開啟搜尋結果預覽
+    window.openSearchPreview = (index, keyword) => {
+        const result = window.currentSearchResults[index];
+        if (!result) return;
+        
+        const preview = document.getElementById('bibleSearchPreview');
+        const title = document.getElementById('bibleSearchPreviewTitle');
+        const body = document.getElementById('bibleSearchPreviewBody');
+        
+        const abbr = bookAbbreviations[result.bookId];
+        title.textContent = currentLang === 'ko' 
+            ? `${result.bookKo} ${result.chapter}:${result.verse}`
+            : `${result.bookZh} ${result.chapter}:${result.verse}`;
+        
+        // 渲染經文內容（可雙擊複製）
+        body.innerHTML = `
+            <div class="bible-search-preview-verse"
+                 data-book-id="${result.bookId}"
+                 data-chapter="${result.chapter}"
+                 data-verse="${result.verse}"
+                 data-ko="${encodeURIComponent(result.ko)}"
+                 data-zh="${encodeURIComponent(result.zh)}"
+                 onclick="window.handlePreviewVerseClick(event, this)">
+                <div class="verse-num" style="color: var(--primary-green); font-weight: bold; margin-bottom: 8px;">
+                    ${result.verse}
+                </div>
+                <div class="verse-text-ko" style="color: #666; font-size: 1.05rem; margin-bottom: 8px; line-height: 1.7;">
+                    ${result.ko}
+                </div>
+                <div class="verse-text-zh" style="font-size: 1.1rem; line-height: 1.8;">
+                    ${result.zh}
+                </div>
+            </div>
+        `;
+        
+        preview.classList.add('show');
+    };
+    
+    // 關閉搜尋預覽
+    window.closeSearchPreview = () => {
+        document.getElementById('bibleSearchPreview').classList.remove('show');
+    };
+    
+    // 處理預覽頁經文點擊（雙擊複製）
+    let previewLastClickTime = 0;
+    let previewLastClickElement = null;
+    let previewFirstClickTimer = null;
+    
+    window.handlePreviewVerseClick = (event, element) => {
+        const currentTime = new Date().getTime();
+        
+        if (previewLastClickElement === element && (currentTime - previewLastClickTime) < DOUBLE_CLICK_DELAY) {
+            // 雙擊成功
+            if (previewFirstClickTimer) {
+                clearTimeout(previewFirstClickTimer);
+                previewFirstClickTimer = null;
+            }
+            element.classList.remove('first-click');
+            element.classList.add('double-clicked');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // 設定複製資料
+            selectedVerseData = {
+                verse: element.dataset.verse,
+                ko: decodeURIComponent(element.dataset.ko),
+                zh: decodeURIComponent(element.dataset.zh),
+                bookId: element.dataset.bookId,
+                chapter: element.dataset.chapter
+            };
+            
+            setTimeout(() => {
+                element.classList.remove('double-clicked');
+                updateCopyMenuLanguage();
+                
+                // 顯示複製選單
+                const menu = document.getElementById('bibleCopyMenu');
+                const overlay = document.getElementById('bibleCopyOverlay');
+                
+                const rect = element.getBoundingClientRect();
+                let x = rect.left + rect.width / 2 - 70;
+                let y = rect.top + rect.height / 2;
+                
+                if (x < 10) x = 10;
+                if (x + 150 > window.innerWidth) x = window.innerWidth - 160;
+                if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
+                
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.classList.add('show');
+                overlay.classList.add('show');
+            }, 100);
+            
+            previewLastClickTime = 0;
+            previewLastClickElement = null;
+        } else {
+            // 第一次點擊
+            if (previewFirstClickTimer) {
+                clearTimeout(previewFirstClickTimer);
+            }
+            if (previewLastClickElement) {
+                previewLastClickElement.classList.remove('first-click');
+            }
+            
+            previewLastClickTime = currentTime;
+            previewLastClickElement = element;
+            element.classList.add('first-click');
+            
+            previewFirstClickTimer = setTimeout(() => {
+                element.classList.remove('first-click');
+                previewLastClickElement = null;
+                previewLastClickTime = 0;
+            }, DOUBLE_CLICK_DELAY);
+        }
+    };
+    
+    // 顯示/隱藏搜尋按鈕
+    function updateSearchButtonVisibility() {
+        const searchBtn = document.getElementById('bibleSearchBtn');
+        const bibleSection = document.getElementById('bibleSection');
+        
+        if (bibleSection && bibleSection.classList.contains('active-section')) {
+            searchBtn.classList.add('show');
+        } else {
+            searchBtn.classList.remove('show');
+        }
+    }
+    
     // 頁面載入時初始化聖經
     initBiblePage();
+    loadSearchHistory();
 
 </script>
 </body>
