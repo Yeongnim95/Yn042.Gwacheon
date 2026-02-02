@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
     
+    <!-- Google Fonts - 思源宋體 (Noto Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+    
     <!-- Favicon - Emoji 樣式 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍀</text></svg>">
     
@@ -742,48 +747,53 @@
         .bible-content-title {
             flex: 1;
             text-align: center;
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 600;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
-        .bible-content-title .ko { display: block; }
-        .bible-content-title .zh { display: block; font-size: 1.05rem; color: #666; margin-top: 2px; }
+        .bible-content-title .ko { display: block; font-family: "Noto Serif KR", "Noto Serif TC", serif; }
+        .bible-content-title .zh { display: block; font-size: 1.15rem; color: #666; margin-top: 2px; font-family: "Noto Serif TC", "Noto Serif KR", serif; }
         
         .bible-verses {
-            line-height: 2;
-            font-size: 1.05rem;
+            line-height: 2.1;
+            font-size: 1.15rem;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
         .bible-verse {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         .bible-verse .verse-num {
             color: var(--primary-green);
             font-weight: bold;
-            font-size: 1rem;
-            margin-right: 6px;
+            font-size: 1.1rem;
+            margin-right: 8px;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
         .bible-verse .verse-text-ko {
             display: block;
-            color: #666;
-            font-size: 1.05rem;
-            margin-left: 22px;
-            margin-bottom: 6px;
-            line-height: 1.7;
+            color: #555;
+            font-size: 1.15rem;
+            margin-left: 24px;
+            margin-bottom: 8px;
+            line-height: 1.8;
+            font-family: "Noto Serif KR", "Noto Serif TC", serif;
         }
         
         .bible-verse .verse-text-zh {
             display: block;
-            font-size: 1.1rem;
-            line-height: 1.8;
+            font-size: 1.2rem;
+            line-height: 1.9;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
         /* 段落標題 - 只顯示中文 */
         .bible-section-heading {
-            margin: 25px 0 15px;
-            padding: 12px 0;
+            margin: 28px 0 18px;
+            padding: 14px 0;
             border-bottom: 1px solid var(--border-color);
         }
         
@@ -797,9 +807,10 @@
         
         .bible-section-heading .heading-zh {
             display: block;
-            font-size: 1.15rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--dark-green);
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
         /* 返回頂部按鈕 */
@@ -1352,12 +1363,13 @@
         
         .bible-search-preview-verse {
             margin-bottom: 12px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s;
             -webkit-user-select: none;
             user-select: none;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
         .bible-search-preview-verse:active {
@@ -1370,6 +1382,11 @@
         
         .bible-search-preview-verse.double-clicked {
             background: var(--border-color);
+        }
+        
+        /* 搜尋結果列表也使用思源宋體 */
+        .bible-search-result-text {
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
     </style>
 </head>
@@ -4271,13 +4288,13 @@
                  data-ko="${encodeURIComponent(result.ko)}"
                  data-zh="${encodeURIComponent(result.zh)}"
                  onclick="window.handlePreviewVerseClick(event, this)">
-                <div class="verse-num" style="color: var(--primary-green); font-weight: bold; margin-bottom: 8px;">
+                <div class="verse-num" style="color: var(--primary-green); font-weight: bold; margin-bottom: 10px; font-size: 1.15rem;">
                     ${result.verse}
                 </div>
-                <div class="verse-text-ko" style="color: #666; font-size: 1.05rem; margin-bottom: 8px; line-height: 1.7;">
+                <div class="verse-text-ko" style="color: #555; font-size: 1.15rem; margin-bottom: 10px; line-height: 1.8; font-family: 'Noto Serif KR', 'Noto Serif TC', serif;">
                     ${result.ko}
                 </div>
-                <div class="verse-text-zh" style="font-size: 1.1rem; line-height: 1.8;">
+                <div class="verse-text-zh" style="font-size: 1.2rem; line-height: 1.9; font-family: 'Noto Serif TC', 'Noto Serif KR', serif;">
                     ${result.zh}
                 </div>
             </div>
