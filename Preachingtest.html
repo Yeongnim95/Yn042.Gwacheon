@@ -4325,26 +4325,32 @@
         const modal = document.getElementById('bibleRangeCopyModal');
         const title = document.getElementById('rangeCopyTitle');
         const subtitle = document.getElementById('rangeCopySubtitle');
+        const startInput = document.getElementById('rangeCopyStart');
+        const endInput = document.getElementById('rangeCopyEnd');
         
-        // 更新標題
+        // 更新標題和輸入框提示
         const abbr = bookAbbreviations[currentBibleBook.id];
         if (currentLang === 'ko') {
             title.textContent = '성경 구절 복사';
             subtitle.textContent = `${currentBibleBook.ko} ${currentBibleChapter}장`;
+            startInput.placeholder = '시작';
+            endInput.placeholder = '끝';
         } else {
             title.textContent = '複製經文範圍';
             subtitle.textContent = `${currentBibleBook.zh} 第${currentBibleChapter}章`;
+            startInput.placeholder = '起';
+            endInput.placeholder = '迄';
         }
         
         // 更新模式按鈕文字
         updateRangeCopyModeButtons();
         
         // 清空輸入
-        document.getElementById('rangeCopyStart').value = '';
-        document.getElementById('rangeCopyEnd').value = '';
+        startInput.value = '';
+        endInput.value = '';
         
         modal.classList.add('show');
-        document.getElementById('rangeCopyStart').focus();
+        startInput.focus();
     };
     
     // 關閉範圍複製彈窗
