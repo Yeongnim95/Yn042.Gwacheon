@@ -902,6 +902,117 @@
             display: block;
         }
         
+        /* 部分複製彈窗 */
+        .bible-partial-copy-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .bible-partial-copy-modal.show {
+            display: flex;
+        }
+        
+        .bible-partial-copy-bubble {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 70vh;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .bible-partial-copy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .bible-partial-copy-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+        
+        .bible-partial-copy-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #888;
+            padding: 5px;
+        }
+        
+        .bible-partial-copy-content {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 10px;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
+            font-size: 1.1rem;
+            line-height: 1.9;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        
+        .bible-partial-copy-content .verse-label {
+            color: var(--primary-green);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .bible-partial-copy-content .verse-ko {
+            color: #555;
+            display: block;
+            margin-bottom: 10px;
+            font-family: "Noto Serif KR", "Noto Serif TC", serif;
+        }
+        
+        .bible-partial-copy-content .verse-zh {
+            display: block;
+            font-family: "Noto Serif TC", "Noto Serif KR", serif;
+        }
+        
+        .bible-partial-copy-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .bible-partial-copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .bible-partial-copy-btn:hover {
+            background: var(--dark-green);
+        }
+        
         .bible-verse {
             cursor: pointer;
             padding: 8px 5px;
@@ -910,20 +1021,30 @@
             transition: background 0.2s;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .bible-verse:active {
             background: var(--light-green-bg);
         }
         
-        /* 第一次點擊等待狀態 */
-        .bible-verse.first-click {
+        /* 長按等待狀態 */
+        .bible-verse.long-press {
             background: #e8f5e9;
         }
         
-        /* 雙擊成功反饋 */
-        .bible-verse.double-clicked {
+        /* 長按成功反饋 */
+        .bible-verse.long-press-success {
             background: var(--border-color);
+        }
+        
+        /* 禁用聖經內容區域的系統右鍵選單和長按選單 */
+        .bible-verses,
+        .bible-search-preview-body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* ===== 聖經右側功能按鈕群組 ===== */
@@ -1370,17 +1491,18 @@
             -webkit-user-select: none;
             user-select: none;
             font-family: "Noto Serif TC", "Noto Serif KR", serif;
+            -webkit-touch-callout: none;
         }
         
         .bible-search-preview-verse:active {
             background: var(--light-green-bg);
         }
         
-        .bible-search-preview-verse.first-click {
+        .bible-search-preview-verse.long-press {
             background: #e8f5e9;
         }
         
-        .bible-search-preview-verse.double-clicked {
+        .bible-search-preview-verse.long-press-success {
             background: var(--border-color);
         }
         
@@ -1603,6 +1725,20 @@
         <div class="bible-copy-menu-item" id="copyMenuZh" onclick="window.copyVerse('zh')">📋 複製中文</div>
         <div class="bible-copy-menu-item" id="copyMenuKo" onclick="window.copyVerse('ko')">📋 한국어 복사</div>
         <div class="bible-copy-menu-item" id="copyMenuBoth" onclick="window.copyVerse('both')">📋 複製雙語</div>
+        <div class="bible-copy-menu-item" id="copyMenuPartial" onclick="window.openPartialCopy()">✂️ 部分複製</div>
+    </div>
+    
+    <!-- 部分複製彈窗 -->
+    <div class="bible-partial-copy-modal" id="biblePartialCopyModal">
+        <div class="bible-partial-copy-bubble">
+            <div class="bible-partial-copy-header">
+                <span class="bible-partial-copy-title" id="partialCopyTitle">部分複製</span>
+                <button class="bible-partial-copy-close" onclick="window.closePartialCopy()">✕</button>
+            </div>
+            <div class="bible-partial-copy-content" id="partialCopyContent"></div>
+            <div class="bible-partial-copy-hint" id="partialCopyHint">選取文字後點擊下方按鈕複製</div>
+            <button class="bible-partial-copy-btn" id="partialCopyBtn" onclick="window.copySelectedText()">複製選取的文字</button>
+        </div>
     </div>
 
     <div id="entrySection" class="page-section">
@@ -3798,13 +3934,19 @@
                         </div>
                     `;
                 }
-                // 一般經文 - 雙擊觸發複製選單
+                // 一般經文 - 長按或右鍵觸發複製選單
                 return `
                     <div class="bible-verse" 
                          data-verse="${v.verse}" 
                          data-ko="${encodeURIComponent(v.ko)}" 
                          data-zh="${encodeURIComponent(v.zh)}"
-                         onclick="window.handleVerseClick(event, this)">
+                         oncontextmenu="window.handleVerseContextMenu(event, this)"
+                         ontouchstart="window.handleVerseTouchStart(event, this)"
+                         ontouchend="window.handleVerseTouchEnd(event, this)"
+                         ontouchmove="window.handleVerseTouchMove(event, this)"
+                         onmousedown="window.handleVerseMouseDown(event, this)"
+                         onmouseup="window.handleVerseMouseUp(event, this)"
+                         onmouseleave="window.handleVerseMouseLeave(event, this)">
                         <span class="verse-num">${v.verse}</span>
                         <span class="verse-text-ko">${v.ko}</span>
                         <span class="verse-text-zh">${v.zh}</span>
@@ -3860,67 +4002,139 @@
         }
     });
     
-    // ===== 雙擊複製功能 =====
-    let lastClickTime = 0;
-    let lastClickElement = null;
-    let firstClickTimer = null;
-    const DOUBLE_CLICK_DELAY = 300; // 雙擊間隔時間 300ms
+    // ===== 長按複製功能 =====
+    const LONG_PRESS_DURATION = 500; // 長按時間 500ms
+    let longPressTimer = null;
+    let longPressElement = null;
+    let longPressTriggered = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
     
-    // 清除第一次點擊狀態
-    function clearFirstClickState() {
-        if (lastClickElement) {
-            lastClickElement.classList.remove('first-click');
+    // 清除長按狀態
+    function clearLongPressState() {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
         }
-        if (firstClickTimer) {
-            clearTimeout(firstClickTimer);
-            firstClickTimer = null;
+        if (longPressElement) {
+            longPressElement.classList.remove('long-press');
+            longPressElement = null;
         }
+        longPressTriggered = false;
     }
     
-    // 處理經文點擊（雙擊觸發複製選單）
-    window.handleVerseClick = (event, element) => {
-        const currentTime = new Date().getTime();
+    // 觸發長按成功
+    function triggerLongPress(event, element) {
+        longPressTriggered = true;
+        element.classList.remove('long-press');
+        element.classList.add('long-press-success');
         
-        // 檢查是否為雙擊（同一元素且間隔小於300ms）
-        if (lastClickElement === element && (currentTime - lastClickTime) < DOUBLE_CLICK_DELAY) {
-            // 雙擊成功 - 清除第一次點擊狀態
-            clearFirstClickState();
-            
-            // 添加雙擊成功反饋
-            element.classList.add('double-clicked');
-            
-            // 震動反饋（如果支援）
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            
-            // 短暫延遲後顯示選單並移除反饋樣式
-            setTimeout(() => {
-                element.classList.remove('double-clicked');
-                showCopyMenu(event, element);
-            }, 100);
-            
-            lastClickTime = 0;
-            lastClickElement = null;
-        } else {
-            // 第一次點擊 - 清除之前的狀態
-            clearFirstClickState();
-            
-            // 記錄時間和元素
-            lastClickTime = currentTime;
-            lastClickElement = element;
-            
-            // 添加第一次點擊視覺反饋
-            element.classList.add('first-click');
-            
-            // 設定計時器，超時後清除反饋狀態
-            firstClickTimer = setTimeout(() => {
-                element.classList.remove('first-click');
-                lastClickElement = null;
-                lastClickTime = 0;
-            }, DOUBLE_CLICK_DELAY);
+        // 震動反饋
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+        
+        // 短暫延遲後顯示選單
+        setTimeout(() => {
+            element.classList.remove('long-press-success');
+            showCopyMenu(event, element);
+        }, 100);
+    }
+    
+    // 手機觸控開始
+    window.handleVerseTouchStart = (event, element) => {
+        clearLongPressState();
+        longPressElement = element;
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+        
+        element.classList.add('long-press');
+        
+        longPressTimer = setTimeout(() => {
+            triggerLongPress(event, element);
+        }, LONG_PRESS_DURATION);
+    };
+    
+    // 手機觸控結束
+    window.handleVerseTouchEnd = (event, element) => {
+        if (!longPressTriggered) {
+            clearLongPressState();
         }
     };
+    
+    // 手機觸控移動（取消長按）
+    window.handleVerseTouchMove = (event, element) => {
+        if (longPressTimer) {
+            const touch = event.touches[0];
+            const moveX = Math.abs(touch.clientX - touchStartX);
+            const moveY = Math.abs(touch.clientY - touchStartY);
+            
+            // 移動超過10px則取消長按
+            if (moveX > 10 || moveY > 10) {
+                clearLongPressState();
+            }
+        }
+    };
+    
+    // 電腦滑鼠按下（左鍵長按）
+    window.handleVerseMouseDown = (event, element) => {
+        // 只處理左鍵
+        if (event.button !== 0) return;
+        
+        clearLongPressState();
+        longPressElement = element;
+        
+        element.classList.add('long-press');
+        
+        longPressTimer = setTimeout(() => {
+            triggerLongPress(event, element);
+        }, LONG_PRESS_DURATION);
+    };
+    
+    // 電腦滑鼠放開
+    window.handleVerseMouseUp = (event, element) => {
+        if (!longPressTriggered) {
+            clearLongPressState();
+        }
+    };
+    
+    // 電腦滑鼠離開
+    window.handleVerseMouseLeave = (event, element) => {
+        if (!longPressTriggered) {
+            clearLongPressState();
+        }
+    };
+    
+    // 電腦右鍵選單
+    window.handleVerseContextMenu = (event, element) => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearLongPressState();
+        showCopyMenu(event, element);
+        return false;
+    };
+    
+    // 禁用聖經內容區域的系統右鍵選單
+    document.addEventListener('DOMContentLoaded', () => {
+        const bibleVerses = document.getElementById('bibleVerses');
+        const previewBody = document.getElementById('bibleSearchPreviewBody');
+        
+        if (bibleVerses) {
+            bibleVerses.addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.bible-verse')) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        if (previewBody) {
+            previewBody.addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.bible-search-preview-verse')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
     
     // 顯示複製選單
     function showCopyMenu(event, element) {
@@ -3932,8 +4146,8 @@
             verse: verse,
             ko: ko,
             zh: zh,
-            bookId: currentBibleBook.id,
-            chapter: currentBibleChapter
+            bookId: currentBibleBook ? currentBibleBook.id : element.dataset.bookId,
+            chapter: currentBibleChapter || element.dataset.chapter
         };
         
         const menu = document.getElementById('bibleCopyMenu');
@@ -3947,6 +4161,9 @@
         if (event.touches && event.touches.length > 0) {
             x = event.touches[0].clientX;
             y = event.touches[0].clientY;
+        } else if (event.changedTouches && event.changedTouches.length > 0) {
+            x = event.changedTouches[0].clientX;
+            y = event.changedTouches[0].clientY;
         } else {
             x = event.clientX;
             y = event.clientY;
@@ -3962,6 +4179,8 @@
         if (y + menuHeight > window.innerHeight) {
             y = window.innerHeight - menuHeight - 10;
         }
+        if (x < 10) x = 10;
+        if (y < 10) y = 10;
         
         menu.style.left = x + 'px';
         menu.style.top = y + 'px';
@@ -3975,15 +4194,18 @@
         const copyMenuZh = document.getElementById('copyMenuZh');
         const copyMenuKo = document.getElementById('copyMenuKo');
         const copyMenuBoth = document.getElementById('copyMenuBoth');
+        const copyMenuPartial = document.getElementById('copyMenuPartial');
         
         if (currentLang === 'ko') {
             copyMenuZh.textContent = '📋 중국어 복사';
             copyMenuKo.textContent = '📋 한국어 복사';
             copyMenuBoth.textContent = '📋 둘 다 복사';
+            copyMenuPartial.textContent = '✂️ 부분 복사';
         } else {
             copyMenuZh.textContent = '📋 複製中文';
             copyMenuKo.textContent = '📋 複製韓文';
             copyMenuBoth.textContent = '📋 複製雙語';
+            copyMenuPartial.textContent = '✂️ 部分複製';
         }
     }
     
@@ -3992,6 +4214,80 @@
         document.getElementById('bibleCopyMenu').classList.remove('show');
         document.getElementById('bibleCopyOverlay').classList.remove('show');
         selectedVerseData = null;
+    };
+    
+    // 開啟部分複製彈窗
+    window.openPartialCopy = () => {
+        if (!selectedVerseData) return;
+        
+        // 關閉複製選單
+        document.getElementById('bibleCopyMenu').classList.remove('show');
+        document.getElementById('bibleCopyOverlay').classList.remove('show');
+        
+        const modal = document.getElementById('biblePartialCopyModal');
+        const content = document.getElementById('partialCopyContent');
+        const title = document.getElementById('partialCopyTitle');
+        const hint = document.getElementById('partialCopyHint');
+        const btn = document.getElementById('partialCopyBtn');
+        
+        const abbr = bookAbbreviations[selectedVerseData.bookId];
+        const chapter = selectedVerseData.chapter;
+        const verse = selectedVerseData.verse;
+        
+        // 更新語言
+        if (currentLang === 'ko') {
+            title.textContent = '부분 복사';
+            hint.textContent = '텍스트를 선택한 후 아래 버튼을 클릭하여 복사';
+            btn.textContent = '선택한 텍스트 복사';
+        } else {
+            title.textContent = '部分複製';
+            hint.textContent = '選取文字後點擊下方按鈕複製';
+            btn.textContent = '複製選取的文字';
+        }
+        
+        // 渲染經文內容（允許選取）
+        content.innerHTML = `
+            <span class="verse-label">${abbr.ko} ${chapter}:${verse} / ${abbr.zh} ${chapter}:${verse}</span>
+            <span class="verse-ko">${selectedVerseData.ko}</span>
+            <span class="verse-zh">${selectedVerseData.zh}</span>
+        `;
+        
+        modal.classList.add('show');
+    };
+    
+    // 關閉部分複製彈窗
+    window.closePartialCopy = () => {
+        document.getElementById('biblePartialCopyModal').classList.remove('show');
+    };
+    
+    // 複製選取的文字
+    window.copySelectedText = () => {
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+        
+        if (!selectedText) {
+            const msg = currentLang === 'ko' ? '텍스트를 먼저 선택하세요.' : '請先選取文字。';
+            alert(msg);
+            return;
+        }
+        
+        navigator.clipboard.writeText(selectedText).then(() => {
+            const t = i18n[currentLang];
+            alert(t.msgCopied || '已複製！');
+            closePartialCopy();
+        }).catch(err => {
+            // 備用複製方法
+            const textarea = document.createElement('textarea');
+            textarea.value = selectedText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            const t = i18n[currentLang];
+            alert(t.msgCopied || '已複製！');
+            closePartialCopy();
+        });
     };
     
     // 複製經文
@@ -4279,7 +4575,7 @@
             ? `${result.bookKo} ${result.chapter}:${result.verse}`
             : `${result.bookZh} ${result.chapter}:${result.verse}`;
         
-        // 渲染經文內容（可雙擊複製）
+        // 渲染經文內容（可長按或右鍵複製）
         body.innerHTML = `
             <div class="bible-search-preview-verse"
                  data-book-id="${result.bookId}"
@@ -4287,7 +4583,13 @@
                  data-verse="${result.verse}"
                  data-ko="${encodeURIComponent(result.ko)}"
                  data-zh="${encodeURIComponent(result.zh)}"
-                 onclick="window.handlePreviewVerseClick(event, this)">
+                 oncontextmenu="window.handlePreviewContextMenu(event, this)"
+                 ontouchstart="window.handlePreviewTouchStart(event, this)"
+                 ontouchend="window.handlePreviewTouchEnd(event, this)"
+                 ontouchmove="window.handlePreviewTouchMove(event, this)"
+                 onmousedown="window.handlePreviewMouseDown(event, this)"
+                 onmouseup="window.handlePreviewMouseUp(event, this)"
+                 onmouseleave="window.handlePreviewMouseLeave(event, this)">
                 <div class="verse-num" style="color: var(--primary-green); font-weight: bold; margin-bottom: 10px; font-size: 1.15rem;">
                     ${result.verse}
                 </div>
@@ -4308,79 +4610,148 @@
         document.getElementById('bibleSearchPreview').classList.remove('show');
     };
     
-    // 處理預覽頁經文點擊（雙擊複製）
-    let previewLastClickTime = 0;
-    let previewLastClickElement = null;
-    let previewFirstClickTimer = null;
+    // 預覽頁長按相關變數
+    let previewLongPressTimer = null;
+    let previewLongPressElement = null;
+    let previewLongPressTriggered = false;
+    let previewTouchStartX = 0;
+    let previewTouchStartY = 0;
     
-    window.handlePreviewVerseClick = (event, element) => {
-        const currentTime = new Date().getTime();
-        
-        if (previewLastClickElement === element && (currentTime - previewLastClickTime) < DOUBLE_CLICK_DELAY) {
-            // 雙擊成功
-            if (previewFirstClickTimer) {
-                clearTimeout(previewFirstClickTimer);
-                previewFirstClickTimer = null;
-            }
-            element.classList.remove('first-click');
-            element.classList.add('double-clicked');
-            
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            
-            // 設定複製資料
-            selectedVerseData = {
-                verse: element.dataset.verse,
-                ko: decodeURIComponent(element.dataset.ko),
-                zh: decodeURIComponent(element.dataset.zh),
-                bookId: element.dataset.bookId,
-                chapter: element.dataset.chapter
-            };
-            
-            setTimeout(() => {
-                element.classList.remove('double-clicked');
-                updateCopyMenuLanguage();
-                
-                // 顯示複製選單
-                const menu = document.getElementById('bibleCopyMenu');
-                const overlay = document.getElementById('bibleCopyOverlay');
-                
-                const rect = element.getBoundingClientRect();
-                let x = rect.left + rect.width / 2 - 70;
-                let y = rect.top + rect.height / 2;
-                
-                if (x < 10) x = 10;
-                if (x + 150 > window.innerWidth) x = window.innerWidth - 160;
-                if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
-                
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-                menu.classList.add('show');
-                overlay.classList.add('show');
-            }, 100);
-            
-            previewLastClickTime = 0;
-            previewLastClickElement = null;
-        } else {
-            // 第一次點擊
-            if (previewFirstClickTimer) {
-                clearTimeout(previewFirstClickTimer);
-            }
-            if (previewLastClickElement) {
-                previewLastClickElement.classList.remove('first-click');
-            }
-            
-            previewLastClickTime = currentTime;
-            previewLastClickElement = element;
-            element.classList.add('first-click');
-            
-            previewFirstClickTimer = setTimeout(() => {
-                element.classList.remove('first-click');
-                previewLastClickElement = null;
-                previewLastClickTime = 0;
-            }, DOUBLE_CLICK_DELAY);
+    // 清除預覽頁長按狀態
+    function clearPreviewLongPressState() {
+        if (previewLongPressTimer) {
+            clearTimeout(previewLongPressTimer);
+            previewLongPressTimer = null;
         }
+        if (previewLongPressElement) {
+            previewLongPressElement.classList.remove('long-press');
+            previewLongPressElement = null;
+        }
+        previewLongPressTriggered = false;
+    }
+    
+    // 觸發預覽頁長按成功
+    function triggerPreviewLongPress(event, element) {
+        previewLongPressTriggered = true;
+        element.classList.remove('long-press');
+        element.classList.add('long-press-success');
+        
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+        
+        setTimeout(() => {
+            element.classList.remove('long-press-success');
+            showPreviewCopyMenu(event, element);
+        }, 100);
+    }
+    
+    // 顯示預覽頁複製選單
+    function showPreviewCopyMenu(event, element) {
+        selectedVerseData = {
+            verse: element.dataset.verse,
+            ko: decodeURIComponent(element.dataset.ko),
+            zh: decodeURIComponent(element.dataset.zh),
+            bookId: element.dataset.bookId,
+            chapter: element.dataset.chapter
+        };
+        
+        updateCopyMenuLanguage();
+        
+        const menu = document.getElementById('bibleCopyMenu');
+        const overlay = document.getElementById('bibleCopyOverlay');
+        
+        let x, y;
+        if (event.touches && event.touches.length > 0) {
+            x = event.touches[0].clientX;
+            y = event.touches[0].clientY;
+        } else if (event.changedTouches && event.changedTouches.length > 0) {
+            x = event.changedTouches[0].clientX;
+            y = event.changedTouches[0].clientY;
+        } else {
+            x = event.clientX;
+            y = event.clientY;
+        }
+        
+        if (x < 10) x = 10;
+        if (x + 150 > window.innerWidth) x = window.innerWidth - 160;
+        if (y + 150 > window.innerHeight) y = window.innerHeight - 160;
+        
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        menu.classList.add('show');
+        overlay.classList.add('show');
+    }
+    
+    // 預覽頁觸控開始
+    window.handlePreviewTouchStart = (event, element) => {
+        clearPreviewLongPressState();
+        previewLongPressElement = element;
+        previewTouchStartX = event.touches[0].clientX;
+        previewTouchStartY = event.touches[0].clientY;
+        
+        element.classList.add('long-press');
+        
+        previewLongPressTimer = setTimeout(() => {
+            triggerPreviewLongPress(event, element);
+        }, LONG_PRESS_DURATION);
+    };
+    
+    // 預覽頁觸控結束
+    window.handlePreviewTouchEnd = (event, element) => {
+        if (!previewLongPressTriggered) {
+            clearPreviewLongPressState();
+        }
+    };
+    
+    // 預覽頁觸控移動
+    window.handlePreviewTouchMove = (event, element) => {
+        if (previewLongPressTimer) {
+            const touch = event.touches[0];
+            const moveX = Math.abs(touch.clientX - previewTouchStartX);
+            const moveY = Math.abs(touch.clientY - previewTouchStartY);
+            
+            if (moveX > 10 || moveY > 10) {
+                clearPreviewLongPressState();
+            }
+        }
+    };
+    
+    // 預覽頁滑鼠按下
+    window.handlePreviewMouseDown = (event, element) => {
+        if (event.button !== 0) return;
+        
+        clearPreviewLongPressState();
+        previewLongPressElement = element;
+        
+        element.classList.add('long-press');
+        
+        previewLongPressTimer = setTimeout(() => {
+            triggerPreviewLongPress(event, element);
+        }, LONG_PRESS_DURATION);
+    };
+    
+    // 預覽頁滑鼠放開
+    window.handlePreviewMouseUp = (event, element) => {
+        if (!previewLongPressTriggered) {
+            clearPreviewLongPressState();
+        }
+    };
+    
+    // 預覽頁滑鼠離開
+    window.handlePreviewMouseLeave = (event, element) => {
+        if (!previewLongPressTriggered) {
+            clearPreviewLongPressState();
+        }
+    };
+    
+    // 預覽頁右鍵選單
+    window.handlePreviewContextMenu = (event, element) => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearPreviewLongPressState();
+        showPreviewCopyMenu(event, element);
+        return false;
     };
     
     // ===== 功能按鈕群組 =====
