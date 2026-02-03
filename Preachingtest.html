@@ -4333,14 +4333,14 @@
     };
     
     // ===== 滑動時關閉複製選單 =====
-    let touchStartY = 0;
+    let scrollTouchStartY = 0;
     document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
+        scrollTouchStartY = e.touches[0].clientY;
     }, { passive: true });
     
     document.addEventListener('touchmove', (e) => {
         const touchMoveY = e.touches[0].clientY;
-        const diff = Math.abs(touchMoveY - touchStartY);
+        const diff = Math.abs(touchMoveY - scrollTouchStartY);
         if (diff > 10) {
             closeCopyMenu();
         }
