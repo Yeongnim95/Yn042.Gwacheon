@@ -852,95 +852,6 @@
             margin-top: 20px;
         }
         
-        /* 章節橫向滑動選擇器 */
-        .chapter-slider-container {
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin: 30px 0 20px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .chapter-slider-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .chapter-slider-title {
-            font-weight: 600;
-            color: var(--dark-green);
-            font-size: 0.95rem;
-        }
-        
-        .chapter-slider-current {
-            background: var(--light-green-bg);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-weight: 600;
-            color: var(--primary-green);
-            font-size: 0.85rem;
-        }
-        
-        .chapter-slider-scroll {
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            padding: 5px 0;
-        }
-        
-        .chapter-slider-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .chapter-slider-items {
-            display: inline-flex;
-            gap: 8px;
-        }
-        
-        .chapter-slider-item {
-            min-width: 44px;
-            height: 44px;
-            border: 2px solid #ddd;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        
-        .chapter-slider-item:hover {
-            border-color: var(--primary-green);
-            color: var(--primary-green);
-            transform: scale(1.05);
-        }
-        
-        .chapter-slider-item.active {
-            background: var(--primary-green);
-            border-color: var(--primary-green);
-            color: white;
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
-        }
-        
-        .chapter-slider-item.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        
         /* 長按複製選單 */
         .bible-copy-menu {
             display: none;
@@ -1722,19 +1633,6 @@
                 </div>
                 <div class="bible-verses" id="bibleVerses">
                     <!-- 經文內容將由JavaScript動態生成 -->
-                </div>
-                
-                <!-- 章節橫向滑動選擇器 -->
-                <div class="chapter-slider-container" id="chapterSliderContainer" style="display: none;">
-                    <div class="chapter-slider-header">
-                        <span class="chapter-slider-title" id="chapterSliderTitle">章節選擇</span>
-                        <span class="chapter-slider-current" id="chapterSliderCurrent">第 1 章</span>
-                    </div>
-                    <div class="chapter-slider-scroll" id="chapterSliderScroll">
-                        <div class="chapter-slider-items" id="chapterSliderItems">
-                            <!-- 章節按鈕將由JavaScript動態生成 -->
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="bible-copyright">
@@ -4100,9 +3998,6 @@
         booksList.style.display = 'none';
         contentView.classList.add('show');
         
-        // 初始化章節滑動選擇器
-        initChapterSlider(book, chapter);
-        
         // 滾動到頂部
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -4127,94 +4022,6 @@
     // 返回頂部
     window.scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-    
-    // ===== 章節橫向滑動選擇器 =====
-    let currentChapterSliderBook = null;
-    let currentChapterSliderChapter = 1;
-    
-    // 初始化章節滑動選擇器
-    function initChapterSlider(book, currentChapter) {
-        const container = document.getElementById('chapterSliderContainer');
-        const itemsContainer = document.getElementById('chapterSliderItems');
-        const titleEl = document.getElementById('chapterSliderTitle');
-        const currentEl = document.getElementById('chapterSliderCurrent');
-        
-        if (!container || !itemsContainer || !book) {
-            if (container) container.style.display = 'none';
-            return;
-        }
-        
-        // 獲取該書卷的章節數
-        const bookData = bibleContent[book.id];
-        if (!bookData) {
-            container.style.display = 'none';
-            return;
-        }
-        
-        const chapters = Object.keys(bookData).map(Number).sort((a, b) => a - b);
-        // 使用book參數中的chapters屬性
-        const totalChapters = book.chapters || chapters.length;
-        
-        // 儲存當前書卷資訊
-        currentChapterSliderBook = book;
-        currentChapterSliderChapter = currentChapter;
-        
-        // 設置標題
-        const lang = localStorage.getItem('missionaryLang') || 'ko';
-        titleEl.textContent = lang === 'ko' ? '장 선택' : '章節選擇';
-        currentEl.textContent = lang === 'ko' ? `${currentChapter}장` : `第 ${currentChapter} 章`;
-        
-        // 生成章節按鈕
-        let html = '';
-        for (let i = 1; i <= totalChapters; i++) {
-            const hasContent = chapters.includes(i);
-            const isActive = i === currentChapter ? 'active' : '';
-            const isDisabled = !hasContent ? 'disabled' : '';
-            html += `<div class="chapter-slider-item ${isActive} ${isDisabled}" data-chapter="${i}" onclick="window.goToChapter(${i})">${i}</div>`;
-        }
-        
-        itemsContainer.innerHTML = html;
-        
-        // 顯示選擇器
-        container.style.display = 'block';
-        
-        // 滾動到當前章節
-        setTimeout(() => {
-            scrollChapterIntoView(currentChapter);
-        }, 100);
-    }
-    
-    // 滾動到指定章節按鈕
-    function scrollChapterIntoView(chapter) {
-        const scrollContainer = document.getElementById('chapterSliderScroll');
-        const activeItem = document.querySelector(`.chapter-slider-item[data-chapter="${chapter}"]`);
-        
-        if (!scrollContainer || !activeItem) return;
-        
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const itemRect = activeItem.getBoundingClientRect();
-        
-        // 計算需要滾動的距離，使目標項目置中
-        const containerCenter = containerRect.width / 2;
-        const itemCenter = itemRect.left - containerRect.left + itemRect.width / 2;
-        const scrollOffset = itemCenter - containerCenter;
-        
-        scrollContainer.scrollLeft += scrollOffset;
-    }
-    
-    // 跳轉到指定章節
-    window.goToChapter = (chapter) => {
-        if (!currentChapterSliderBook) return;
-        
-        const bookData = bibleContent[currentChapterSliderBook.id];
-        if (!bookData || !bookData[chapter]) {
-            // 該章節尚未有內容
-            return;
-        }
-        
-        // 重新載入該章節
-        openBibleChapter(currentChapterSliderBook, chapter);
     };
     
     // 監聽滾動事件，顯示/隱藏返回頂部按鈕
