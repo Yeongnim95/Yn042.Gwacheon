@@ -4153,7 +4153,8 @@
         }
         
         const chapters = Object.keys(bookData).map(Number).sort((a, b) => a - b);
-        const totalChapters = bibleBooks.find(b => b.id === book.id)?.chapters || chapters.length;
+        // 使用book參數中的chapters屬性
+        const totalChapters = book.chapters || chapters.length;
         
         // 儲存當前書卷資訊
         currentChapterSliderBook = book;
