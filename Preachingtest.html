@@ -22,6 +22,36 @@
             --border-color: #c5e1a5;
             --text-color: #333;
             --danger-red: #e53935;
+            
+            /* 暗黑模式變量 */
+            --bg-color: #ffffff;
+            --bg-secondary: rgba(255, 255, 255, 0.98);
+            --card-bg: white;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --border-light: #ccc;
+            --border-lighter: #ddd;
+            --border-lightest: #eee;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --input-bg: white;
+            --nav-bg: white;
+        }
+        
+        /* 暗黑模式 */
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --bg-secondary: rgba(30, 30, 30, 0.98);
+            --card-bg: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #888;
+            --border-light: #444;
+            --border-lighter: #3a3a3a;
+            --border-lightest: #333;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --input-bg: #3a3a3a;
+            --nav-bg: #252525;
         }
 
         * { box-sizing: border-box; }
@@ -39,15 +69,21 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            color: var(--text-color);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #1a2e1a 0%, #1a3a1a 100%);
         }
 
         /* --- 導航列 --- */
         nav {
-            background: white;
+            background: var(--nav-bg);
             padding: 0 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px var(--shadow-color);
             display: flex;
+            transition: background 0.3s;
             align-items: center;
             justify-content: space-between;
             height: 60px;
@@ -185,11 +221,43 @@
         .lang-select {
             padding: 5px 10px;
             border-radius: 5px;
-            border: 1px solid #ccc;
-            background: white;
+            border: 1px solid var(--border-light);
+            background: var(--input-bg);
             font-size: 0.9rem;
-            color: #555;
+            color: var(--text-secondary);
             outline: none;
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
+        }
+        
+        /* 設定區域（語言+暗黑模式） */
+        .settings-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 暗黑模式切換按鈕 */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-light);
+            background: var(--input-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--light-green-bg);
+            border-color: var(--primary-green);
+        }
+        
+        [data-theme="dark"] .theme-toggle:hover {
+            background: #3a3a3a;
         }
 
         /* --- 容器 --- */
@@ -197,11 +265,12 @@
             width: 100%;
             max-width: 1280px;
             margin: 20px auto;
-            background: rgba(255, 255, 255, 0.98);
+            background: var(--bg-secondary);
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px var(--shadow-color);
             padding: 25px 25px;
             min-height: 600px;
+            transition: background 0.3s, box-shadow 0.3s;
         }
         
         /* 自適應字體大小 */
@@ -1510,6 +1579,755 @@
         .bible-search-result-text {
             font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
+        
+        /* ===== 暗黑模式額外樣式 ===== */
+        [data-theme="dark"] .menu-btn {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .menu-btn:hover {
+            background: #2a3d2a;
+        }
+        
+        [data-theme="dark"] .menu-btn.active {
+            background-color: var(--primary-green);
+            color: white;
+        }
+        
+        [data-theme="dark"] h2 {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .faith-content,
+        [data-theme="dark"] .page-section {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .data-table th {
+            background: #2a3d2a;
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .data-table td {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .data-table tr:hover td {
+            background: #3a4a3a;
+        }
+        
+        [data-theme="dark"] .expandable-row {
+            background: #252525;
+        }
+        
+        [data-theme="dark"] .log-item {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .profile-popup {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .profile-section {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .btn-cancel {
+            background: #444;
+            color: var(--text-primary);
+        }
+        
+        /* 聖經頁面暗黑模式 */
+        [data-theme="dark"] .bible-book-item {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-book-item:hover {
+            background: #3a4a3a;
+            border-color: var(--primary-green);
+        }
+        
+        [data-theme="dark"] .bible-chapter-btn {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-chapter-btn:hover {
+            background: #3a4a3a;
+        }
+        
+        [data-theme="dark"] .bible-back-btn {
+            background: #2a3d2a;
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .bible-verse {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-verse .verse-text-ko {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-verse .verse-text-zh {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-section-heading {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-section-heading .heading-zh {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .bible-copyright {
+            color: #666;
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-content-title .zh {
+            color: var(--text-secondary);
+        }
+        
+        /* 搜尋框暗黑模式 */
+        [data-theme="dark"] .bible-search-overlay {
+            background: rgba(0, 0, 0, 0.85);
+        }
+        
+        [data-theme="dark"] .bible-search-container {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .bible-search-input {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-search-result-item {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-search-result-item:hover {
+            background: #3a4a3a;
+        }
+        
+        [data-theme="dark"] .bible-search-result-text {
+            color: var(--text-primary);
+        }
+        
+        /* 複製選單暗黑模式 */
+        [data-theme="dark"] .bible-copy-menu {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .bible-copy-menu-item {
+            color: var(--text-primary);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-copy-menu-item:hover {
+            background: #3a4a3a;
+        }
+        
+        /* 範圍複製彈窗暗黑模式 */
+        [data-theme="dark"] .bible-range-copy-box {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .bible-range-input {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        /* 部分複製彈窗暗黑模式 */
+        [data-theme="dark"] .partial-copy-modal {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .partial-copy-text {
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        /* FAB按鈕暗黑模式 */
+        [data-theme="dark"] .bible-fab-btn {
+            background: var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* 搜尋歷史暗黑模式 */
+        [data-theme="dark"] .bible-search-history-item {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-search-history-item:hover {
+            background: #4a4a4a;
+        }
+        
+        /* 預覽區域暗黑模式 */
+        [data-theme="dark"] .bible-search-preview {
+            background: #252525;
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-search-preview-verse {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 選單暗黑模式 ===== */
+        [data-theme="dark"] .menu-toggle {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .menu-dropdown {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] .menu-category {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .menu-category-title {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .menu-category-title:hover {
+            background: #2a3d2a;
+        }
+        
+        [data-theme="dark"] .hamburger-icon {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .dropdown-arrow {
+            color: var(--text-secondary);
+        }
+        
+        /* ===== 聖經章節選擇區暗黑模式 ===== */
+        [data-theme="dark"] .bible-chapters-container {
+            background: #252525;
+        }
+        
+        [data-theme="dark"] .bible-chapters-title {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-testament-title {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .bible-book-btn {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-book-btn:hover {
+            background: #3a4a3a;
+            border-color: var(--primary-green);
+        }
+        
+        [data-theme="dark"] .bible-book-btn .zh {
+            color: var(--text-secondary);
+        }
+        
+        /* ===== 表單和輸入框暗黑模式 ===== */
+        [data-theme="dark"] .form-group label {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .form-group input,
+        [data-theme="dark"] .form-group select,
+        [data-theme="dark"] .form-group textarea {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .form-group input::placeholder,
+        [data-theme="dark"] .form-group textarea::placeholder {
+            color: #666;
+        }
+        
+        [data-theme="dark"] .btn-submit {
+            background: var(--primary-green);
+            color: white;
+        }
+        
+        [data-theme="dark"] .status-found,
+        [data-theme="dark"] .status-new {
+            color: #81c784;
+        }
+        
+        /* ===== 資料表格暗黑模式 ===== */
+        [data-theme="dark"] .backend-controls {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .backend-controls label {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .total-count {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .name-cell {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .log-content {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .log-date {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .log-tag {
+            background: #2a3d2a;
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .log-tag.other {
+            background: #3d3a2a;
+            color: #c7b781;
+        }
+        
+        /* ===== 個人資料彈窗暗黑模式 ===== */
+        [data-theme="dark"] .profile-overlay {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        [data-theme="dark"] .profile-row {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .profile-label {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .profile-value {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 其他元素暗黑模式 ===== */
+        [data-theme="dark"] .activity-badge {
+            background: #2a3d2a;
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .activity-badge.normal {
+            background: #3d3a2a;
+            color: #c7b781;
+        }
+        
+        [data-theme="dark"] .activity-badge.low {
+            background: #3d2a2a;
+            color: #c78181;
+        }
+        
+        [data-theme="dark"] .btn-edit,
+        [data-theme="dark"] .btn-done {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+        
+        [data-theme="dark"] .btn-delete {
+            background: #5a2a2a;
+            color: #ff8a80;
+        }
+        
+        [data-theme="dark"] .faith-content {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .faith-content p {
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Toast提示暗黑模式 ===== */
+        [data-theme="dark"] .toast {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* ===== 聖經內容頁面標題暗黑模式 ===== */
+        [data-theme="dark"] .bible-content-header {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-content-title {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-content-title .ko {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 線下登錄表單暗黑模式 ===== */
+        [data-theme="dark"] #offlineEntrySection input,
+        [data-theme="dark"] #offlineEntrySection select,
+        [data-theme="dark"] #offlineEntrySection textarea {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] #offlineBackendSection .data-table th {
+            background: #2a3d2a;
+        }
+        
+        [data-theme="dark"] #offlineBackendSection .data-table td {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        
+        /* ===== 選單按鈕暗黑模式 ===== */
+        [data-theme="dark"] .menu-toggle {
+            background: #3a3a3a;
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .menu-toggle:hover {
+            background: #2a3d2a;
+        }
+        
+        [data-theme="dark"] #current-page-title {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 後台工具列暗黑模式 ===== */
+        [data-theme="dark"] .backend-toolbar {
+            background: #252525;
+        }
+        
+        [data-theme="dark"] .toolbar-left {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .stat-divider {
+            color: #555;
+        }
+        
+        [data-theme="dark"] .highlight-stat {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .toggle-edit-btn {
+            background: #1976d2;
+        }
+        
+        [data-theme="dark"] .delete-btn {
+            background: #3d2a2a;
+            color: #ff8a80;
+            border-color: #5a3a3a;
+        }
+        
+        /* ===== 後台表格暗黑模式 ===== */
+        [data-theme="dark"] .list-header-row {
+            background: var(--primary-green);
+        }
+        
+        [data-theme="dark"] .user-card {
+            background: var(--card-bg);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .user-summary {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .user-summary:hover {
+            background: #2a3d2a;
+        }
+        
+        [data-theme="dark"] .user-summary.expanded {
+            background: #2a3d2a;
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .user-details {
+            background: #252525;
+        }
+        
+        [data-theme="dark"] .detail-row {
+            background: #2d2d2d;
+            color: var(--text-secondary);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .list-container.edit-mode .editable {
+            background: var(--input-bg);
+            border-color: #555;
+        }
+        
+        [data-theme="dark"] .list-container.edit-mode .editable:hover {
+            background: #3a4a5a;
+            border-color: #1976d2;
+        }
+        
+        /* ===== 個人資訊彈出框暗黑模式 ===== */
+        [data-theme="dark"] .profile-popup {
+            background: var(--card-bg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] .profile-popup-item {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .profile-popup-label {
+            color: var(--text-muted);
+        }
+        
+        [data-theme="dark"] .profile-popup-value {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 標籤暗黑模式 ===== */
+        [data-theme="dark"] .tag-me {
+            background: #00897b;
+        }
+        
+        [data-theme="dark"] .tag-other {
+            background: #e53935;
+        }
+        
+        /* ===== 刪除按鈕暗黑模式 ===== */
+        [data-theme="dark"] .btn-remove-log {
+            background: #5a3a3a;
+            color: #ff8a80;
+        }
+        
+        /* ===== 複製提示暗黑模式 ===== */
+        [data-theme="dark"] .copy-toast {
+            background: rgba(60, 60, 60, 0.95);
+        }
+        
+        /* ===== 個人資料頁面暗黑模式 ===== */
+        [data-theme="dark"] #profileSection input,
+        [data-theme="dark"] #profileSection select {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] #profileSection label {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 登錄表單暗黑模式 ===== */
+        [data-theme="dark"] #entrySection input,
+        [data-theme="dark"] #entrySection select,
+        [data-theme="dark"] #entrySection textarea {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] #entrySection label {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .form-row label {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .radio-group label {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 可複製內容暗黑模式 ===== */
+        [data-theme="dark"] .copyable:hover {
+            background: #3a4a3a;
+        }
+        
+        /* ===== 欄位標題暗黑模式 ===== */
+        [data-theme="dark"] .col-id,
+        [data-theme="dark"] .col-name,
+        [data-theme="dark"] .col-activity,
+        [data-theme="dark"] .col-date,
+        [data-theme="dark"] .col-content {
+            color: var(--text-primary);
+        }
+        
+        /* ===== 聖經搜尋面板暗黑模式 ===== */
+        [data-theme="dark"] .bible-search-panel {
+            background: var(--card-bg);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] .bible-search-header {
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-search-close {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-search-input {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-search-input::placeholder {
+            color: #666;
+        }
+        
+        [data-theme="dark"] .bible-search-clear {
+            color: var(--text-muted);
+        }
+        
+        [data-theme="dark"] .bible-search-body {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .bible-search-section-title {
+            color: var(--text-muted);
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-search-result-item {
+            background: #252525;
+            border-color: var(--border-lighter);
+        }
+        
+        [data-theme="dark"] .bible-search-result-item:hover {
+            background: #3a4a3a;
+        }
+        
+        [data-theme="dark"] .bible-search-result-ref {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .bible-search-no-result {
+            color: var(--text-muted);
+        }
+        
+        /* ===== 範圍複製彈窗暗黑模式 ===== */
+        [data-theme="dark"] .bible-range-copy-modal {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-box {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-title {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-subtitle {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-input {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-separator {
+            color: var(--text-muted);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-btn.secondary {
+            background: #3a3a3a;
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-btn.secondary:hover {
+            background: #4a4a4a;
+        }
+        
+        [data-theme="dark"] .bible-range-copy-mode-btn {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .bible-range-copy-mode-btn.active {
+            background: #2a3d2a;
+            border-color: var(--primary-green);
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .bible-range-copy-mode-btn:hover {
+            background: #3a3a3a;
+        }
+        
+        /* ===== 部分複製彈窗暗黑模式 ===== */
+        [data-theme="dark"] .partial-copy-modal {
+            background: var(--card-bg);
+        }
+        
+        [data-theme="dark"] .partial-copy-title {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .partial-copy-ref {
+            color: #81c784;
+        }
+        
+        [data-theme="dark"] .partial-copy-text {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--border-light);
+        }
+        
+        [data-theme="dark"] .partial-copy-hint {
+            color: var(--text-muted);
+        }
+        
+        [data-theme="dark"] .partial-copy-btn {
+            background: #3a3a3a;
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .partial-copy-btn:hover {
+            background: #4a4a4a;
+        }
+        
+        [data-theme="dark"] .partial-copy-btn.primary {
+            background: var(--primary-green);
+            color: white;
+        }
+        
+        /* ===== FAB按鈕暗黑模式 ===== */
+        [data-theme="dark"] .bible-fab-btn {
+            background: var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        [data-theme="dark"] .bible-fab-btn:hover {
+            background: #3a3a3a;
+        }
     </style>
 </head>
 <body>
@@ -1561,7 +2379,10 @@
         </div>
     </div>
     
-    <div class="lang-switch">
+    <div class="settings-group">
+        <button class="theme-toggle" id="themeToggle" onclick="window.toggleTheme()" title="切換暗黑模式">
+            <span id="themeIcon">🌙</span>
+        </button>
         <select class="lang-select" onchange="window.setLanguage(this.value)">
             <option value="ko">한국어</option>
             <option value="zh">中文</option>
@@ -2245,6 +3066,36 @@
         applyLanguage();
         updateDateInput(); // 使用新的日期更新函數
     };
+
+    // ===== 暗黑模式切換功能 =====
+    window.toggleTheme = () => {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('app_theme', newTheme);
+        
+        // 更新圖示
+        updateThemeIcon(newTheme);
+    };
+    
+    function updateThemeIcon(theme) {
+        const icon = document.getElementById('themeIcon');
+        if (icon) {
+            icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+    
+    // 初始化暗黑模式
+    function initTheme() {
+        const savedTheme = localStorage.getItem('app_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+    
+    // 頁面載入時初始化主題
+    initTheme();
 
     window.setLanguage = (lang) => {
         currentLang = lang;
