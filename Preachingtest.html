@@ -1168,7 +1168,7 @@
         display: flex;
     }
     
-    /* 主按鈕（展開/收起） */
+    /* 主按鈕（搜尋） */
     .bible-fab-main {
         width: 46px;
         height: 46px;
@@ -1194,6 +1194,40 @@
     .bible-fab-main.active {
         background: rgba(56, 142, 60, 0.9);
         transform: rotate(45deg);
+    }
+    
+    /* 複製模式按鈕 */
+    .bible-fab-copy {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+        animation: fabCopyPulse 0.5s ease;
+    }
+    
+    .bible-fab-copy.show {
+        display: flex;
+    }
+    
+    .bible-fab-copy:hover {
+        background: var(--light-green-bg);
+        transform: scale(1.1);
+    }
+    
+    @keyframes fabCopyPulse {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
     }
     
     /* 子按鈕容器 */
@@ -2077,6 +2111,16 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
     
+    [data-theme="dark"] .bible-fab-copy {
+        background: var(--card-bg);
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+    }
+    
+    [data-theme="dark"] .bible-fab-copy:hover {
+        background: #3a4a3a;
+    }
+    
     /* 搜尋歷史暗黑模式 */
     [data-theme="dark"] .bible-search-history-item {
         background: var(--input-bg);
@@ -2776,10 +2820,14 @@
 <!-- 返回頂部按鈕 -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollToTop()">↑</button>
 
-<!-- 聖經搜尋按鈕 -->
+<!-- 聖經功能按鈕群組 -->
 <div class="bible-fab-container" id="bibleFabContainer">
     <button class="bible-fab-main" id="bibleFabMain" onclick="window.openBibleSearch()" title="搜尋">
         <span id="bibleFabIcon">🔍</span>
+    </button>
+    <!-- 複製模式按鈕（長按經文後顯示） -->
+    <button class="bible-fab-copy" id="bibleFabCopy" onclick="window.openCopyModePanel()" title="複製模式">
+        <span>📋</span>
     </button>
 </div>
 
@@ -5349,21 +5397,27 @@
     let isCopyModeActive = false;
     let selectedVerses = new Set(); // 存儲選中的經文節數
     
-    // 載入語言偏好設定
+    // 載入語言偏好設定（預設兩個都打勾）
     function loadCopyLangPreference() {
         try {
             const zhEl = document.getElementById('copyLangZh');
             const koEl = document.getElementById('copyLangKo');
-            if (!zhEl || !koEl) return; // 元素不存在時返回
+            if (!zhEl || !koEl) return;
             
+            // 預設兩個都打勾
+            zhEl.checked = true;
+            koEl.checked = true;
+            
+            // 如果有儲存的偏好，則使用儲存的設定
             const saved = localStorage.getItem(COPY_LANG_PREF_KEY);
             if (saved) {
                 const pref = JSON.parse(saved);
-                zhEl.checked = pref.zh !== false;
-                koEl.checked = pref.ko !== false;
+                // 只有明確設為 false 時才取消勾選
+                if (pref.zh === false) zhEl.checked = false;
+                if (pref.ko === false) koEl.checked = false;
             }
         } catch (e) {
-            // 使用預設值
+            // 使用預設值（兩個都打勾）
         }
     }
     
@@ -5408,7 +5462,7 @@
         longPressTriggered = false;
     }
     
-    // 觸發長按成功 - 進入複製模式
+    // 觸發長按成功 - 顯示複製模式小圖示
     function triggerLongPress(event, element) {
         longPressTriggered = true;
         element.classList.remove('long-press');
@@ -5419,27 +5473,63 @@
             navigator.vibrate(50);
         }
         
-        // 短暫延遲後進入複製模式
+        // 記錄長按的經文元素
+        window.pendingCopyElement = element;
+        
+        // 短暫延遲後顯示複製小圖示
         setTimeout(() => {
             element.classList.remove('long-press-success');
-            enterCopyMode(element);
+            // 選中這節經文
+            element.classList.add('selected');
+            // 顯示複製小圖示
+            showCopyFabButton();
         }, 100);
     }
     
-    // 進入複製模式
-    function enterCopyMode(element) {
+    // 顯示複製小圖示
+    function showCopyFabButton() {
+        const copyBtn = document.getElementById('bibleFabCopy');
+        if (copyBtn) {
+            copyBtn.classList.add('show');
+        }
+    }
+    
+    // 隱藏複製小圖示
+    function hideCopyFabButton() {
+        const copyBtn = document.getElementById('bibleFabCopy');
+        if (copyBtn) {
+            copyBtn.classList.remove('show');
+        }
+    }
+    
+    // 點擊複製小圖示 - 打開複製面板
+    window.openCopyModePanel = () => {
+        const element = window.pendingCopyElement;
+        if (!element) return;
+        
         isCopyModeActive = true;
-        longPressTriggered = false; // 重置長按狀態
+        longPressTriggered = false;
         selectedVerses.clear();
         
-        // 選中第一個經文
+        // 選中該經文
         const verse = parseInt(element.dataset.verse);
-        selectedVerses.add(verse);
-        element.classList.add('selected');
+        if (!isNaN(verse)) {
+            selectedVerses.add(verse);
+            element.classList.add('selected');
+        }
+        
+        // 確保語言預設都打勾
+        const zhEl = document.getElementById('copyLangZh');
+        const koEl = document.getElementById('copyLangKo');
+        if (zhEl) zhEl.checked = true;
+        if (koEl) koEl.checked = true;
         
         // 顯示複製模式面板
         const panel = document.getElementById('copyModePanel');
         if (panel) panel.classList.add('show');
+        
+        // 隱藏複製小圖示
+        hideCopyFabButton();
         
         // 顯示提示
         const hint = document.getElementById('copyModeHint');
@@ -5455,12 +5545,19 @@
         
         // 更新面板語言
         updateCopyModePanelLanguage();
+    };
+    
+    // 進入複製模式（保留給右鍵使用）
+    function enterCopyMode(element) {
+        window.pendingCopyElement = element;
+        window.openCopyModePanel();
     }
     
     // 退出複製模式
     window.exitCopyMode = () => {
         isCopyModeActive = false;
         selectedVerses.clear();
+        window.pendingCopyElement = null;
         
         // 移除所有選中狀態
         document.querySelectorAll('.bible-verse.selected').forEach(el => {
@@ -5475,6 +5572,9 @@
         
         if (panel) panel.classList.remove('show');
         if (hint) hint.classList.remove('show');
+        
+        // 隱藏複製小圖示
+        hideCopyFabButton();
         
         // 清空範圍輸入
         if (rangeStart) rangeStart.value = '';
@@ -5697,10 +5797,20 @@
     
     // 手機觸控開始
     window.handleVerseTouchStart = (event, element) => {
-        // 如果已在複製模式，不阻止事件，讓touchEnd處理
+        // 如果已在複製模式，準備處理選取
         if (isCopyModeActive) {
-            clearLongPressState();
             return;
+        }
+        
+        // 如果小圖示顯示中但還沒進入複製模式，點擊其他地方取消
+        const copyBtn = document.getElementById('bibleFabCopy');
+        if (copyBtn && copyBtn.classList.contains('show') && !isCopyModeActive) {
+            // 移除之前選中的經文
+            if (window.pendingCopyElement) {
+                window.pendingCopyElement.classList.remove('selected');
+            }
+            hideCopyFabButton();
+            window.pendingCopyElement = null;
         }
         
         clearLongPressState();
@@ -5724,6 +5834,7 @@
     window.handleVerseTouchEnd = (event, element) => {
         // 如果在複製模式，處理選取切換
         if (isCopyModeActive) {
+            event.preventDefault();
             toggleVerseSelection(element);
             return;
         }
@@ -5752,10 +5863,20 @@
         // 只處理左鍵
         if (event.button !== 0) return;
         
-        // 如果已在複製模式，不阻止事件，讓mouseUp處理
+        // 如果已在複製模式，準備處理選取
         if (isCopyModeActive) {
-            clearLongPressState();
             return;
+        }
+        
+        // 如果小圖示顯示中但還沒進入複製模式，點擊其他地方取消
+        const copyBtn = document.getElementById('bibleFabCopy');
+        if (copyBtn && copyBtn.classList.contains('show') && !isCopyModeActive) {
+            // 移除之前選中的經文
+            if (window.pendingCopyElement) {
+                window.pendingCopyElement.classList.remove('selected');
+            }
+            hideCopyFabButton();
+            window.pendingCopyElement = null;
         }
         
         clearLongPressState();
@@ -5777,6 +5898,7 @@
     window.handleVerseMouseUp = (event, element) => {
         // 如果在複製模式，處理選取切換
         if (isCopyModeActive) {
+            event.preventDefault();
             toggleVerseSelection(element);
             return;
         }
