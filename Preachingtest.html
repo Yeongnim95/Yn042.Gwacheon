@@ -5616,9 +5616,24 @@
         const countEl = document.getElementById('copyModeSelectedCount');
         if (countEl) countEl.textContent = count;
         
-        // 如果沒有選中任何經文，禁用反白複製按鈕
-        const copySelectedBtn = document.getElementById('copySelectedBtn');
-        if (copySelectedBtn) copySelectedBtn.disabled = count === 0;
+        // 如果沒有選中任何經文
+        if (count === 0) {
+            // 禁用反白複製按鈕
+            const copySelectedBtn = document.getElementById('copySelectedBtn');
+            if (copySelectedBtn) copySelectedBtn.disabled = true;
+            
+            // 隱藏複製小圖示並退出複製模式
+            hideCopyFabButton();
+            isCopyModeActive = false;
+            
+            // 如果面板開著，也關閉它
+            const panel = document.getElementById('copyModePanel');
+            if (panel) panel.classList.remove('show');
+        } else {
+            // 啟用反白複製按鈕
+            const copySelectedBtn = document.getElementById('copySelectedBtn');
+            if (copySelectedBtn) copySelectedBtn.disabled = false;
+        }
     }
     
     // 更新複製模式面板語言
@@ -5634,6 +5649,8 @@
         const el7 = document.getElementById('copyRangeBtnText');
         const el8 = document.getElementById('copyModeChapterTitle');
         const el9 = document.getElementById('copyChapterBtnText');
+        const rangeStart = document.getElementById('copyModeRangeStart');
+        const rangeEnd = document.getElementById('copyModeRangeEnd');
         
         if (el1) el1.textContent = isKo ? '복사 모드' : '複製模式';
         if (el2) el2.innerHTML = isKo 
@@ -5646,6 +5663,10 @@
         if (el7) el7.textContent = isKo ? '지정 범위 복사' : '複製指定範圍';
         if (el8) el8.textContent = isKo ? '📖 전체 장 복사' : '📖 全章複製';
         if (el9) el9.textContent = isKo ? '전체 장 복사' : '複製整章經文';
+        
+        // 更新範圍輸入框的placeholder
+        if (rangeStart) rangeStart.placeholder = isKo ? '시작' : '起';
+        if (rangeEnd) rangeEnd.placeholder = isKo ? '끝' : '迄';
     }
     
     // 檢查語言選擇是否有效
@@ -5809,10 +5830,18 @@
         });
     }
     
+    // 複製模式下的觸控追蹤
+    let copyModeTouchStartX = 0;
+    let copyModeTouchStartY = 0;
+    let copyModeTouchMoved = false;
+    
     // 手機觸控開始
     window.handleVerseTouchStart = (event, element) => {
-        // 如果已在複製模式，不需要長按計時
+        // 如果已在複製模式，記錄觸控起始位置
         if (isCopyModeActive) {
+            copyModeTouchStartX = event.touches[0].clientX;
+            copyModeTouchStartY = event.touches[0].clientY;
+            copyModeTouchMoved = false;
             return;
         }
         
@@ -5835,10 +5864,12 @@
     
     // 手機觸控結束
     window.handleVerseTouchEnd = (event, element) => {
-        // 如果在複製模式，處理選取切換
+        // 如果在複製模式，處理選取切換（只在沒有滑動時）
         if (isCopyModeActive) {
-            event.preventDefault();
-            toggleVerseSelection(element);
+            if (!copyModeTouchMoved) {
+                event.preventDefault();
+                toggleVerseSelection(element);
+            }
             return;
         }
         
@@ -5849,6 +5880,19 @@
     
     // 手機觸控移動（取消長按）
     window.handleVerseTouchMove = (event, element) => {
+        // 如果在複製模式，檢測是否滑動
+        if (isCopyModeActive) {
+            const touch = event.touches[0];
+            const moveX = Math.abs(touch.clientX - copyModeTouchStartX);
+            const moveY = Math.abs(touch.clientY - copyModeTouchStartY);
+            
+            // 移動超過10px視為滑動
+            if (moveX > 10 || moveY > 10) {
+                copyModeTouchMoved = true;
+            }
+            return;
+        }
+        
         if (longPressTimer) {
             const touch = event.touches[0];
             const moveX = Math.abs(touch.clientX - touchStartX);
