@@ -608,6 +608,111 @@
         .tag-me { background: #26a69a; }
         .tag-other { background: #ef5350; }
         
+        /* ===== 訊息重點與需確認訊息區塊 ===== */
+        .message-points-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: var(--light-green-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .message-points-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .message-points-title {
+            font-weight: 600;
+            color: var(--dark-green);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .message-points-add-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .message-points-add-btn:hover {
+            background: var(--dark-green);
+        }
+        
+        .message-points-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message-point-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .message-point-tag-select {
+            min-width: 90px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        
+        .message-point-content {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 36px;
+        }
+        
+        .message-point-remove {
+            background: #ffcdd2;
+            color: #b71c1c;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .message-point-remove:hover {
+            background: #ef9a9a;
+        }
+        
+        .message-points-empty {
+            color: #888;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 10px;
+        }
+        
         /* 複製成功提示 */
         .copy-toast {
             position: fixed;
@@ -2226,6 +2331,32 @@
             color: #81c784;
         }
         
+        /* ===== 訊息重點暗黑模式 ===== */
+        [data-theme="dark"] .message-points-section {
+            background: var(--card-bg);
+            border-color: var(--border-light);
+        }
+        
+        [data-theme="dark"] .message-points-title {
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .message-point-item {
+            background: var(--input-bg);
+            border-color: var(--border-light);
+        }
+        
+        [data-theme="dark"] .message-point-tag-select,
+        [data-theme="dark"] .message-point-content {
+            background: var(--card-bg);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+        
+        [data-theme="dark"] .message-points-empty {
+            color: var(--text-muted);
+        }
+        
         /* ===== 資料表格暗黑模式 ===== */
         [data-theme="dark"] .backend-controls {
             color: var(--text-primary);
@@ -2966,6 +3097,32 @@
                 <label id="lbl-content">내용</label>
                 <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
             </div>
+            
+            <!-- 訊息重點區塊 -->
+            <div class="form-group form-full-width">
+                <div class="message-points-section" id="messagePointsSection">
+                    <div class="message-points-header">
+                        <span class="message-points-title" id="messagePointsTitle">📌 訊息重點</span>
+                        <button class="message-points-add-btn" onclick="window.addMessagePoint()" title="新增重點">+</button>
+                    </div>
+                    <div class="message-points-list" id="messagePointsList">
+                        <div class="message-points-empty" id="messagePointsEmpty">點擊 + 新增訊息重點</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 需確認訊息區塊 -->
+            <div class="form-group form-full-width">
+                <div class="message-points-section" id="confirmPointsSection">
+                    <div class="message-points-header">
+                        <span class="message-points-title" id="confirmPointsTitle">❓ 需確認的訊息</span>
+                        <button class="message-points-add-btn" onclick="window.addConfirmPoint()" title="新增確認項目">+</button>
+                    </div>
+                    <div class="message-points-list" id="confirmPointsList">
+                        <div class="message-points-empty" id="confirmPointsEmpty">點擊 + 新增需確認的訊息</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
     </div>
@@ -3573,6 +3730,9 @@
         
         updateCounter();
         updateOfflineCounter();
+        
+        // 更新訊息重點區塊語言
+        updateMessagePointsLanguage();
     }
 
     // --- 邏輯修正區塊 ---
@@ -3639,6 +3799,195 @@
         el.style.display = 'block';
     }
 
+    // ===== 訊息重點與需確認訊息功能 =====
+    const pointTags = {
+        ko: ['학업', '학습', '직장', '가정', '감정', '직접 입력'],
+        zh: ['學業', '學習', '工作', '家庭', '感情', '自訂']
+    };
+    
+    let messagePointsCounter = 0;
+    let confirmPointsCounter = 0;
+    
+    // 創建標籤選項HTML
+    function createTagOptions() {
+        const tags = pointTags[currentLang] || pointTags.ko;
+        return tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+    }
+    
+    // 新增訊息重點
+    window.addMessagePoint = () => {
+        const list = document.getElementById('messagePointsList');
+        const empty = document.getElementById('messagePointsEmpty');
+        if (empty) empty.style.display = 'none';
+        
+        const itemId = `messagePoint_${messagePointsCounter++}`;
+        const item = document.createElement('div');
+        item.className = 'message-point-item';
+        item.id = itemId;
+        item.innerHTML = `
+            <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
+                ${createTagOptions()}
+            </select>
+            <input type="text" class="message-point-content" placeholder="${currentLang === 'ko' ? '내용을 입력하세요...' : '請輸入內容...'}">
+            <button class="message-point-remove" onclick="window.removeMessagePoint('${itemId}')">✕</button>
+        `;
+        list.appendChild(item);
+    };
+    
+    // 移除訊息重點
+    window.removeMessagePoint = (itemId) => {
+        const item = document.getElementById(itemId);
+        if (item) item.remove();
+        
+        const list = document.getElementById('messagePointsList');
+        const empty = document.getElementById('messagePointsEmpty');
+        if (list && list.querySelectorAll('.message-point-item').length === 0 && empty) {
+            empty.style.display = 'block';
+        }
+    };
+    
+    // 新增需確認訊息
+    window.addConfirmPoint = () => {
+        const list = document.getElementById('confirmPointsList');
+        const empty = document.getElementById('confirmPointsEmpty');
+        if (empty) empty.style.display = 'none';
+        
+        const itemId = `confirmPoint_${confirmPointsCounter++}`;
+        const item = document.createElement('div');
+        item.className = 'message-point-item';
+        item.id = itemId;
+        item.innerHTML = `
+            <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
+                ${createTagOptions()}
+            </select>
+            <input type="text" class="message-point-content" placeholder="${currentLang === 'ko' ? '확인할 내용...' : '需確認的內容...'}">
+            <button class="message-point-remove" onclick="window.removeConfirmPoint('${itemId}')">✕</button>
+        `;
+        list.appendChild(item);
+    };
+    
+    // 移除需確認訊息
+    window.removeConfirmPoint = (itemId) => {
+        const item = document.getElementById(itemId);
+        if (item) item.remove();
+        
+        const list = document.getElementById('confirmPointsList');
+        const empty = document.getElementById('confirmPointsEmpty');
+        if (list && list.querySelectorAll('.message-point-item').length === 0 && empty) {
+            empty.style.display = 'block';
+        }
+    };
+    
+    // 處理標籤選擇變化（自訂選項）
+    window.handleTagChange = (selectEl) => {
+        const lastOption = pointTags[currentLang]?.[5] || '직접 입력';
+        if (selectEl.value === lastOption) {
+            const customTag = prompt(currentLang === 'ko' ? '태그를 입력하세요:' : '請輸入自訂標籤:');
+            if (customTag && customTag.trim()) {
+                // 添加自訂選項
+                const option = document.createElement('option');
+                option.value = customTag.trim();
+                option.textContent = customTag.trim();
+                option.selected = true;
+                selectEl.insertBefore(option, selectEl.lastElementChild);
+            } else {
+                // 取消則回到第一個選項
+                selectEl.selectedIndex = 0;
+            }
+        }
+    };
+    
+    // 獲取訊息重點數據
+    function getMessagePoints() {
+        const list = document.getElementById('messagePointsList');
+        const items = list.querySelectorAll('.message-point-item');
+        const points = [];
+        items.forEach(item => {
+            const tag = item.querySelector('.message-point-tag-select')?.value || '';
+            const content = item.querySelector('.message-point-content')?.value?.trim() || '';
+            if (tag && content) {
+                points.push({ tag, content });
+            }
+        });
+        return points;
+    }
+    
+    // 獲取需確認訊息數據
+    function getConfirmPoints() {
+        const list = document.getElementById('confirmPointsList');
+        const items = list.querySelectorAll('.message-point-item');
+        const points = [];
+        items.forEach(item => {
+            const tag = item.querySelector('.message-point-tag-select')?.value || '';
+            const content = item.querySelector('.message-point-content')?.value?.trim() || '';
+            if (tag && content) {
+                points.push({ tag, content });
+            }
+        });
+        return points;
+    }
+    
+    // 清空訊息重點和需確認訊息
+    function clearMessagePoints() {
+        const msgList = document.getElementById('messagePointsList');
+        const msgEmpty = document.getElementById('messagePointsEmpty');
+        if (msgList) {
+            msgList.querySelectorAll('.message-point-item').forEach(item => item.remove());
+        }
+        if (msgEmpty) msgEmpty.style.display = 'block';
+        
+        const confList = document.getElementById('confirmPointsList');
+        const confEmpty = document.getElementById('confirmPointsEmpty');
+        if (confList) {
+            confList.querySelectorAll('.message-point-item').forEach(item => item.remove());
+        }
+        if (confEmpty) confEmpty.style.display = 'block';
+    }
+    
+    // 更新訊息重點區塊的語言
+    function updateMessagePointsLanguage() {
+        const t = i18n[currentLang];
+        const isKo = currentLang === 'ko';
+        
+        // 更新標題
+        const msgTitle = document.getElementById('messagePointsTitle');
+        const confTitle = document.getElementById('confirmPointsTitle');
+        const msgEmpty = document.getElementById('messagePointsEmpty');
+        const confEmpty = document.getElementById('confirmPointsEmpty');
+        
+        if (msgTitle) msgTitle.textContent = isKo ? '📌 메시지 포인트' : '📌 訊息重點';
+        if (confTitle) confTitle.textContent = isKo ? '❓ 확인 필요 사항' : '❓ 需確認的訊息';
+        if (msgEmpty) msgEmpty.textContent = isKo ? '+ 버튼을 눌러 추가하세요' : '點擊 + 新增訊息重點';
+        if (confEmpty) confEmpty.textContent = isKo ? '+ 버튼을 눌러 추가하세요' : '點擊 + 新增需確認的訊息';
+        
+        // 更新現有項目的選項和placeholder
+        const tags = pointTags[currentLang] || pointTags.ko;
+        document.querySelectorAll('.message-point-tag-select').forEach(select => {
+            const currentValue = select.value;
+            const isCustom = !tags.includes(currentValue);
+            
+            select.innerHTML = createTagOptions();
+            
+            if (isCustom && currentValue) {
+                const option = document.createElement('option');
+                option.value = currentValue;
+                option.textContent = currentValue;
+                option.selected = true;
+                select.insertBefore(option, select.lastElementChild);
+            } else if (tags.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        });
+        
+        document.querySelectorAll('#messagePointsList .message-point-content').forEach(input => {
+            input.placeholder = isKo ? '내용을 입력하세요...' : '請輸入內容...';
+        });
+        
+        document.querySelectorAll('#confirmPointsList .message-point-content').forEach(input => {
+            input.placeholder = isKo ? '확인할 내용...' : '需確認的內容...';
+        });
+    }
+
     // --- 核心資料操作 (Cloud) ---
 
     window.submitData = async () => {
@@ -3668,9 +4017,20 @@
         let typeLabel = (typeSelect === 'me') ? 'me' : 'other';
         const userRef = doc(dbInstance, "missionary_data", id);
         
+        // 獲取訊息重點和需確認訊息
+        const messagePoints = getMessagePoints();
+        const confirmPoints = getConfirmPoints();
+        
         // 使用時間戳記 (timestamp) 來進行秒數排序
         const timestamp = new Date().getTime();
-        const newLogEntry = { date, type: typeLabel, content, createdAt: timestamp };
+        const newLogEntry = { 
+            date, 
+            type: typeLabel, 
+            content, 
+            createdAt: timestamp,
+            messagePoints: messagePoints.length > 0 ? messagePoints : null,
+            confirmPoints: confirmPoints.length > 0 ? confirmPoints : null
+        };
 
         let updatedLogs = [];
         
@@ -3684,6 +4044,9 @@
             alert(t.alertCreate + name);
         }
         document.getElementById('content').value = '';
+        
+        // 清空訊息重點和需確認訊息
+        clearMessagePoints();
     };
 
     window.deleteSelected = async () => {
