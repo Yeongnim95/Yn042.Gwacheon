@@ -655,22 +655,30 @@
         .message-points-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         
         .message-point-item {
             display: flex;
-            gap: 10px;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 8px;
             background: white;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        .message-point-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
         
         .message-point-tag-select {
-            min-width: 90px;
-            padding: 8px;
+            flex: 1;
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.9rem;
@@ -678,13 +686,15 @@
         }
         
         .message-point-content {
-            flex: 1;
-            padding: 8px;
+            width: 100%;
+            padding: 10px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             resize: vertical;
-            min-height: 36px;
+            min-height: 60px;
+            line-height: 1.5;
+            box-sizing: border-box;
         }
         
         .message-point-remove {
@@ -711,6 +721,52 @@
             font-size: 0.85rem;
             text-align: center;
             padding: 10px;
+        }
+        
+        /* ===== 後台記錄中的訊息重點顯示 ===== */
+        .log-points-container {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .log-points-section {
+            margin-bottom: 8px;
+        }
+        
+        .log-points-title {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        
+        .log-point-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            padding: 4px 0;
+            font-size: 0.85rem;
+        }
+        
+        .log-point-tag {
+            background: var(--primary-green);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .log-point-tag.confirm {
+            background: #ff9800;
+        }
+        
+        .log-point-content {
+            flex: 1;
+            color: #333;
+            line-height: 1.4;
         }
         
         /* 複製成功提示 */
@@ -2357,6 +2413,19 @@
             color: var(--text-muted);
         }
         
+        /* 後台記錄訊息重點暗黑模式 */
+        [data-theme="dark"] .log-points-container {
+            border-top-color: #555;
+        }
+        
+        [data-theme="dark"] .log-points-title {
+            color: var(--text-secondary);
+        }
+        
+        [data-theme="dark"] .log-point-content {
+            color: var(--text-primary);
+        }
+        
         /* ===== 資料表格暗黑模式 ===== */
         [data-theme="dark"] .backend-controls {
             color: var(--text-primary);
@@ -3825,11 +3894,13 @@
         item.className = 'message-point-item';
         item.id = itemId;
         item.innerHTML = `
-            <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
-                ${createTagOptions()}
-            </select>
-            <input type="text" class="message-point-content" placeholder="${currentLang === 'ko' ? '내용을 입력하세요...' : '請輸入內容...'}">
-            <button class="message-point-remove" onclick="window.removeMessagePoint('${itemId}')">✕</button>
+            <div class="message-point-header">
+                <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
+                    ${createTagOptions()}
+                </select>
+                <button class="message-point-remove" onclick="window.removeMessagePoint('${itemId}')">✕</button>
+            </div>
+            <textarea class="message-point-content" placeholder="${currentLang === 'ko' ? '내용을 입력하세요...' : '請輸入內容...'}" rows="2"></textarea>
         `;
         list.appendChild(item);
     };
@@ -3857,11 +3928,13 @@
         item.className = 'message-point-item';
         item.id = itemId;
         item.innerHTML = `
-            <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
-                ${createTagOptions()}
-            </select>
-            <input type="text" class="message-point-content" placeholder="${currentLang === 'ko' ? '확인할 내용...' : '需確認的內容...'}">
-            <button class="message-point-remove" onclick="window.removeConfirmPoint('${itemId}')">✕</button>
+            <div class="message-point-header">
+                <select class="message-point-tag-select" onchange="window.handleTagChange(this)">
+                    ${createTagOptions()}
+                </select>
+                <button class="message-point-remove" onclick="window.removeConfirmPoint('${itemId}')">✕</button>
+            </div>
+            <textarea class="message-point-content" placeholder="${currentLang === 'ko' ? '확인할 내용...' : '需確認的內容...'}" rows="2"></textarea>
         `;
         list.appendChild(item);
     };
@@ -4316,6 +4389,34 @@
             user.logs.forEach((log, idx) => {
                 const typeText = log.type === 'me' ? t.tagMe : t.tagOther;
                 const typeClass = log.type === 'me' ? 'tag-me' : 'tag-other';
+                
+                // 生成訊息重點和需確認訊息的HTML
+                let pointsHtml = '';
+                if ((log.messagePoints && log.messagePoints.length > 0) || 
+                    (log.confirmPoints && log.confirmPoints.length > 0)) {
+                    pointsHtml = '<div class="log-points-container">';
+                    
+                    if (log.messagePoints && log.messagePoints.length > 0) {
+                        const msgTitle = currentLang === 'ko' ? '📌 메시지 포인트' : '📌 訊息重點';
+                        pointsHtml += `<div class="log-points-section"><div class="log-points-title">${msgTitle}</div>`;
+                        log.messagePoints.forEach(point => {
+                            pointsHtml += `<div class="log-point-item"><span class="log-point-tag">${point.tag}</span><span class="log-point-content">${point.content}</span></div>`;
+                        });
+                        pointsHtml += '</div>';
+                    }
+                    
+                    if (log.confirmPoints && log.confirmPoints.length > 0) {
+                        const confTitle = currentLang === 'ko' ? '❓ 확인 필요' : '❓ 需確認';
+                        pointsHtml += `<div class="log-points-section"><div class="log-points-title">${confTitle}</div>`;
+                        log.confirmPoints.forEach(point => {
+                            pointsHtml += `<div class="log-point-item"><span class="log-point-tag confirm">${point.tag}</span><span class="log-point-content">${point.content}</span></div>`;
+                        });
+                        pointsHtml += '</div>';
+                    }
+                    
+                    pointsHtml += '</div>';
+                }
+                
                 logsHtml += `
                     <div class="detail-row grid-row">
                         <div class="check-cell"></div>
@@ -4324,7 +4425,7 @@
                         <div><span class="tag ${typeClass}">${typeText}</span></div>
                         <div></div>
                         <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}</div>
-                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)">${log.content}</div>
+                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)">${log.content}${pointsHtml}</div>
                         <div class="action-cell">
                             <button class="btn-remove-log" onclick="window.deleteSingleLog(event, '${user.id}', ${idx})">✕</button>
                         </div>
