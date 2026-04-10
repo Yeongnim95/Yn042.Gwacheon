@@ -543,11 +543,11 @@
         /* Grid System - 線上後台 */
         .grid-row {
             display: grid;
-            grid-template-columns: 0px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 0px; 
+            grid-template-columns: 0px 40px 0.8fr 0.6fr 1fr 1fr 0px; 
             align-items: center; padding: 15px; transition: all 0.3s ease;
         }
         .list-container.edit-mode .grid-row {
-            grid-template-columns: 40px 40px 0.6fr 0.5fr 0.8fr 1.2fr 1.5fr 40px; 
+            grid-template-columns: 40px 40px 0.8fr 0.6fr 1fr 1fr 40px; 
         }
 
         /* Grid System - 線下後台 */
@@ -3616,13 +3616,18 @@
             <div class="list-header-row grid-row">
                 <div class="check-cell"></div>
                 <div></div>
-                <div id="col-id">번호</div>
-                <div id="col-activity">활동</div>
-                <div id="col-name">이름</div>
-                <div class="sortable" onclick="window.toggleSort()">
-                    <span id="col-date">최근 날짜</span> <span id="sortIcon">▼</span>
+                <div class="sortable" onclick="window.toggleSortBy('id')">
+                    <span id="col-id">번호</span> <span id="sortIconId"></span>
                 </div>
-                <div id="col-content">최신 내용</div>
+                <div class="sortable" onclick="window.toggleSortBy('activity')">
+                    <span id="col-activity">활동</span> <span id="sortIconActivity"></span>
+                </div>
+                <div class="sortable" onclick="window.toggleSortBy('name')">
+                    <span id="col-name">이름</span> <span id="sortIconName"></span>
+                </div>
+                <div class="sortable" onclick="window.toggleSortBy('date')">
+                    <span id="col-date">최근 날짜</span> <span id="sortIconDate">▼</span>
+                </div>
                 <div class="action-cell"></div>
             </div>
             <div id="dataList">
@@ -3762,6 +3767,7 @@
     let localDb = [];
     let offlineDb = [];
     let sortDesc = true; 
+    let sortBy = 'date'; // 'date', 'id', 'name', 'activity'
     let offlineSortDesc = true;
     let isEditMode = false;
     let isOfflineEditMode = false;
@@ -4090,7 +4096,7 @@
             'opt-me': t.optMe, 'opt-other': t.optOther, 'btn-submit': t.btnSubmit,
             'txt-backend-header': t.headerBackend, 'txt-select-all': t.txtSelectAll,
             'btn-delete': t.btnDelete, 'col-id': t.colId, 'col-name': t.colName,
-            'col-activity': t.colActivity, 'col-date': t.colDate, 'col-content': t.colContent,
+            'col-activity': t.colActivity, 'col-date': t.colDate,
             'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
             'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
             'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
@@ -4817,20 +4823,36 @@
         });
 
         processedUsers.sort((a, b) => {
-            const dateA = a.lastLog.date || '0000-00-00';
-            const dateB = b.lastLog.date || '0000-00-00';
-            const timeA = a.lastLog.createdAt || 0;
-            const timeB = b.lastLog.createdAt || 0;
+            let compareResult = 0;
             
-            if (sortDesc) {
-                // 降序：日期晚的靠前，同一天時間晚的靠前
-                if (dateA !== dateB) return dateB.localeCompare(dateA);
-                return timeB - timeA;
-            } else {
-                // 升序：日期早的靠前，同一天時間早的靠前
-                if (dateA !== dateB) return dateA.localeCompare(dateB);
-                return timeA - timeB;
+            if (sortBy === 'date') {
+                const dateA = a.lastLog.date || '0000-00-00';
+                const dateB = b.lastLog.date || '0000-00-00';
+                const timeA = a.lastLog.createdAt || 0;
+                const timeB = b.lastLog.createdAt || 0;
+                if (dateA !== dateB) {
+                    compareResult = dateB.localeCompare(dateA);
+                } else {
+                    compareResult = timeB - timeA;
+                }
+            } else if (sortBy === 'id') {
+                compareResult = a.id.localeCompare(b.id, undefined, { numeric: true });
+            } else if (sortBy === 'name') {
+                compareResult = a.name.localeCompare(b.name, 'ko');
+            } else if (sortBy === 'activity') {
+                // 活躍度排序：high > normal > low
+                const getActivityScore = (user) => {
+                    const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
+                    if (!lastLogDate) return 0;
+                    const daysDiff = Math.floor((new Date() - lastLogDate) / (1000 * 60 * 60 * 24));
+                    if (daysDiff <= 3) return 3;
+                    if (daysDiff <= 7) return 2;
+                    return 1;
+                };
+                compareResult = getActivityScore(b) - getActivityScore(a);
             }
+            
+            return sortDesc ? compareResult : -compareResult;
         });
 
         processedUsers.forEach(user => {
@@ -4937,8 +4959,7 @@
                     <div style="font-weight:bold; color:#666;">${user.id}</div>
                     <div><span class="activity-badge ${activityClass}">${activityText}</span></div>
                     <div style="font-weight:bold; font-size:1.05rem;">${user.name}</div>
-                    <div class="col-date editable" style="color:#2e7d32;" onclick="window.editDate(event, '${user.id}', 0, this)">${displayDate}</div>
-                    <div class="col-content editable" onclick="window.editContent(event, '${user.id}', 0, this)">${user.lastLog.content}</div>
+                    <div class="col-date" style="color:#2e7d32;">${displayDate}</div>
                     <div class="action-cell"></div>
                 </div>`;
 
@@ -4991,11 +5012,9 @@
                     <div class="detail-row grid-row">
                         <div class="check-cell"></div>
                         <div></div>
-                        <div></div>
                         <div><span class="tag ${typeClass}">${typeText}</span></div>
-                        <div></div>
                         <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}<button class="ai-summary-btn" onclick="window.triggerAiSummary(event, '${user.id}', ${idx})" title="AI整理">🤖</button></div>
-                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)">${log.content}${aiSummaryHtml}${pointsHtml}</div>
+                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)" style="grid-column: span 2;">${log.content}${aiSummaryHtml}${pointsHtml}</div>
                         <div class="action-cell">
                             <button class="btn-remove-log" onclick="window.deleteSingleLog(event, '${user.id}', ${idx})">✕</button>
                         </div>
@@ -5131,7 +5150,23 @@
         }, 100); 
     }
 
-    window.toggleSort = () => { sortDesc = !sortDesc; document.getElementById('sortIcon').textContent = sortDesc ? '▼' : '▲'; renderBackend(); };
+    window.toggleSortBy = (field) => {
+        if (sortBy === field) {
+            sortDesc = !sortDesc;
+        } else {
+            sortBy = field;
+            sortDesc = true;
+        }
+        // 更新所有排序圖示
+        ['Id', 'Activity', 'Name', 'Date'].forEach(f => {
+            const icon = document.getElementById('sortIcon' + f);
+            if (icon) icon.textContent = '';
+        });
+        const activeIcon = document.getElementById('sortIcon' + field.charAt(0).toUpperCase() + field.slice(1));
+        if (activeIcon) activeIcon.textContent = sortDesc ? '▼' : '▲';
+        renderBackend();
+    };
+    window.toggleSort = () => { window.toggleSortBy('date'); }; // 保留舊函數相容性
     window.toggleOfflineSort = () => { offlineSortDesc = !offlineSortDesc; document.getElementById('offlineSortIcon').textContent = offlineSortDesc ? '▼' : '▲'; renderOfflineBackend(); };
     window.toggleSelectAll = () => { const m = document.getElementById('selectAll'); document.getElementsByName('selectUser').forEach(c => c.checked = m.checked); };
     window.toggleOfflineSelectAll = () => { const m = document.getElementById('offlineSelectAll'); document.getElementsByName('selectOfflineUser').forEach(c => c.checked = m.checked); };
