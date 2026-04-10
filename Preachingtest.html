@@ -2428,25 +2428,25 @@
         
         /* ===== AI整理功能 ===== */
         .ai-summary-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: transparent;
+            color: #888;
             border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-left: 8px;
+            margin-left: 6px;
             transition: all 0.2s;
             vertical-align: middle;
         }
         
         .ai-summary-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            color: var(--primary-green);
+            transform: scale(1.15);
         }
         
         .ai-summary-btn.loading {
@@ -2463,9 +2463,9 @@
         .ai-summary-container {
             margin-top: 8px;
             padding: 10px 12px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            background: rgba(67, 160, 71, 0.08);
             border-radius: 8px;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid var(--primary-green);
         }
         
         .ai-summary-header {
@@ -2474,7 +2474,7 @@
             gap: 6px;
             margin-bottom: 6px;
             font-size: 0.8rem;
-            color: #667eea;
+            color: var(--primary-green);
             font-weight: 600;
         }
         
@@ -2515,7 +2515,7 @@
         }
         
         .ai-modal {
-            background: white;
+            background: var(--card-bg, white);
             border-radius: 16px;
             width: 90%;
             max-width: 500px;
@@ -2531,7 +2531,7 @@
         }
         
         .ai-modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-green);
             color: white;
             padding: 15px 20px;
             display: flex;
@@ -2569,12 +2569,13 @@
             padding: 20px;
             max-height: 50vh;
             overflow-y: auto;
+            background: var(--card-bg, white);
         }
         
         .ai-modal-content {
             font-size: 0.95rem;
             line-height: 1.6;
-            color: #333;
+            color: var(--text-primary, #333);
             white-space: pre-wrap;
         }
         
@@ -2586,11 +2587,15 @@
         .ai-modal-loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #eee;
-            border-top-color: #667eea;
+            border: 3px solid var(--border-light, #eee);
+            border-top-color: var(--primary-green);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
+        }
+        
+        .ai-modal-loading-text {
+            color: var(--text-secondary, #666);
         }
         
         @keyframes spin {
@@ -2599,10 +2604,11 @@
         
         .ai-modal-footer {
             padding: 15px 20px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border-light, #eee);
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            background: var(--card-bg, white);
         }
         
         .ai-modal-btn {
@@ -2615,64 +2621,79 @@
         }
         
         .ai-modal-btn.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-green);
             color: white;
         }
         
         .ai-modal-btn.primary:hover {
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 8px rgba(67, 160, 71, 0.4);
         }
         
         .ai-modal-btn.secondary {
-            background: #f0f0f0;
-            color: #666;
+            background: var(--input-bg, #f0f0f0);
+            color: var(--text-primary, #666);
         }
         
         .ai-modal-btn.secondary:hover {
-            background: #e0e0e0;
+            opacity: 0.8;
         }
         
         /* AI設定區塊 */
         .ai-settings-section {
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-light, #eee);
         }
         
         .ai-settings-label {
             font-size: 0.85rem;
-            color: #666;
+            color: var(--text-secondary, #666);
             margin-bottom: 8px;
             display: block;
+        }
+        
+        .ai-provider-display {
+            padding: 10px 12px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
         }
         
         .ai-provider-select {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-light, #ddd);
             border-radius: 8px;
             font-size: 0.95rem;
-            background: white;
+            background: var(--input-bg, white);
+            color: var(--text-primary, #333);
         }
         
         .ai-api-key-input {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-light, #ddd);
             border-radius: 8px;
             font-size: 0.9rem;
             margin-top: 8px;
+            background: var(--input-bg, white);
+            color: var(--text-primary, #333);
         }
         
         .ai-api-key-hint {
             font-size: 0.75rem;
-            color: #888;
+            color: var(--text-secondary, #888);
             margin-top: 4px;
+        }
+        
+        .ai-api-key-hint a {
+            color: var(--primary-green);
         }
         
         /* AI設定切換按鈕 */
         .ai-settings-toggle {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-green);
             color: white;
             border: none;
             padding: 6px 12px;
@@ -2687,39 +2708,24 @@
         
         .ai-settings-toggle:hover {
             transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 2px 8px rgba(67, 160, 71, 0.4);
         }
         
-        /* 暗黑模式 */
+        /* AI暗黑模式 */
         [data-theme="dark"] .ai-summary-container {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            background: rgba(67, 160, 71, 0.15);
         }
         
         [data-theme="dark"] .ai-summary-content {
             color: var(--text-primary);
         }
         
-        [data-theme="dark"] .ai-modal {
-            background: var(--card-bg);
+        [data-theme="dark"] .ai-summary-btn {
+            color: #aaa;
         }
         
-        [data-theme="dark"] .ai-modal-content {
-            color: var(--text-primary);
-        }
-        
-        [data-theme="dark"] .ai-modal-footer {
-            border-top-color: var(--border-light);
-        }
-        
-        [data-theme="dark"] .ai-provider-select,
-        [data-theme="dark"] .ai-api-key-input {
-            background: var(--input-bg);
-            border-color: var(--border-light);
-            color: var(--text-primary);
-        }
-        
-        [data-theme="dark"] .ai-settings-section {
-            border-bottom-color: var(--border-light);
+        [data-theme="dark"] .ai-summary-btn:hover {
+            color: var(--primary-green);
         }
         
         /* ===== 資料表格暗黑模式 ===== */
@@ -3591,7 +3597,7 @@
     <div id="backendSection" class="page-section">
         <h2 id="txt-backend-header" style="display: flex; align-items: center; justify-content: space-between;">
             <span>온라인 데이터 관리</span>
-            <button class="ai-settings-toggle" onclick="window.openAiSettings()" title="AI 設定">⚙️ AI</button>
+            <button class="ai-settings-toggle" onclick="window.openAiSettings()" title="AI 設定">✦ AI</button>
         </h2>
         
         <div class="backend-toolbar">
@@ -3682,7 +3688,7 @@
 <div class="ai-modal-overlay" id="aiModalOverlay" onclick="window.closeAiModal(event)">
     <div class="ai-modal" onclick="event.stopPropagation()">
         <div class="ai-modal-header">
-            <span class="ai-modal-title">🤖 <span id="aiModalTitle">AI 整理重點</span></span>
+            <span class="ai-modal-title">✦ <span id="aiModalTitle">AI 整理重點</span></span>
             <button class="ai-modal-close" onclick="window.closeAiModal()">✕</button>
         </div>
         <div class="ai-modal-body" id="aiModalBody">
@@ -3703,21 +3709,21 @@
 <div class="ai-modal-overlay" id="aiSettingsOverlay" onclick="window.closeAiSettings(event)">
     <div class="ai-modal" onclick="event.stopPropagation()">
         <div class="ai-modal-header">
-            <span class="ai-modal-title">⚙️ <span id="aiSettingsTitle">AI 設定</span></span>
+            <span class="ai-modal-title">✦ <span id="aiSettingsTitle">AI 設定</span></span>
             <button class="ai-modal-close" onclick="window.closeAiSettings()">✕</button>
         </div>
         <div class="ai-modal-body">
             <div class="ai-settings-section">
                 <label class="ai-settings-label" id="aiProviderLabel">AI 服務</label>
-                <div style="padding: 10px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-weight: 600;">
-                    🤖 Google Gemini 3.1 Flash Lite
+                <div class="ai-provider-display">
+                    ✦ Google Gemini 3.1 Flash Lite
                 </div>
             </div>
             <div class="ai-settings-section">
                 <label class="ai-settings-label" id="aiApiKeyLabel">Gemini API Key</label>
                 <input type="text" class="ai-api-key-input" id="aiApiKeyInput" placeholder="AIzaSy...">
                 <div class="ai-api-key-hint" id="aiApiKeyHint">
-                    <a href="https://aistudio.google.com/apikey" target="_blank" style="color: #667eea;">👉 點此取得免費 API Key</a>
+                    <a href="https://aistudio.google.com/apikey" target="_blank">👉 點此取得免費 API Key</a>
                 </div>
             </div>
         </div>
@@ -4971,7 +4977,7 @@
                 // 生成AI摘要HTML（如果有）
                 let aiSummaryHtml = '';
                 if (log.aiSummary) {
-                    const aiTitle = currentLang === 'ko' ? '🤖 AI 요약' : '🤖 AI 摘要';
+                    const aiTitle = currentLang === 'ko' ? '✦ AI 요약' : '✦ AI 摘要';
                     const providerName = log.aiProvider || 'AI';
                     aiSummaryHtml = `
                         <div class="ai-summary-container">
@@ -5013,7 +5019,7 @@
                         <div class="check-cell"></div>
                         <div></div>
                         <div><span class="tag ${typeClass}">${typeText}</span></div>
-                        <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}<button class="ai-summary-btn" onclick="window.triggerAiSummary(event, '${user.id}', ${idx})" title="AI整理">🤖</button></div>
+                        <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}<button class="ai-summary-btn" onclick="window.triggerAiSummary(event, '${user.id}', ${idx})" title="AI整理">✦</button></div>
                         <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)" style="grid-column: span 2;">${log.content}${aiSummaryHtml}${pointsHtml}</div>
                         <div class="action-cell">
                             <button class="btn-remove-log" onclick="window.deleteSingleLog(event, '${user.id}', ${idx})">✕</button>
