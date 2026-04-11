@@ -2731,39 +2731,32 @@
             color: var(--primary-green);
         }
         
-        /* AI分析閃光動畫 */
-        .ai-analyzing {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .ai-analyzing::before {
-            content: '';
-            position: absolute;
-            top: -100%;
-            left: 0;
-            right: 0;
-            height: 100%;
+        /* AI分析文字閃光動畫 */
+        .ai-analyzing-text {
             background: linear-gradient(
-                180deg,
-                transparent 0%,
-                rgba(67, 160, 71, 0.3) 30%,
-                rgba(76, 175, 80, 0.5) 50%,
-                rgba(67, 160, 71, 0.3) 70%,
-                transparent 100%
+                90deg,
+                var(--text-primary, #333) 0%,
+                var(--text-primary, #333) 40%,
+                #43a047 45%,
+                #66bb6a 50%,
+                #43a047 55%,
+                var(--text-primary, #333) 60%,
+                var(--text-primary, #333) 100%
             );
-            animation: aiScanDown 1.5s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 10;
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: aiTextShimmer 1.5s ease-in-out infinite;
         }
         
-        @keyframes aiScanDown {
-            0% { top: -100%; }
-            100% { top: 200%; }
+        @keyframes aiTextShimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
         }
         
-        .ai-analyzing .ai-summary-btn {
-            color: var(--primary-green);
+        .ai-analyzing-btn {
+            color: var(--primary-green) !important;
             animation: aiButtonPulse 0.8s ease-in-out infinite;
         }
         
@@ -4690,13 +4683,16 @@
         const log = sortedLogs[logIndex];
         if (!log) return;
         
-        // 找到該則內容的DOM元素並添加閃光動畫
-        const detailRows = document.querySelectorAll(`#details-${uid} .detail-row`);
-        const targetRow = detailRows[logIndex];
-        const contentCell = targetRow?.querySelector('.editable.copyable');
+        // 找到該則內容的DOM元素並添加文字閃光動畫
+        const targetRow = document.querySelector(`.detail-row[data-uid="${uid}"][data-idx="${logIndex}"]`);
+        const contentText = targetRow?.querySelector('.log-content-text');
+        const aiBtn = targetRow?.querySelector('.ai-summary-btn');
         
-        if (contentCell) {
-            contentCell.classList.add('ai-analyzing');
+        if (contentText) {
+            contentText.classList.add('ai-analyzing-text');
+        }
+        if (aiBtn) {
+            aiBtn.classList.add('ai-analyzing-btn');
         }
         
         try {
@@ -4704,8 +4700,11 @@
             currentAiSummary = summary;
             
             // 移除閃光動畫
-            if (contentCell) {
-                contentCell.classList.remove('ai-analyzing');
+            if (contentText) {
+                contentText.classList.remove('ai-analyzing-text');
+            }
+            if (aiBtn) {
+                aiBtn.classList.remove('ai-analyzing-btn');
             }
             
             // 顯示結果彈窗
@@ -4726,8 +4725,11 @@
             
         } catch (error) {
             // 移除閃光動畫
-            if (contentCell) {
-                contentCell.classList.remove('ai-analyzing');
+            if (contentText) {
+                contentText.classList.remove('ai-analyzing-text');
+            }
+            if (aiBtn) {
+                aiBtn.classList.remove('ai-analyzing-btn');
             }
             
             // 顯示錯誤彈窗
@@ -5348,12 +5350,12 @@
                 }
                 
                 logsHtml += `
-                    <div class="detail-row grid-row">
+                    <div class="detail-row grid-row" data-uid="${user.id}" data-idx="${idx}">
                         <div class="check-cell"></div>
                         <div></div>
                         <div><span class="tag ${typeClass}">${typeText}</span></div>
                         <div class="editable" style="color:#1565c0;" onclick="window.editDate(event, '${user.id}', ${idx}, this)">${log.date}<button class="ai-summary-btn" onclick="window.triggerAiSummary(event, '${user.id}', ${idx})" title="AI整理">✦AI</button></div>
-                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)" style="grid-column: span 2;">${log.content}${aiSummaryHtml}${pointsHtml}</div>
+                        <div class="editable copyable" onclick="window.editContent(event, '${user.id}', ${idx}, this)" ondblclick="window.copyContent(event, this)" style="grid-column: span 2;"><span class="log-content-text">${log.content}</span>${aiSummaryHtml}${pointsHtml}</div>
                         <div class="action-cell">
                             <button class="btn-remove-log" onclick="window.deleteSingleLog(event, '${user.id}', ${idx})">✕</button>
                         </div>
