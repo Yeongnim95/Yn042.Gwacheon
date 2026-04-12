@@ -397,19 +397,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .weather-location {
-            font-size: 1rem;
-            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
         
-        .weather-location::before {
-            content: '📍';
+        .weather-location-icon {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+        }
+        
+        .weather-location-icon svg {
+            width: 100%;
+            height: 100%;
         }
         
         .weather-main {
@@ -420,8 +428,8 @@
         }
         
         .weather-icon {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -433,7 +441,7 @@
         }
         
         .weather-temp {
-            font-size: 3.5rem;
+            font-size: 3.8rem;
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1;
@@ -3603,7 +3611,15 @@
                     <span id="weatherLoadingText">날씨 정보 로딩 중...</span>
                 </div>
                 <div class="weather-content" id="weatherContent" style="display: none;">
-                    <div class="weather-location" id="weatherLocation">--</div>
+                    <div class="weather-location">
+                        <span class="weather-location-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21c-4-4-8-7.5-8-12a8 8 0 1 1 16 0c0 4.5-4 8-8 12z"/>
+                                <circle cx="12" cy="9" r="3"/>
+                            </svg>
+                        </span>
+                        <span id="weatherLocation">--</span>
+                    </div>
                     <div class="weather-main">
                         <div class="weather-icon" id="weatherIcon"></div>
                         <div class="weather-temp" id="weatherTemp">--°</div>
@@ -4434,6 +4450,29 @@
 
     // 頁面記憶超時設定（12小時 = 12 * 60 * 60 * 1000 毫秒）
     const PAGE_MEMORY_TIMEOUT = 12 * 60 * 60 * 1000;
+    
+    // ===== 滑動與點擊區分（後台用） =====
+    let backendTouchStartX = 0;
+    let backendTouchStartY = 0;
+    let isBackendSwiping = false;
+    const BACKEND_SWIPE_THRESHOLD = 10; // 移動超過10px視為滑動
+    
+    document.addEventListener('touchstart', (e) => {
+        backendTouchStartX = e.touches[0].clientX;
+        backendTouchStartY = e.touches[0].clientY;
+        isBackendSwiping = false;
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (!backendTouchStartX || !backendTouchStartY) return;
+        const deltaX = Math.abs(e.touches[0].clientX - backendTouchStartX);
+        const deltaY = Math.abs(e.touches[0].clientY - backendTouchStartY);
+        if (deltaX > BACKEND_SWIPE_THRESHOLD || deltaY > BACKEND_SWIPE_THRESHOLD) {
+            isBackendSwiping = true;
+        }
+    }, { passive: true });
+    
+    window.isSwipeAction = () => isBackendSwiping;
     
     // 儲存頁面和時間戳
     function saveCurrentPage(page) {
@@ -5342,6 +5381,7 @@
 
     window.editDate = (event, uid, logIndex, el) => {
         if (!isEditMode) return;
+        if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
         event.stopPropagation();
         if (el.querySelector('input')) return;
 
@@ -5374,6 +5414,7 @@
 
     window.editContent = (event, uid, logIndex, el) => {
         if (!isEditMode) return;
+        if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
         event.stopPropagation();
         if (el.querySelector('textarea')) return;
 
@@ -5740,6 +5781,7 @@
     };
 
     window.toggleDetails = (uid) => {
+        if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
         if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
         const details = document.getElementById(`details-${uid}`);
         const summary = details.previousElementSibling;
@@ -5909,8 +5951,13 @@
     }
     
     // ===== 天氣功能 =====
+    const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000; // 30分鐘更新一次
+    let weatherUpdateTimer = null;
+    let lastWeatherData = null;
+    
     const weatherIcons = {
-        clear: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        // 白天圖示
+        clearDay: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="22" fill="#FFB300"/>
             <g stroke="#FFB300" stroke-width="4" stroke-linecap="round">
                 <line x1="50" y1="10" x2="50" y2="22"/>
@@ -5923,12 +5970,20 @@
                 <line x1="69.8" y1="30.2" x2="78.3" y2="21.7"/>
             </g>
         </svg>`,
+        // 夜間月亮圖示
+        clearNight: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M55 15C35 15 20 32 20 52s15 37 35 37c8 0 15-2.5 21-7-5 2-10 3-16 3-20 0-36-16-36-36 0-15 9-28 22-34-3 0-6 0-9 0z" fill="#FFD54F"/>
+            <circle cx="70" cy="25" r="2" fill="#FFD54F"/>
+            <circle cx="80" cy="40" r="1.5" fill="#FFD54F"/>
+            <circle cx="85" cy="55" r="2" fill="#FFD54F"/>
+            <circle cx="78" cy="70" r="1.5" fill="#FFD54F"/>
+        </svg>`,
         cloudy: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="55" cy="55" rx="30" ry="20" fill="#90A4AE"/>
             <ellipse cx="35" cy="60" rx="22" ry="15" fill="#B0BEC5"/>
             <ellipse cx="65" cy="58" rx="18" ry="14" fill="#B0BEC5"/>
         </svg>`,
-        partlyCloudy: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        partlyCloudyDay: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="35" cy="35" r="16" fill="#FFB300"/>
             <g stroke="#FFB300" stroke-width="3" stroke-linecap="round">
                 <line x1="35" y1="8" x2="35" y2="15"/>
@@ -5936,6 +5991,13 @@
                 <line x1="8" y1="35" x2="15" y2="35"/>
                 <line x1="55" y1="35" x2="62" y2="35"/>
             </g>
+            <ellipse cx="58" cy="62" rx="26" ry="17" fill="#90A4AE"/>
+            <ellipse cx="40" cy="66" rx="20" ry="13" fill="#B0BEC5"/>
+            <ellipse cx="68" cy="64" rx="16" ry="12" fill="#B0BEC5"/>
+        </svg>`,
+        partlyCloudyNight: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M38 18C28 18 20 27 20 38c0 5 2 9 5 12-1 0-2 0-3 0 0 0 0 0 0 0" fill="none"/>
+            <path d="M35 15c-8 0-15 5-18 12 2-1 5-1 7-1 10 0 18 8 18 18 0 3-1 6-2 8h2c0 0 0 0 0 0" fill="#FFD54F"/>
             <ellipse cx="58" cy="62" rx="26" ry="17" fill="#90A4AE"/>
             <ellipse cx="40" cy="66" rx="20" ry="13" fill="#B0BEC5"/>
             <ellipse cx="68" cy="64" rx="16" ry="12" fill="#B0BEC5"/>
@@ -5977,30 +6039,56 @@
         </svg>`
     };
     
-    function getWeatherIcon(code) {
-        // OpenWeatherMap weather codes
-        if (code >= 200 && code < 300) return weatherIcons.thunder;
-        if (code >= 300 && code < 400) return weatherIcons.rain;
-        if (code >= 500 && code < 600) return weatherIcons.rain;
-        if (code >= 600 && code < 700) return weatherIcons.snow;
-        if (code >= 700 && code < 800) return weatherIcons.fog;
-        if (code === 800) return weatherIcons.clear;
-        if (code === 801 || code === 802) return weatherIcons.partlyCloudy;
-        if (code >= 803) return weatherIcons.cloudy;
-        return weatherIcons.clear;
+    function isNightTime() {
+        const hour = new Date().getHours();
+        return hour < 6 || hour >= 18; // 18:00-06:00 視為夜間
     }
     
-    async function loadWeather() {
+    function getWeatherIcon(code, isNight = false) {
+        // WMO Weather interpretation codes
+        if (code >= 95 && code <= 99) return weatherIcons.thunder;
+        if (code >= 80 && code <= 82) return weatherIcons.rain;
+        if (code >= 85 && code <= 86) return weatherIcons.snow;
+        if (code >= 71 && code <= 77) return weatherIcons.snow;
+        if (code >= 66 && code <= 67) return weatherIcons.rain;
+        if (code >= 61 && code <= 65) return weatherIcons.rain;
+        if (code >= 56 && code <= 57) return weatherIcons.rain;
+        if (code >= 51 && code <= 55) return weatherIcons.rain;
+        if (code >= 45 && code <= 48) return weatherIcons.fog;
+        if (code === 3) return weatherIcons.cloudy;
+        if (code === 2) return isNight ? weatherIcons.partlyCloudyNight : weatherIcons.partlyCloudyDay;
+        if (code === 1) return isNight ? weatherIcons.partlyCloudyNight : weatherIcons.partlyCloudyDay;
+        if (code === 0) return isNight ? weatherIcons.clearNight : weatherIcons.clearDay;
+        return isNight ? weatherIcons.clearNight : weatherIcons.clearDay;
+    }
+    
+    async function loadWeather(forceRefresh = false) {
         const loading = document.getElementById('weatherLoading');
         const content = document.getElementById('weatherContent');
         const error = document.getElementById('weatherError');
         
+        // 檢查是否有快取且未過期
+        const cached = localStorage.getItem('weather_cache');
+        if (cached && !forceRefresh) {
+            try {
+                const cacheData = JSON.parse(cached);
+                if (Date.now() - cacheData.timestamp < WEATHER_UPDATE_INTERVAL) {
+                    displayWeatherData(cacheData);
+                    scheduleWeatherUpdate();
+                    return;
+                }
+            } catch (e) {}
+        }
+        
         // 更新載入文字
-        const t = i18n[currentLang];
         document.getElementById('weatherLoadingText').textContent = 
             currentLang === 'ko' ? '날씨 정보 로딩 중...' : '正在載入天氣資訊...';
         document.getElementById('weatherErrorText').textContent = 
             currentLang === 'ko' ? '날씨 정보를 불러올 수 없습니다' : '無法載入天氣資訊';
+        
+        loading.style.display = 'flex';
+        content.style.display = 'none';
+        error.style.display = 'none';
         
         try {
             // 取得位置
@@ -6011,14 +6099,14 @@
                 }
                 navigator.geolocation.getCurrentPosition(resolve, reject, {
                     timeout: 10000,
-                    maximumAge: 300000 // 5分鐘快取
+                    maximumAge: 300000
                 });
             });
             
             const { latitude, longitude } = position.coords;
             
-            // 呼叫 Open-Meteo API (免費，無需 API Key)
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto`;
+            // 呼叫 Open-Meteo API
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`;
             const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=${currentLang === 'ko' ? 'ko' : 'zh-TW'}`;
             
             const [weatherRes, geoRes] = await Promise.all([
@@ -6036,15 +6124,22 @@
                 locationName = addr.city || addr.town || addr.village || addr.county || addr.state || '';
             }
             
-            // 更新天氣顯示
-            document.getElementById('weatherLocation').textContent = locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
-            document.getElementById('weatherTemp').textContent = `${Math.round(weatherData.current.temperature_2m)}°`;
-            document.getElementById('weatherIcon').innerHTML = getWeatherIcon(weatherData.current.weather_code);
-            document.getElementById('weatherDesc').textContent = getWeatherDescription(weatherData.current.weather_code);
+            // 建立快取資料
+            const cacheData = {
+                timestamp: Date.now(),
+                temperature: weatherData.current.temperature_2m,
+                weatherCode: weatherData.current.weather_code,
+                isDay: weatherData.current.is_day === 1,
+                locationName: locationName,
+                lang: currentLang
+            };
             
-            loading.style.display = 'none';
-            content.style.display = 'flex';
-            error.style.display = 'none';
+            // 儲存快取
+            localStorage.setItem('weather_cache', JSON.stringify(cacheData));
+            
+            // 顯示天氣
+            displayWeatherData(cacheData);
+            scheduleWeatherUpdate();
             
         } catch (err) {
             console.error('Weather error:', err);
@@ -6052,6 +6147,34 @@
             content.style.display = 'none';
             error.style.display = 'block';
         }
+    }
+    
+    function displayWeatherData(data) {
+        const loading = document.getElementById('weatherLoading');
+        const content = document.getElementById('weatherContent');
+        const error = document.getElementById('weatherError');
+        
+        const isNight = !data.isDay || isNightTime();
+        
+        document.getElementById('weatherLocation').textContent = data.locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
+        document.getElementById('weatherTemp').textContent = `${Math.round(data.temperature)}°`;
+        document.getElementById('weatherIcon').innerHTML = getWeatherIcon(data.weatherCode, isNight);
+        document.getElementById('weatherDesc').textContent = getWeatherDescription(data.weatherCode);
+        
+        loading.style.display = 'none';
+        content.style.display = 'flex';
+        error.style.display = 'none';
+    }
+    
+    function scheduleWeatherUpdate() {
+        if (weatherUpdateTimer) {
+            clearTimeout(weatherUpdateTimer);
+        }
+        weatherUpdateTimer = setTimeout(() => {
+            if (document.getElementById('homeSection').classList.contains('active-section')) {
+                loadWeather(true);
+            }
+        }, WEATHER_UPDATE_INTERVAL);
     }
     
     function getWeatherDescription(code) {
