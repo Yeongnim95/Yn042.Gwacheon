@@ -368,40 +368,92 @@
             padding: 20px 0;
         }
         
-        .home-welcome {
-            margin-bottom: 40px;
+        /* 天氣區塊 */
+        .weather-section {
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.08) 0%, rgba(139, 195, 74, 0.08) 100%);
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
         }
         
-        .home-title {
-            margin: 0 0 15px 0;
-        }
-        
-        .home-title-ko {
-            display: block;
-            font-size: 2.2rem;
-            color: var(--primary-green);
-            font-weight: 700;
-        }
-        
-        .home-title-zh {
-            display: block;
-            font-size: 1.4rem;
+        .weather-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
             color: var(--text-secondary);
-            font-weight: 400;
+        }
+        
+        .weather-loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-light);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .weather-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .weather-location {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .weather-location::before {
+            content: '📍';
+        }
+        
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .weather-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .weather-temp {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        
+        .weather-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
             margin-top: 5px;
         }
         
-        .home-subtitle {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin: 0;
+        .weather-error {
+            color: #999;
+            font-size: 0.95rem;
         }
         
         .home-quick-links {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
-            margin-bottom: 40px;
         }
         
         .home-card {
@@ -436,37 +488,10 @@
             color: var(--text-secondary);
         }
         
-        .home-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            padding: 25px;
-            background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%);
-            border-radius: 16px;
-        }
-        
-        .home-stat-item {
-            text-align: center;
-        }
-        
-        .home-stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-        }
-        
-        .home-stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 5px;
-        }
-        
         @media (max-width: 500px) {
-            .home-title-ko { font-size: 1.8rem; }
-            .home-title-zh { font-size: 1.2rem; }
+            .weather-temp { font-size: 2.8rem; }
+            .weather-icon { width: 60px; height: 60px; }
             .home-quick-links { grid-template-columns: repeat(2, 1fr); }
-            .home-stats { gap: 25px; padding: 20px; }
-            .home-stat-number { font-size: 2rem; }
         }
 
         h2 {
@@ -724,14 +749,16 @@
         .user-card { border: 1px solid #eee; border-top: none; background: white; }
         .user-card:last-child { border-radius: 0 0 8px 8px; }
 
-        .user-summary { cursor: pointer; font-size: 1rem; }
-        .user-summary:hover { background: #f9fbe7; }
+        .user-summary { cursor: pointer; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
+        @media (hover: hover) {
+            .user-summary:hover { background: #f9fbe7; }
+        }
         .user-summary.expanded { background: #f1f8e9; border-bottom: 1px solid #e0e0e0; }
 
         .user-details { display: none; background: #fafafa; }
         .user-details.show { display: block; }
 
-        .detail-row { border-bottom: 1px solid #eee; background: #fff; color: #555; font-size: 1rem; }
+        .detail-row { border-bottom: 1px solid #eee; background: #fff; color: #555; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
         .detail-row:last-child { border-bottom: none; }
 
         .check-cell { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; opacity: 0; transition: opacity 0.3s; }
@@ -3233,8 +3260,10 @@
             color: var(--text-primary);
         }
         
-        [data-theme="dark"] .user-summary:hover {
-            background: #2a3d2a;
+        @media (hover: hover) {
+            [data-theme="dark"] .user-summary:hover {
+                background: #2a3d2a;
+            }
         }
         
         [data-theme="dark"] .user-summary.expanded {
@@ -3567,14 +3596,26 @@
     <!-- 首頁 -->
     <div id="homeSection" class="page-section active-section">
         <div class="home-container">
-            <div class="home-welcome">
-                <h1 class="home-title">
-                    <span class="home-title-ko">전도 트래커</span>
-                    <span class="home-title-zh">傳道追蹤器</span>
-                </h1>
-                <p class="home-subtitle" id="home-subtitle">복음의 열매를 기록하고 관리하세요</p>
+            <!-- 天氣區塊 -->
+            <div class="weather-section" id="weatherSection">
+                <div class="weather-loading" id="weatherLoading">
+                    <div class="weather-loading-spinner"></div>
+                    <span id="weatherLoadingText">날씨 정보 로딩 중...</span>
+                </div>
+                <div class="weather-content" id="weatherContent" style="display: none;">
+                    <div class="weather-location" id="weatherLocation">--</div>
+                    <div class="weather-main">
+                        <div class="weather-icon" id="weatherIcon"></div>
+                        <div class="weather-temp" id="weatherTemp">--°</div>
+                    </div>
+                    <div class="weather-desc" id="weatherDesc">--</div>
+                </div>
+                <div class="weather-error" id="weatherError" style="display: none;">
+                    <span id="weatherErrorText">날씨 정보를 불러올 수 없습니다</span>
+                </div>
             </div>
             
+            <!-- 快速連結 -->
             <div class="home-quick-links">
                 <div class="home-card" onclick="window.switchPage('bible')">
                     <div class="home-card-icon">📖</div>
@@ -3595,17 +3636,6 @@
                     <div class="home-card-icon">👤</div>
                     <div class="home-card-title" id="home-card-profile">개인정보</div>
                     <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
-                </div>
-            </div>
-            
-            <div class="home-stats" id="homeStats">
-                <div class="home-stat-item">
-                    <div class="home-stat-number" id="home-stat-total">0</div>
-                    <div class="home-stat-label" id="home-stat-total-label">총 섭외자</div>
-                </div>
-                <div class="home-stat-item">
-                    <div class="home-stat-number" id="home-stat-week">0</div>
-                    <div class="home-stat-label" id="home-stat-week-label">주간 교류</div>
                 </div>
             </div>
         </div>
@@ -4605,9 +4635,9 @@
         updateCounter();
         updateOfflineCounter();
         
-        // 更新首頁統計
+        // 如果在首頁，重新載入天氣（更新語言）
         if (document.getElementById('homeSection').classList.contains('active-section')) {
-            updateHomeStats();
+            loadWeather();
         }
         
         // 更新訊息重點區塊語言
@@ -5799,8 +5829,8 @@
         if (page === 'home') {
             document.getElementById('homeSection').classList.add('active-section');
             pageTitleEl.textContent = currentLang === 'ko' ? '홈' : '首頁';
-            // 更新首頁統計
-            updateHomeStats();
+            // 載入天氣
+            loadWeather();
         } else if (page === 'daily-faith') {
             document.getElementById('dailyFaithSection').classList.add('active-section');
             document.getElementById('btn-daily-faith')?.classList.add('active');
@@ -5878,26 +5908,170 @@
         document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
     }
     
-    function updateHomeStats() {
-        // 計算總人數
-        const totalCount = localDb.length + offlineDb.length;
-        document.getElementById('home-stat-total').textContent = totalCount;
+    // ===== 天氣功能 =====
+    const weatherIcons = {
+        clear: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="22" fill="#FFB300"/>
+            <g stroke="#FFB300" stroke-width="4" stroke-linecap="round">
+                <line x1="50" y1="10" x2="50" y2="22"/>
+                <line x1="50" y1="78" x2="50" y2="90"/>
+                <line x1="10" y1="50" x2="22" y2="50"/>
+                <line x1="78" y1="50" x2="90" y2="50"/>
+                <line x1="21.7" y1="21.7" x2="30.2" y2="30.2"/>
+                <line x1="69.8" y1="69.8" x2="78.3" y2="78.3"/>
+                <line x1="21.7" y1="78.3" x2="30.2" y2="69.8"/>
+                <line x1="69.8" y1="30.2" x2="78.3" y2="21.7"/>
+            </g>
+        </svg>`,
+        cloudy: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="55" cy="55" rx="30" ry="20" fill="#90A4AE"/>
+            <ellipse cx="35" cy="60" rx="22" ry="15" fill="#B0BEC5"/>
+            <ellipse cx="65" cy="58" rx="18" ry="14" fill="#B0BEC5"/>
+        </svg>`,
+        partlyCloudy: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="35" cy="35" r="16" fill="#FFB300"/>
+            <g stroke="#FFB300" stroke-width="3" stroke-linecap="round">
+                <line x1="35" y1="8" x2="35" y2="15"/>
+                <line x1="35" y1="55" x2="35" y2="48"/>
+                <line x1="8" y1="35" x2="15" y2="35"/>
+                <line x1="55" y1="35" x2="62" y2="35"/>
+            </g>
+            <ellipse cx="58" cy="62" rx="26" ry="17" fill="#90A4AE"/>
+            <ellipse cx="40" cy="66" rx="20" ry="13" fill="#B0BEC5"/>
+            <ellipse cx="68" cy="64" rx="16" ry="12" fill="#B0BEC5"/>
+        </svg>`,
+        rain: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="50" cy="40" rx="28" ry="18" fill="#78909C"/>
+            <ellipse cx="32" cy="44" rx="20" ry="14" fill="#90A4AE"/>
+            <ellipse cx="65" cy="42" rx="18" ry="13" fill="#90A4AE"/>
+            <g stroke="#42A5F5" stroke-width="3" stroke-linecap="round">
+                <line x1="30" y1="60" x2="26" y2="75"/>
+                <line x1="45" y1="62" x2="41" y2="80"/>
+                <line x1="60" y1="60" x2="56" y2="78"/>
+                <line x1="75" y1="58" x2="71" y2="73"/>
+            </g>
+        </svg>`,
+        snow: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="50" cy="35" rx="28" ry="18" fill="#78909C"/>
+            <ellipse cx="32" cy="39" rx="20" ry="14" fill="#90A4AE"/>
+            <ellipse cx="65" cy="37" rx="18" ry="13" fill="#90A4AE"/>
+            <circle cx="30" cy="65" r="4" fill="#B3E5FC"/>
+            <circle cx="50" cy="70" r="4" fill="#B3E5FC"/>
+            <circle cx="70" cy="63" r="4" fill="#B3E5FC"/>
+            <circle cx="40" cy="82" r="3" fill="#B3E5FC"/>
+            <circle cx="60" cy="85" r="3" fill="#B3E5FC"/>
+        </svg>`,
+        thunder: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="50" cy="35" rx="28" ry="18" fill="#546E7A"/>
+            <ellipse cx="32" cy="39" rx="20" ry="14" fill="#607D8B"/>
+            <ellipse cx="65" cy="37" rx="18" ry="13" fill="#607D8B"/>
+            <polygon points="55,50 45,68 52,68 47,88 62,62 54,62" fill="#FFC107"/>
+        </svg>`,
+        fog: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#90A4AE" stroke-width="5" stroke-linecap="round">
+                <line x1="20" y1="35" x2="80" y2="35"/>
+                <line x1="25" y1="50" x2="75" y2="50"/>
+                <line x1="20" y1="65" x2="80" y2="65"/>
+                <line x1="30" y1="80" x2="70" y2="80"/>
+            </g>
+        </svg>`
+    };
+    
+    function getWeatherIcon(code) {
+        // OpenWeatherMap weather codes
+        if (code >= 200 && code < 300) return weatherIcons.thunder;
+        if (code >= 300 && code < 400) return weatherIcons.rain;
+        if (code >= 500 && code < 600) return weatherIcons.rain;
+        if (code >= 600 && code < 700) return weatherIcons.snow;
+        if (code >= 700 && code < 800) return weatherIcons.fog;
+        if (code === 800) return weatherIcons.clear;
+        if (code === 801 || code === 802) return weatherIcons.partlyCloudy;
+        if (code >= 803) return weatherIcons.cloudy;
+        return weatherIcons.clear;
+    }
+    
+    async function loadWeather() {
+        const loading = document.getElementById('weatherLoading');
+        const content = document.getElementById('weatherContent');
+        const error = document.getElementById('weatherError');
         
-        // 計算週間交流人數
-        const now = new Date();
-        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        // 更新載入文字
+        const t = i18n[currentLang];
+        document.getElementById('weatherLoadingText').textContent = 
+            currentLang === 'ko' ? '날씨 정보 로딩 중...' : '正在載入天氣資訊...';
+        document.getElementById('weatherErrorText').textContent = 
+            currentLang === 'ko' ? '날씨 정보를 불러올 수 없습니다' : '無法載入天氣資訊';
         
-        const weeklyOnline = localDb.filter(user => {
-            if (!user.logs || user.logs.length === 0) return false;
-            return user.logs.some(log => new Date(log.date) >= oneWeekAgo);
-        }).length;
-        
-        const weeklyOffline = offlineDb.filter(user => {
-            if (!user.logs || user.logs.length === 0) return false;
-            return user.logs.some(log => new Date(log.date) >= oneWeekAgo);
-        }).length;
-        
-        document.getElementById('home-stat-week').textContent = weeklyOnline + weeklyOffline;
+        try {
+            // 取得位置
+            const position = await new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation not supported'));
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    timeout: 10000,
+                    maximumAge: 300000 // 5分鐘快取
+                });
+            });
+            
+            const { latitude, longitude } = position.coords;
+            
+            // 呼叫 Open-Meteo API (免費，無需 API Key)
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto`;
+            const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=${currentLang === 'ko' ? 'ko' : 'zh-TW'}`;
+            
+            const [weatherRes, geoRes] = await Promise.all([
+                fetch(weatherUrl),
+                fetch(geoUrl, { headers: { 'User-Agent': 'PreachingTracker/1.0' } })
+            ]);
+            
+            const weatherData = await weatherRes.json();
+            const geoData = await geoRes.json();
+            
+            // 解析位置名稱
+            let locationName = '';
+            if (geoData.address) {
+                const addr = geoData.address;
+                locationName = addr.city || addr.town || addr.village || addr.county || addr.state || '';
+            }
+            
+            // 更新天氣顯示
+            document.getElementById('weatherLocation').textContent = locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
+            document.getElementById('weatherTemp').textContent = `${Math.round(weatherData.current.temperature_2m)}°`;
+            document.getElementById('weatherIcon').innerHTML = getWeatherIcon(weatherData.current.weather_code);
+            document.getElementById('weatherDesc').textContent = getWeatherDescription(weatherData.current.weather_code);
+            
+            loading.style.display = 'none';
+            content.style.display = 'flex';
+            error.style.display = 'none';
+            
+        } catch (err) {
+            console.error('Weather error:', err);
+            loading.style.display = 'none';
+            content.style.display = 'none';
+            error.style.display = 'block';
+        }
+    }
+    
+    function getWeatherDescription(code) {
+        const isKo = currentLang === 'ko';
+        // WMO Weather interpretation codes
+        if (code === 0) return isKo ? '맑음' : '晴朗';
+        if (code === 1) return isKo ? '대체로 맑음' : '大致晴朗';
+        if (code === 2) return isKo ? '구름 조금' : '局部多雲';
+        if (code === 3) return isKo ? '흐림' : '多雲';
+        if (code >= 45 && code <= 48) return isKo ? '안개' : '霧';
+        if (code >= 51 && code <= 55) return isKo ? '이슬비' : '毛毛雨';
+        if (code >= 56 && code <= 57) return isKo ? '결빙 이슬비' : '凍毛雨';
+        if (code >= 61 && code <= 65) return isKo ? '비' : '雨';
+        if (code >= 66 && code <= 67) return isKo ? '결빙 비' : '凍雨';
+        if (code >= 71 && code <= 75) return isKo ? '눈' : '雪';
+        if (code === 77) return isKo ? '눈 알갱이' : '雪粒';
+        if (code >= 80 && code <= 82) return isKo ? '소나기' : '陣雨';
+        if (code >= 85 && code <= 86) return isKo ? '눈 소나기' : '陣雪';
+        if (code >= 95 && code <= 99) return isKo ? '뇌우' : '雷雨';
+        return isKo ? '알 수 없음' : '未知';
     }
     
     function updateOfflineCounter() {
