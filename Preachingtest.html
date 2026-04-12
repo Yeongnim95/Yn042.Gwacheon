@@ -114,7 +114,7 @@
         /* --- 導航列 --- */
         nav {
             background: var(--nav-bg);
-            padding: 0 20px;
+            padding: 0 15px;
             box-shadow: 0 2px 10px var(--shadow-color);
             display: flex;
             transition: background 0.3s;
@@ -216,6 +216,28 @@
         .menu-category-title:hover {
             background: #e8f5e9;
         }
+        .menu-category-title.home-link {
+            background: var(--light-green-bg);
+        }
+        .menu-category-title.home-link:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+        .menu-category-title.disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+        .menu-category-title.disabled:hover {
+            background: transparent;
+        }
+        .dev-badge {
+            font-size: 0.65rem;
+            background: #ff9800;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
         .submenu-arrow {
             font-size: 0.7rem;
             transition: transform 0.3s;
@@ -296,15 +318,39 @@
 
         /* --- 容器 --- */
         .container {
-            width: 100%;
-            max-width: 1280px;
-            margin: 20px auto;
+            width: calc(100% - 30px);
+            max-width: 1400px;
+            margin: 15px auto;
             background: var(--bg-secondary);
             border-radius: 16px;
             box-shadow: 0 10px 30px var(--shadow-color);
-            padding: 25px 25px;
+            padding: 25px;
             min-height: 600px;
             transition: background 0.3s, box-shadow 0.3s;
+        }
+        
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: calc(100% - 20px);
+                margin: 10px auto;
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                width: calc(100% - 16px);
+                margin: 8px auto;
+                padding: 15px 12px;
+                border-radius: 10px;
+            }
         }
         
         /* 自適應字體大小 */
@@ -315,6 +361,113 @@
         .page-section { display: none; animation: fadeIn 0.3s ease; }
         .page-section.active-section { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ===== 首頁樣式 ===== */
+        .home-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .home-welcome {
+            margin-bottom: 40px;
+        }
+        
+        .home-title {
+            margin: 0 0 15px 0;
+        }
+        
+        .home-title-ko {
+            display: block;
+            font-size: 2.2rem;
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+        
+        .home-title-zh {
+            display: block;
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: 5px;
+        }
+        
+        .home-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        .home-quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .home-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .home-card:hover {
+            border-color: var(--primary-green);
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .home-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+        
+        .home-card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .home-card-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .home-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%);
+            border-radius: 16px;
+        }
+        
+        .home-stat-item {
+            text-align: center;
+        }
+        
+        .home-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        
+        .home-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 500px) {
+            .home-title-ko { font-size: 1.8rem; }
+            .home-title-zh { font-size: 1.2rem; }
+            .home-quick-links { grid-template-columns: repeat(2, 1fr); }
+            .home-stats { gap: 25px; padding: 20px; }
+            .home-stat-number { font-size: 2rem; }
+        }
 
         h2 {
             color: var(--dark-green);
@@ -3359,15 +3512,17 @@
             <span class="dropdown-arrow">▼</span>
         </div>
         <div class="menu-dropdown" id="menuDropdown">
-            <!-- 我的信仰 子選單 -->
-            <div class="menu-category open" id="menu-category-faith">
-                <div class="menu-category-title" onclick="window.toggleSubMenu('faith')">
-                    <span id="menu-faith-title">나의 신앙</span>
-                    <span class="submenu-arrow">▶</span>
+            <!-- 首頁 (無子分頁) -->
+            <div class="menu-category" id="menu-category-home">
+                <div class="menu-category-title home-link" onclick="window.switchPage('home')">
+                    <span id="menu-home-title">🏠 홈</span>
                 </div>
-                <div class="menu-submenu" id="submenu-faith">
-                    <button class="menu-btn active" onclick="window.switchPage('daily-faith')" id="btn-daily-faith">매일 신앙 기록</button>
-                    <button class="menu-btn" onclick="window.switchPage('faith-chart')" id="btn-faith-chart">신앙 기록 차트</button>
+            </div>
+            <!-- 我的信仰 子選單 (開發中) -->
+            <div class="menu-category" id="menu-category-faith">
+                <div class="menu-category-title disabled">
+                    <span id="menu-faith-title">나의 신앙</span>
+                    <span class="dev-badge">개발 중</span>
                 </div>
             </div>
             <!-- 書籍 子選單 -->
@@ -3409,8 +3564,55 @@
 </nav>
 
 <div class="container">
-    <!-- 每日信仰記錄 (首頁) -->
-    <div id="dailyFaithSection" class="page-section active-section">
+    <!-- 首頁 -->
+    <div id="homeSection" class="page-section active-section">
+        <div class="home-container">
+            <div class="home-welcome">
+                <h1 class="home-title">
+                    <span class="home-title-ko">전도 트래커</span>
+                    <span class="home-title-zh">傳道追蹤器</span>
+                </h1>
+                <p class="home-subtitle" id="home-subtitle">복음의 열매를 기록하고 관리하세요</p>
+            </div>
+            
+            <div class="home-quick-links">
+                <div class="home-card" onclick="window.switchPage('bible')">
+                    <div class="home-card-icon">📖</div>
+                    <div class="home-card-title" id="home-card-bible">성경</div>
+                    <div class="home-card-desc" id="home-card-bible-desc">말씀을 읽고 복사하세요</div>
+                </div>
+                <div class="home-card" onclick="window.switchPage('entry')">
+                    <div class="home-card-icon">✏️</div>
+                    <div class="home-card-title" id="home-card-entry">온라인 등록</div>
+                    <div class="home-card-desc" id="home-card-entry-desc">새로운 만남을 기록하세요</div>
+                </div>
+                <div class="home-card" onclick="window.switchPage('backend')">
+                    <div class="home-card-icon">📊</div>
+                    <div class="home-card-title" id="home-card-backend">데이터 관리</div>
+                    <div class="home-card-desc" id="home-card-backend-desc">기록된 데이터를 확인하세요</div>
+                </div>
+                <div class="home-card" onclick="window.switchPage('profile')">
+                    <div class="home-card-icon">👤</div>
+                    <div class="home-card-title" id="home-card-profile">개인정보</div>
+                    <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
+                </div>
+            </div>
+            
+            <div class="home-stats" id="homeStats">
+                <div class="home-stat-item">
+                    <div class="home-stat-number" id="home-stat-total">0</div>
+                    <div class="home-stat-label" id="home-stat-total-label">총 섭외자</div>
+                </div>
+                <div class="home-stat-item">
+                    <div class="home-stat-number" id="home-stat-week">0</div>
+                    <div class="home-stat-label" id="home-stat-week-label">주간 교류</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 每日信仰記錄 (開發中) -->
+    <div id="dailyFaithSection" class="page-section">
         <h2 id="txt-daily-faith-header">매일 신앙 기록</h2>
         <div class="faith-content">
             <p id="txt-daily-faith-desc">이 페이지에서 매일의 신앙 생활을 기록할 수 있습니다.</p>
@@ -3418,7 +3620,7 @@
         </div>
     </div>
     
-    <!-- 信仰記錄圖 -->
+    <!-- 信仰記錄圖 (開發中) -->
     <div id="faithChartSection" class="page-section">
         <h2 id="txt-faith-chart-header">신앙 기록 차트</h2>
         <div class="faith-content">
@@ -4031,7 +4233,15 @@
         ko: {
             appTitle: "전도 관리 시스템", 
             // 主選單
-            menuFaith: "나의 신앙", menuFruit: "열매 정보",
+            menuHome: "홈", menuFaith: "나의 신앙", menuFruit: "열매 정보",
+            devBadge: "개발 중",
+            // 首頁
+            homeSubtitle: "복음의 열매를 기록하고 관리하세요",
+            homeCardBible: "성경", homeCardBibleDesc: "말씀을 읽고 복사하세요",
+            homeCardEntry: "온라인 등록", homeCardEntryDesc: "새로운 만남을 기록하세요",
+            homeCardBackend: "데이터 관리", homeCardBackendDesc: "기록된 데이터를 확인하세요",
+            homeCardProfile: "개인정보", homeCardProfileDesc: "프로필을 설정하세요",
+            homeStatTotal: "총 섭외자", homeStatWeek: "주간 교류",
             // 我的信仰
             btnDailyFaith: "매일 신앙 기록", btnFaithChart: "신앙 기록 차트",
             headerDailyFaith: "매일 신앙 기록", headerFaithChart: "신앙 기록 차트",
@@ -4094,7 +4304,15 @@
         zh: {
             appTitle: "傳道整理系統", 
             // 主選單
-            menuFaith: "我的信仰", menuFruit: "果子資訊",
+            menuHome: "首頁", menuFaith: "我的信仰", menuFruit: "果子資訊",
+            devBadge: "開發中",
+            // 首頁
+            homeSubtitle: "記錄並管理福音的果子",
+            homeCardBible: "聖經", homeCardBibleDesc: "閱讀並複製經文",
+            homeCardEntry: "線上登錄", homeCardEntryDesc: "記錄新的相遇",
+            homeCardBackend: "資料管理", homeCardBackendDesc: "查看已記錄的資料",
+            homeCardProfile: "個人資料", homeCardProfileDesc: "設定個人檔案",
+            homeStatTotal: "總涉外者", homeStatWeek: "週間交流",
             // 我的信仰
             btnDailyFaith: "每日信仰記錄", btnFaithChart: "信仰記錄圖",
             headerDailyFaith: "每日信仰記錄", headerFaithChart: "信仰記錄圖",
@@ -4222,10 +4440,13 @@
     window.onload = function() {
         document.querySelector('.lang-select').value = currentLang;
         
-        // 載入儲存的頁面（帶超時檢查）
+        // 載入儲存的頁面（帶超時檢查），預設為首頁
         const savedPage = loadSavedPage();
         if (savedPage) {
             switchPage(savedPage);
+        } else {
+            // 預設顯示首頁
+            switchPage('home');
         }
         
         applyLanguage();
@@ -4286,8 +4507,15 @@
         const map = {
             'txt-app-title': t.appTitle, 
             // 主選單
-            'menu-faith-title': t.menuFaith, 'menu-fruit-title': t.menuFruit,
+            'menu-home-title': t.menuHome, 'menu-faith-title': t.menuFaith, 'menu-fruit-title': t.menuFruit,
             'menu-books-title': t.menuBooks,
+            // 首頁
+            'home-subtitle': t.homeSubtitle,
+            'home-card-bible': t.homeCardBible, 'home-card-bible-desc': t.homeCardBibleDesc,
+            'home-card-entry': t.homeCardEntry, 'home-card-entry-desc': t.homeCardEntryDesc,
+            'home-card-backend': t.homeCardBackend, 'home-card-backend-desc': t.homeCardBackendDesc,
+            'home-card-profile': t.homeCardProfile, 'home-card-profile-desc': t.homeCardProfileDesc,
+            'home-stat-total-label': t.homeStatTotal, 'home-stat-week-label': t.homeStatWeek,
             // 我的信仰
             'btn-daily-faith': t.btnDailyFaith, 'btn-faith-chart': t.btnFaithChart,
             'txt-daily-faith-header': t.headerDailyFaith, 'txt-faith-chart-header': t.headerFaithChart,
@@ -4354,12 +4582,17 @@
         const offlineContent = document.getElementById('offlineContent');
         if(offlineContent) offlineContent.placeholder = t.phOfflineContent;
         
+        // 更新開發中徽章
+        const devBadge = document.querySelector('.dev-badge');
+        if (devBadge) devBadge.textContent = t.devBadge;
+        
         // 更新當前頁面標題
         const pageTitleEl = document.getElementById('current-page-title');
         const activeSection = document.querySelector('.page-section.active-section');
         if (pageTitleEl && activeSection) {
             const sectionId = activeSection.id;
-            if (sectionId === 'dailyFaithSection') pageTitleEl.textContent = t.btnDailyFaith;
+            if (sectionId === 'homeSection') pageTitleEl.textContent = t.menuHome;
+            else if (sectionId === 'dailyFaithSection') pageTitleEl.textContent = t.btnDailyFaith;
             else if (sectionId === 'faithChartSection') pageTitleEl.textContent = t.btnFaithChart;
             else if (sectionId === 'bibleSection') pageTitleEl.textContent = t.btnBible;
             else if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
@@ -4371,6 +4604,11 @@
         
         updateCounter();
         updateOfflineCounter();
+        
+        // 更新首頁統計
+        if (document.getElementById('homeSection').classList.contains('active-section')) {
+            updateHomeStats();
+        }
         
         // 更新訊息重點區塊語言
         updateMessagePointsLanguage();
@@ -5558,14 +5796,19 @@
             window.exitCopyMode();
         }
         
-        if (page === 'daily-faith') {
+        if (page === 'home') {
+            document.getElementById('homeSection').classList.add('active-section');
+            pageTitleEl.textContent = currentLang === 'ko' ? '홈' : '首頁';
+            // 更新首頁統計
+            updateHomeStats();
+        } else if (page === 'daily-faith') {
             document.getElementById('dailyFaithSection').classList.add('active-section');
-            document.getElementById('btn-daily-faith').classList.add('active');
+            document.getElementById('btn-daily-faith')?.classList.add('active');
             document.getElementById('menu-category-faith').classList.add('open');
             pageTitleEl.textContent = t.btnDailyFaith;
         } else if (page === 'faith-chart') {
             document.getElementById('faithChartSection').classList.add('active-section');
-            document.getElementById('btn-faith-chart').classList.add('active');
+            document.getElementById('btn-faith-chart')?.classList.add('active');
             document.getElementById('menu-category-faith').classList.add('open');
             pageTitleEl.textContent = t.btnFaithChart;
         } else if (page === 'bible') {
@@ -5633,6 +5876,28 @@
         }).length;
         
         document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
+    }
+    
+    function updateHomeStats() {
+        // 計算總人數
+        const totalCount = localDb.length + offlineDb.length;
+        document.getElementById('home-stat-total').textContent = totalCount;
+        
+        // 計算週間交流人數
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        const weeklyOnline = localDb.filter(user => {
+            if (!user.logs || user.logs.length === 0) return false;
+            return user.logs.some(log => new Date(log.date) >= oneWeekAgo);
+        }).length;
+        
+        const weeklyOffline = offlineDb.filter(user => {
+            if (!user.logs || user.logs.length === 0) return false;
+            return user.logs.some(log => new Date(log.date) >= oneWeekAgo);
+        }).length;
+        
+        document.getElementById('home-stat-week').textContent = weeklyOnline + weeklyOffline;
     }
     
     function updateOfflineCounter() {
