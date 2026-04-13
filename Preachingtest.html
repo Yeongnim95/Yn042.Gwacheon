@@ -305,6 +305,12 @@
         .home-container {
             text-align: center;
             padding: 20px 0;
+            /* 防止選字/複製 */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
         
         /* 天氣區塊 */
@@ -313,6 +319,7 @@
             border-radius: 20px;
             padding: 30px 20px;
             margin-bottom: 30px;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .weather-loading {
@@ -410,6 +417,13 @@
             padding: 25px 15px;
             cursor: pointer;
             transition: all 0.3s;
+            /* 防止選字/複製 */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .home-card:hover {
@@ -419,8 +433,21 @@
         }
         
         .home-card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 12px;
+            color: #333;
+            transition: color 0.3s;
+            pointer-events: none;
+        }
+        
+        .home-card-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .home-card:hover .home-card-icon {
+            color: var(--primary-green);
         }
         
         .home-card-title {
@@ -428,11 +455,13 @@
             font-size: 1rem;
             color: var(--text-primary);
             margin-bottom: 5px;
+            pointer-events: none;
         }
         
         .home-card-desc {
             font-size: 0.8rem;
             color: var(--text-secondary);
+            pointer-events: none;
         }
         
         @media (max-width: 500px) {
@@ -2689,22 +2718,73 @@
             <!-- 快速連結 -->
             <div class="home-quick-links">
                 <div class="home-card" onclick="window.switchPage('bible')">
-                    <div class="home-card-icon">📖</div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- 書本底層（厚度/立體感） -->
+                            <path d="M6 52l2 2h48l2-2" stroke-width="2.5"/>
+                            <path d="M6 50l2 2h48l2-2" stroke-width="1.5" opacity="0.6"/>
+                            <path d="M6 48l2 2h48l2-2" stroke-width="1" opacity="0.3"/>
+                            <!-- 書脊（中間立體線） -->
+                            <path d="M32 8v46" stroke-width="3"/>
+                            <!-- 左側書頁（前景） -->
+                            <path d="M32 10C28 8 20 6 6 8v44c14-2 22 0 26 4" stroke-width="2.5"/>
+                            <!-- 左側書頁內文線 -->
+                            <path d="M10 16c10-1 16 0 20 2" stroke-width="1.5"/>
+                            <path d="M10 24c10-1 16 0 20 2" stroke-width="1.5"/>
+                            <path d="M10 32c10-1 16 0 20 2" stroke-width="1.5"/>
+                            <path d="M10 40c8-1 14 0 18 2" stroke-width="1.5"/>
+                            <!-- 右側書頁（前景） -->
+                            <path d="M32 10C36 8 44 6 58 8v44c-14-2-22 0-26 4" stroke-width="2.5"/>
+                            <!-- 右側書頁內文線 -->
+                            <path d="M54 16c-10-1-16 0-20 2" stroke-width="1.5"/>
+                            <path d="M54 24c-10-1-16 0-20 2" stroke-width="1.5"/>
+                            <path d="M54 32c-10-1-16 0-20 2" stroke-width="1.5"/>
+                            <path d="M54 40c-8-1-14 0-18 2" stroke-width="1.5"/>
+                            <!-- 書本左右厚度邊緣 -->
+                            <path d="M4 8v46l2 2V10z" fill="currentColor" stroke="none"/>
+                            <path d="M58 8v46l2 2V10z" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </div>
                     <div class="home-card-title" id="home-card-bible">성경</div>
                     <div class="home-card-desc" id="home-card-bible-desc">말씀을 읽고 복사하세요</div>
                 </div>
                 <div class="home-card" onclick="window.switchPage('entry')">
-                    <div class="home-card-icon">✏️</div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- 鉛筆/編輯圖示 -->
+                            <path d="M46 8L56 18L24 50L12 54L16 42L46 8Z"/>
+                            <path d="M40 14L50 24"/>
+                            <path d="M16 42L24 50"/>
+                            <!-- 紙張 -->
+                            <path d="M8 58h32"/>
+                        </svg>
+                    </div>
                     <div class="home-card-title" id="home-card-entry">온라인 등록</div>
                     <div class="home-card-desc" id="home-card-entry-desc">새로운 만남을 기록하세요</div>
                 </div>
                 <div class="home-card" onclick="window.switchPage('backend')">
-                    <div class="home-card-icon">📊</div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- 資料夾/文件櫃圖示 -->
+                            <rect x="8" y="16" width="48" height="40" rx="2"/>
+                            <path d="M8 16l6-8h20l6 8"/>
+                            <!-- 文件夾標籤 -->
+                            <path d="M16 28h32"/>
+                            <path d="M16 38h24"/>
+                            <path d="M16 48h16"/>
+                        </svg>
+                    </div>
                     <div class="home-card-title" id="home-card-backend">데이터 관리</div>
                     <div class="home-card-desc" id="home-card-backend-desc">기록된 데이터를 확인하세요</div>
                 </div>
                 <div class="home-card" onclick="window.switchPage('profile')">
-                    <div class="home-card-icon">👤</div>
+                    <div class="home-card-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- 人物圖示 -->
+                            <circle cx="32" cy="20" r="12"/>
+                            <path d="M12 58c0-14 9-22 20-22s20 8 20 22"/>
+                        </svg>
+                    </div>
                     <div class="home-card-title" id="home-card-profile">개인정보</div>
                     <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
                 </div>
