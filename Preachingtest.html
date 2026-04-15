@@ -3976,8 +3976,11 @@
             const saved = localStorage.getItem(AI_SETTINGS_KEY);
             if (saved) return JSON.parse(saved);
         } catch (e) {}
-        return { provider: 'gemini', apiKey: 'AIzaSyDmLkZIE4yFK1p7_bXo156lFPKyOg5b5TI' };
+        return { provider: 'gemini' };
     }
+    
+    // Cloudflare Worker 代理 URL（請替換成你的 Worker URL）
+    const AI_WORKER_URL = 'https://gemini-proxy.may90613may90613.workers.dev/';
     
     // 觸發AI整理
     window.triggerAiSummary = async (event, uid, logIndex) => {
@@ -4068,7 +4071,7 @@
         }
     };
     
-    // 調用AI API (只支援 Gemini)
+    // 調用AI API (透過 Cloudflare Worker 代理)
     async function callAiApi(provider, apiKey, content) {
         // 檢測內文主要語言（韓文字符範圍：AC00-D7AF）
         const koreanChars = (content.match(/[\uAC00-\uD7AF]/g) || []).length;
@@ -4079,18 +4082,16 @@
             ? `다음 대화 내용의 핵심 포인트를 간결하게 요약해주세요. 중요한 정보, 질문, 약속 등을 포함해주세요. 반드시 한국어로만 답변해주세요:\n\n${content}`
             : `請簡潔地整理以下對話內容的重點。包含重要資訊、問題、約定等。請務必只用繁體中文回答：\n\n${content}`;
         
-        // Gemini 3.1 Flash Lite API
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`, {
+        // 透過 Cloudflare Worker 代理呼叫 Gemini API
+        const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
+            body: JSON.stringify({ prompt })
         });
         
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error?.message || 'Gemini API Error');
+            throw new Error(errorData.error?.message || 'AI API Error');
         }
         
         const data = await response.json();
