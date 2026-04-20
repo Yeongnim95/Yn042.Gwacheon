@@ -304,7 +304,7 @@
         /* ===== 首頁樣式 ===== */
         .home-container {
             text-align: center;
-            padding: 20px 0;
+            padding: 0;
             /* 防止選字/複製 */
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -313,95 +313,209 @@
             -webkit-touch-callout: none;
         }
         
-        /* 天氣區塊 */
-        .weather-section {
-            background: linear-gradient(135deg, rgba(67, 160, 71, 0.08) 0%, rgba(139, 195, 74, 0.08) 100%);
-            border-radius: 20px;
-            padding: 30px 20px;
-            margin-bottom: 30px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .weather-loading {
+        /* 今日默想區塊 */
+        .daily-verse-section {
+            position: relative;
+            width: calc(100% + 50px);
+            margin-left: -25px;
+            margin-top: -25px;
+            height: 65vh;
+            min-height: 400px;
+            max-height: 600px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
-            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 1.2s ease;
         }
         
-        .weather-loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--border-light);
-            border-top-color: var(--primary-green);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .daily-verse-section.loaded {
+            opacity: 1;
         }
         
-        .weather-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+        .daily-verse-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
         }
         
-        .weather-location {
-            font-size: 1.2rem;
+        .daily-verse-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(67, 160, 71, 0.65) 0%, 
+                rgba(46, 125, 50, 0.75) 50%,
+                rgba(27, 94, 32, 0.85) 100%);
+            z-index: 2;
+        }
+        
+        .daily-verse-content {
+            position: relative;
+            z-index: 3;
+            padding: 30px;
+            max-width: 600px;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
+        }
+        
+        .daily-verse-section.loaded .daily-verse-content {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .daily-verse-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .daily-verse-reference {
+            font-size: 1.3rem;
             font-weight: 700;
-            color: var(--text-primary);
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .daily-verse-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            font-weight: 400;
+        }
+        
+        .daily-verse-scroll-hint {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
             display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 8px;
+            animation: bounce 2s infinite;
         }
         
-        .weather-location-icon {
-            width: 22px;
-            height: 22px;
-            display: inline-flex;
+        .daily-verse-scroll-hint svg {
+            width: 24px;
+            height: 24px;
         }
         
-        .weather-location-icon svg {
-            width: 100%;
-            height: 100%;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-8px); }
+            60% { transform: translateX(-50%) translateY(-4px); }
         }
         
-        .weather-main {
+        /* 快速連結區塊 */
+        .home-cards-section {
+            padding: 30px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .home-cards-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 500px) {
+            .daily-verse-section {
+                width: calc(100% + 24px);
+                margin-left: -12px;
+                margin-top: -15px;
+                height: 60vh;
+                min-height: 350px;
+            }
+            .daily-verse-content {
+                padding: 20px;
+            }
+            .daily-verse-reference {
+                font-size: 1.1rem;
+            }
+            .daily-verse-text {
+                font-size: 1rem;
+            }
+        }
+        
+        /* 選單內天氣區塊 */
+        .menu-weather-section {
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(67, 160, 71, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%);
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 10px;
+        }
+        
+        .menu-weather-content {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 15px;
         }
         
-        .weather-icon {
-            width: 90px;
-            height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .menu-weather-icon {
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
         }
         
-        .weather-icon svg {
+        .menu-weather-icon svg {
             width: 100%;
             height: 100%;
         }
         
-        .weather-temp {
-            font-size: 3.8rem;
+        .menu-weather-info {
+            flex: 1;
+        }
+        
+        .menu-weather-location {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .menu-weather-location svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .menu-weather-temp {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1;
         }
         
-        .weather-desc {
-            font-size: 1.1rem;
+        .menu-weather-desc {
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-top: 5px;
         }
         
-        .weather-error {
-            color: #999;
-            font-size: 0.95rem;
+        .menu-weather-loading,
+        .menu-weather-error {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 10px 0;
         }
         
         .home-quick-links {
@@ -2596,6 +2710,30 @@
             <span class="dropdown-arrow">▼</span>
         </div>
         <div class="menu-dropdown" id="menuDropdown">
+            <!-- 選單內天氣 -->
+            <div class="menu-weather-section" id="menuWeatherSection">
+                <div class="menu-weather-loading" id="menuWeatherLoading">
+                    <span id="menuWeatherLoadingText">날씨 로딩 중...</span>
+                </div>
+                <div class="menu-weather-content" id="menuWeatherContent" style="display: none;">
+                    <div class="menu-weather-icon" id="menuWeatherIcon"></div>
+                    <div class="menu-weather-info">
+                        <div class="menu-weather-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 21c-4-4-8-7.5-8-12a8 8 0 1 1 16 0c0 4.5-4 8-8 12z"/>
+                                <circle cx="12" cy="9" r="3"/>
+                            </svg>
+                            <span id="menuWeatherLocation">--</span>
+                        </div>
+                        <div class="menu-weather-temp" id="menuWeatherTemp">--°</div>
+                        <div class="menu-weather-desc" id="menuWeatherDesc">--</div>
+                    </div>
+                </div>
+                <div class="menu-weather-error" id="menuWeatherError" style="display: none;">
+                    <span id="menuWeatherErrorText">날씨 정보 없음</span>
+                </div>
+            </div>
+            
             <!-- 首頁 (無子分頁) -->
             <div class="menu-category" id="menu-category-home">
                 <div class="menu-category-title home-link" onclick="window.switchPage('home')">
@@ -2648,105 +2786,85 @@
     <!-- 首頁 -->
     <div id="homeSection" class="page-section active-section">
         <div class="home-container">
-            <!-- 天氣區塊 -->
-            <div class="weather-section" id="weatherSection">
-                <div class="weather-loading" id="weatherLoading">
-                    <div class="weather-loading-spinner"></div>
-                    <span id="weatherLoadingText">날씨 정보 로딩 중...</span>
+            <!-- 今日默想區塊 -->
+            <div class="daily-verse-section" id="dailyVerseSection">
+                <div class="daily-verse-bg" id="dailyVerseBg"></div>
+                <div class="daily-verse-overlay"></div>
+                <div class="daily-verse-content">
+                    <div class="daily-verse-label" id="dailyVerseLabel">오늘의 묵상</div>
+                    <div class="daily-verse-reference" id="dailyVerseReference">--</div>
+                    <div class="daily-verse-text" id="dailyVerseText">--</div>
                 </div>
-                <div class="weather-content" id="weatherContent" style="display: none;">
-                    <div class="weather-location">
-                        <span class="weather-location-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 21c-4-4-8-7.5-8-12a8 8 0 1 1 16 0c0 4.5-4 8-8 12z"/>
-                                <circle cx="12" cy="9" r="3"/>
-                            </svg>
-                        </span>
-                        <span id="weatherLocation">--</span>
-                    </div>
-                    <div class="weather-main">
-                        <div class="weather-icon" id="weatherIcon"></div>
-                        <div class="weather-temp" id="weatherTemp">--°</div>
-                    </div>
-                    <div class="weather-desc" id="weatherDesc">--</div>
-                </div>
-                <div class="weather-error" id="weatherError" style="display: none;">
-                    <span id="weatherErrorText">날씨 정보를 불러올 수 없습니다</span>
+                <div class="daily-verse-scroll-hint" id="scrollHint">
+                    <span id="scrollHintText">아래로 스크롤</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 10l5 5 5-5"/>
+                    </svg>
                 </div>
             </div>
             
             <!-- 快速連結 -->
-            <div class="home-quick-links">
-                <div class="home-card" onclick="window.switchPage('bible')">
-                    <div class="home-card-icon">
-                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <!-- 書本底層（厚度/立體感） -->
-                            <path d="M6 52l2 2h48l2-2" stroke-width="2.5"/>
-                            <path d="M6 50l2 2h48l2-2" stroke-width="1.5" opacity="0.6"/>
-                            <path d="M6 48l2 2h48l2-2" stroke-width="1" opacity="0.3"/>
-                            <!-- 書脊（中間立體線） -->
-                            <path d="M32 8v46" stroke-width="3"/>
-                            <!-- 左側書頁（前景） -->
-                            <path d="M32 10C28 8 20 6 6 8v44c14-2 22 0 26 4" stroke-width="2.5"/>
-                            <!-- 左側書頁內文線 -->
-                            <path d="M10 16c10-1 16 0 20 2" stroke-width="1.5"/>
-                            <path d="M10 24c10-1 16 0 20 2" stroke-width="1.5"/>
-                            <path d="M10 32c10-1 16 0 20 2" stroke-width="1.5"/>
-                            <path d="M10 40c8-1 14 0 18 2" stroke-width="1.5"/>
-                            <!-- 右側書頁（前景） -->
-                            <path d="M32 10C36 8 44 6 58 8v44c-14-2-22 0-26 4" stroke-width="2.5"/>
-                            <!-- 右側書頁內文線 -->
-                            <path d="M54 16c-10-1-16 0-20 2" stroke-width="1.5"/>
-                            <path d="M54 24c-10-1-16 0-20 2" stroke-width="1.5"/>
-                            <path d="M54 32c-10-1-16 0-20 2" stroke-width="1.5"/>
-                            <path d="M54 40c-8-1-14 0-18 2" stroke-width="1.5"/>
-                            <!-- 書本左右厚度邊緣 -->
-                            <path d="M4 8v46l2 2V10z" fill="currentColor" stroke="none"/>
-                            <path d="M58 8v46l2 2V10z" fill="currentColor" stroke="none"/>
-                        </svg>
+            <div class="home-cards-section" id="homeCardsSection">
+                <div class="home-quick-links">
+                    <div class="home-card" onclick="window.switchPage('bible')">
+                        <div class="home-card-icon">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 52l2 2h48l2-2" stroke-width="2.5"/>
+                                <path d="M6 50l2 2h48l2-2" stroke-width="1.5" opacity="0.6"/>
+                                <path d="M6 48l2 2h48l2-2" stroke-width="1" opacity="0.3"/>
+                                <path d="M32 8v46" stroke-width="3"/>
+                                <path d="M32 10C28 8 20 6 6 8v44c14-2 22 0 26 4" stroke-width="2.5"/>
+                                <path d="M10 16c10-1 16 0 20 2" stroke-width="1.5"/>
+                                <path d="M10 24c10-1 16 0 20 2" stroke-width="1.5"/>
+                                <path d="M10 32c10-1 16 0 20 2" stroke-width="1.5"/>
+                                <path d="M10 40c8-1 14 0 18 2" stroke-width="1.5"/>
+                                <path d="M32 10C36 8 44 6 58 8v44c-14-2-22 0-26 4" stroke-width="2.5"/>
+                                <path d="M54 16c-10-1-16 0-20 2" stroke-width="1.5"/>
+                                <path d="M54 24c-10-1-16 0-20 2" stroke-width="1.5"/>
+                                <path d="M54 32c-10-1-16 0-20 2" stroke-width="1.5"/>
+                                <path d="M54 40c-8-1-14 0-18 2" stroke-width="1.5"/>
+                                <path d="M4 8v46l2 2V10z" fill="currentColor" stroke="none"/>
+                                <path d="M58 8v46l2 2V10z" fill="currentColor" stroke="none"/>
+                            </svg>
+                        </div>
+                        <div class="home-card-title" id="home-card-bible">성경</div>
+                        <div class="home-card-desc" id="home-card-bible-desc">말씀을 읽고 복사하세요</div>
                     </div>
-                    <div class="home-card-title" id="home-card-bible">성경</div>
-                    <div class="home-card-desc" id="home-card-bible-desc">말씀을 읽고 복사하세요</div>
-                </div>
-                <div class="home-card" onclick="window.switchPage('entry')">
-                    <div class="home-card-icon">
-                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <!-- 鉛筆/編輯圖示 -->
-                            <path d="M46 8L56 18L24 50L12 54L16 42L46 8Z"/>
-                            <path d="M40 14L50 24"/>
-                            <path d="M16 42L24 50"/>
-                            <!-- 紙張 -->
-                            <path d="M8 58h32"/>
-                        </svg>
+                    <div class="home-card" onclick="window.switchPage('entry')">
+                        <div class="home-card-icon">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M46 8L56 18L24 50L12 54L16 42L46 8Z"/>
+                                <path d="M40 14L50 24"/>
+                                <path d="M16 42L24 50"/>
+                                <path d="M8 58h32"/>
+                            </svg>
+                        </div>
+                        <div class="home-card-title" id="home-card-entry">온라인 등록</div>
+                        <div class="home-card-desc" id="home-card-entry-desc">새로운 만남을 기록하세요</div>
                     </div>
-                    <div class="home-card-title" id="home-card-entry">온라인 등록</div>
-                    <div class="home-card-desc" id="home-card-entry-desc">새로운 만남을 기록하세요</div>
-                </div>
-                <div class="home-card" onclick="window.switchPage('backend')">
-                    <div class="home-card-icon">
-                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <!-- 資料夾/文件櫃圖示 -->
-                            <rect x="8" y="16" width="48" height="40" rx="2"/>
-                            <path d="M8 16l6-8h20l6 8"/>
-                            <!-- 文件夾標籤 -->
-                            <path d="M16 28h32"/>
-                            <path d="M16 38h24"/>
-                            <path d="M16 48h16"/>
-                        </svg>
+                    <div class="home-card" onclick="window.switchPage('backend')">
+                        <div class="home-card-icon">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="8" y="16" width="48" height="40" rx="2"/>
+                                <path d="M8 16l6-8h20l6 8"/>
+                                <path d="M16 28h32"/>
+                                <path d="M16 38h24"/>
+                                <path d="M16 48h16"/>
+                            </svg>
+                        </div>
+                        <div class="home-card-title" id="home-card-backend">데이터 관리</div>
+                        <div class="home-card-desc" id="home-card-backend-desc">기록된 데이터를 확인하세요</div>
                     </div>
-                    <div class="home-card-title" id="home-card-backend">데이터 관리</div>
-                    <div class="home-card-desc" id="home-card-backend-desc">기록된 데이터를 확인하세요</div>
-                </div>
-                <div class="home-card" onclick="window.switchPage('profile')">
-                    <div class="home-card-icon">
-                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <!-- 人物圖示 -->
-                            <circle cx="32" cy="20" r="12"/>
-                            <path d="M12 58c0-14 9-22 20-22s20 8 20 22"/>
-                        </svg>
+                    <div class="home-card" onclick="window.switchPage('profile')">
+                        <div class="home-card-icon">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="32" cy="20" r="12"/>
+                                <path d="M12 58c0-14 9-22 20-22s20 8 20 22"/>
+                            </svg>
+                        </div>
+                        <div class="home-card-title" id="home-card-profile">개인정보</div>
+                        <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
                     </div>
-                    <div class="home-card-title" id="home-card-profile">개인정보</div>
-                    <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
                 </div>
             </div>
         </div>
@@ -3351,6 +3469,8 @@
             homeCardBackend: "데이터 관리", homeCardBackendDesc: "기록된 데이터를 확인하세요",
             homeCardProfile: "개인정보", homeCardProfileDesc: "프로필을 설정하세요",
             homeStatTotal: "총 섭외자", homeStatWeek: "주간 교류",
+            // 今日默想
+            dailyVerseLabel: "오늘의 묵상", scrollHint: "아래로 스크롤",
             // 我的信仰
             btnDailyFaith: "매일 신앙 기록", btnFaithChart: "신앙 기록 차트",
             headerDailyFaith: "매일 신앙 기록", headerFaithChart: "신앙 기록 차트",
@@ -3422,6 +3542,8 @@
             homeCardBackend: "資料管理", homeCardBackendDesc: "查看已記錄的資料",
             homeCardProfile: "個人資料", homeCardProfileDesc: "設定個人檔案",
             homeStatTotal: "總涉外者", homeStatWeek: "週間交流",
+            // 今日默想
+            dailyVerseLabel: "今日默想", scrollHint: "向下滾動",
             // 我的信仰
             btnDailyFaith: "每日信仰記錄", btnFaithChart: "信仰記錄圖",
             headerDailyFaith: "每日信仰記錄", headerFaithChart: "信仰記錄圖",
@@ -3979,7 +4101,7 @@
         return { provider: 'gemini' };
     }
     
-    // Cloudflare Worker 代理 URL（請替換成你的 Worker URL）
+    // Cloudflare Worker 代理 URL
     const AI_WORKER_URL = 'https://gemini-proxy.may90613may90613.workers.dev';
     
     // 觸發AI整理
@@ -4842,6 +4964,10 @@
             pageTitleEl.textContent = currentLang === 'ko' ? '홈' : '首頁';
             // 載入天氣
             loadWeather();
+            // 初始化今日默想
+            initDailyVerse();
+            // 滾動到頂部
+            window.scrollTo(0, 0);
         } else if (page === 'daily-faith') {
             document.getElementById('dailyFaithSection').classList.add('active-section');
             document.getElementById('btn-daily-faith')?.classList.add('active');
@@ -5197,23 +5323,244 @@
     }
     
     function displayWeatherData(data) {
-        const loading = document.getElementById('weatherLoading');
-        const content = document.getElementById('weatherContent');
-        const error = document.getElementById('weatherError');
+        // 選單內天氣顯示
+        const menuLoading = document.getElementById('menuWeatherLoading');
+        const menuContent = document.getElementById('menuWeatherContent');
+        const menuError = document.getElementById('menuWeatherError');
         
         const isNight = !data.isDay || isNightTime();
         
-        document.getElementById('weatherLocation').textContent = data.locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
-        document.getElementById('weatherTemp').textContent = `${Math.round(data.temperature)}°`;
-        document.getElementById('weatherIcon').innerHTML = getWeatherIcon(data.weatherCode, isNight);
-        document.getElementById('weatherDesc').textContent = getWeatherDescription(data.weatherCode);
-        
-        loading.style.display = 'none';
-        content.style.display = 'flex';
-        error.style.display = 'none';
+        if (menuLoading && menuContent) {
+            document.getElementById('menuWeatherLocation').textContent = data.locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
+            document.getElementById('menuWeatherTemp').textContent = `${Math.round(data.temperature)}°`;
+            document.getElementById('menuWeatherIcon').innerHTML = getWeatherIcon(data.weatherCode, isNight);
+            document.getElementById('menuWeatherDesc').textContent = getWeatherDescription(data.weatherCode);
+            
+            menuLoading.style.display = 'none';
+            menuContent.style.display = 'flex';
+            if (menuError) menuError.style.display = 'none';
+        }
     }
     
-    function scheduleWeatherUpdate() {
+    function showWeatherError() {
+        const menuLoading = document.getElementById('menuWeatherLoading');
+        const menuContent = document.getElementById('menuWeatherContent');
+        const menuError = document.getElementById('menuWeatherError');
+        
+        if (menuLoading) menuLoading.style.display = 'none';
+        if (menuContent) menuContent.style.display = 'none';
+        if (menuError) menuError.style.display = 'block';
+    }
+    
+    // ===== 今日默想功能 =====
+    const DAILY_VERSE_KEY = 'daily_verse_cache';
+    const DAILY_VERSE_BG_IMAGE = 'data:image/jpeg;base64,'; // 會由外部圖片替換
+    
+    // 背景圖片 Base64（將在後面替換）
+    let dailyVerseBgImage = '';
+    
+    // 取得今日種子（基於日期）
+    function getDailySeed() {
+        const today = new Date();
+        return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    }
+    
+    // 基於種子的偽隨機數生成器
+    function seededRandom(seed) {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    }
+    
+    // 從聖經資料庫取得今日章節
+    function getDailyVerse() {
+        const cacheKey = DAILY_VERSE_KEY;
+        const cached = localStorage.getItem(cacheKey);
+        const todaySeed = getDailySeed();
+        
+        // 檢查快取是否為今天的
+        if (cached) {
+            try {
+                const cacheData = JSON.parse(cached);
+                if (cacheData.seed === todaySeed) {
+                    return cacheData;
+                }
+            } catch(e) {}
+        }
+        
+        // 從 bibleContent 中隨機選取
+        const availableBooks = Object.keys(window.bibleContent || {});
+        if (availableBooks.length === 0) {
+            return {
+                seed: todaySeed,
+                reference: { ko: '창세기 1:1', zh: '創世記 1:1' },
+                text: { ko: '태초에 하나님이 천지를 창조하시니라', zh: '起初，神創造天地。' }
+            };
+        }
+        
+        // 用種子選擇書卷
+        const bookIndex = Math.floor(seededRandom(todaySeed) * availableBooks.length);
+        const bookId = availableBooks[bookIndex];
+        const bookData = window.bibleContent[bookId];
+        
+        // 選擇章節
+        const chapters = Object.keys(bookData);
+        if (chapters.length === 0) {
+            return getDailyVerseDefault(todaySeed);
+        }
+        
+        const chapterIndex = Math.floor(seededRandom(todaySeed + 1) * chapters.length);
+        const chapter = chapters[chapterIndex];
+        const verses = bookData[chapter];
+        
+        // 過濾出經文（非標題）
+        const verseItems = verses.filter(v => v.type === 'verse');
+        if (verseItems.length === 0) {
+            return getDailyVerseDefault(todaySeed);
+        }
+        
+        // 選擇一節或連續幾節（1-3節）
+        const startIndex = Math.floor(seededRandom(todaySeed + 2) * verseItems.length);
+        const verseCount = Math.min(Math.floor(seededRandom(todaySeed + 3) * 3) + 1, verseItems.length - startIndex);
+        
+        const selectedVerses = verseItems.slice(startIndex, startIndex + verseCount);
+        
+        // 書卷名稱映射
+        const bookNames = {
+            'genesis': { ko: '창세기', zh: '創世記' },
+            'isaiah': { ko: '이사야', zh: '以賽亞書' },
+            'revelation': { ko: '요한계시록', zh: '啟示錄' }
+        };
+        
+        const bookName = bookNames[bookId] || { ko: bookId, zh: bookId };
+        const verseRange = verseCount === 1 
+            ? selectedVerses[0].verse 
+            : `${selectedVerses[0].verse}-${selectedVerses[verseCount-1].verse}`;
+        
+        const result = {
+            seed: todaySeed,
+            reference: {
+                ko: `${bookName.ko} ${chapter}:${verseRange}`,
+                zh: `${bookName.zh} ${chapter}:${verseRange}`
+            },
+            text: {
+                ko: selectedVerses.map(v => v.ko).join(' '),
+                zh: selectedVerses.map(v => v.zh).join(' ')
+            }
+        };
+        
+        // 快取今日經文
+        localStorage.setItem(cacheKey, JSON.stringify(result));
+        
+        return result;
+    }
+    
+    function getDailyVerseDefault(seed) {
+        return {
+            seed: seed,
+            reference: { ko: '창세기 1:1', zh: '創世記 1:1' },
+            text: { ko: '태초에 하나님이 천지를 창조하시니라', zh: '起初，神創造天地。' }
+        };
+    }
+    
+    // 初始化今日默想區塊
+    function initDailyVerse() {
+        const section = document.getElementById('dailyVerseSection');
+        const bg = document.getElementById('dailyVerseBg');
+        const labelEl = document.getElementById('dailyVerseLabel');
+        const refEl = document.getElementById('dailyVerseReference');
+        const textEl = document.getElementById('dailyVerseText');
+        const scrollHintEl = document.getElementById('scrollHintText');
+        const cardsSection = document.getElementById('homeCardsSection');
+        
+        if (!section || !bg) return;
+        
+        // 設定背景圖片
+        bg.style.backgroundImage = `url('bible-bg.jpeg')`;
+        
+        // 取得今日經文
+        const verse = getDailyVerse();
+        
+        // 根據語言顯示
+        if (labelEl) {
+            labelEl.textContent = currentLang === 'ko' ? '오늘의 묵상' : '今日默想';
+        }
+        if (refEl) {
+            refEl.textContent = verse.reference[currentLang] || verse.reference.ko;
+        }
+        if (textEl) {
+            textEl.textContent = verse.text[currentLang] || verse.text.ko;
+        }
+        if (scrollHintEl) {
+            scrollHintEl.textContent = currentLang === 'ko' ? '아래로 스크롤' : '向下滾動';
+        }
+        
+        // 延遲觸發淡入動畫
+        setTimeout(() => {
+            section.classList.add('loaded');
+        }, 100);
+        
+        // 監聽滾動
+        setupScrollListener(section, cardsSection);
+    }
+    
+    // 滾動監聽器
+    function setupScrollListener(verseSection, cardsSection) {
+        if (!verseSection || !cardsSection) return;
+        
+        const container = document.querySelector('.container');
+        if (!container) return;
+        
+        let lastScrollY = 0;
+        let ticking = false;
+        
+        const handleScroll = () => {
+            const scrollY = window.scrollY || window.pageYOffset;
+            const verseSectionHeight = verseSection.offsetHeight;
+            const scrollThreshold = verseSectionHeight * 0.3;
+            
+            // 經文區塊淡出效果
+            const fadeProgress = Math.min(scrollY / (verseSectionHeight * 0.6), 1);
+            verseSection.style.opacity = 1 - fadeProgress * 0.8;
+            verseSection.style.transform = `translateY(-${fadeProgress * 30}px)`;
+            
+            // 隱藏滾動提示
+            const scrollHint = document.getElementById('scrollHint');
+            if (scrollHint) {
+                scrollHint.style.opacity = scrollY > 50 ? 0 : 1;
+            }
+            
+            // 卡片區塊顯示
+            if (scrollY > scrollThreshold) {
+                cardsSection.classList.add('visible');
+            } else {
+                cardsSection.classList.remove('visible');
+            }
+            
+            ticking = false;
+        };
+        
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(handleScroll);
+                ticking = true;
+            }
+        }, { passive: true });
+        
+        // 初始狀態
+        handleScroll();
+    }
+    
+    // 檢查並更新今日經文（每日0時）
+    function scheduleDailyVerseUpdate() {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+        const msUntilMidnight = tomorrow - now;
+        
+        setTimeout(() => {
+            initDailyVerse();
+            scheduleDailyVerseUpdate(); // 遞迴設定下一次
+        }, msUntilMidnight);
+    }
         if (weatherUpdateTimer) {
             clearTimeout(weatherUpdateTimer);
         }
