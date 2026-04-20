@@ -302,9 +302,31 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ===== 首頁樣式 ===== */
+        
+        /* 首頁時導航欄透明 */
+        body.home-active nav {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        
+        body.home-active nav .nav-title,
+        body.home-active nav .menu-toggle,
+        body.home-active nav .lang-select {
+            color: white !important;
+        }
+        
+        body.home-active nav .dropdown-arrow {
+            color: rgba(255,255,255,0.7) !important;
+        }
+        
+        body.home-active nav .lang-select {
+            background: rgba(255,255,255,0.15) !important;
+            border-color: rgba(255,255,255,0.3) !important;
+        }
+        
         .home-container {
-            text-align: center;
             padding: 0;
+            margin: 0;
             /* 防止選字/複製 */
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -313,22 +335,30 @@
             -webkit-touch-callout: none;
         }
         
-        /* 今日默想區塊 */
+        /* 今日默想區塊 - 全滿版 */
         .daily-verse-section {
-            position: relative;
-            width: calc(100% + 50px);
-            margin-left: -25px;
-            margin-top: -25px;
-            height: 65vh;
-            min-height: 400px;
-            max-height: 600px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .daily-verse-section.loaded {
             opacity: 1;
-            transition: opacity 0.5s ease;
+        }
+        
+        .daily-verse-section.scrolled-out {
+            opacity: 0;
+            pointer-events: none;
         }
         
         .daily-verse-bg {
@@ -337,9 +367,9 @@
             left: 0;
             width: 100%;
             height: 100%;
+            background-image: url('bible-bg.jpeg');
             background-size: cover;
             background-position: center;
-            background-image: url('bible-bg.jpeg');
             z-index: 1;
         }
         
@@ -349,10 +379,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, 
-                rgba(67, 160, 71, 0.65) 0%, 
-                rgba(46, 125, 50, 0.75) 50%,
-                rgba(27, 94, 32, 0.85) 100%);
+            background: rgba(67, 160, 71, 0.15);
             z-index: 2;
         }
         
@@ -362,90 +389,90 @@
             padding: 30px;
             max-width: 600px;
             text-align: center;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .daily-verse-content.show {
             opacity: 1;
             transform: translateX(0);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
         
         .daily-verse-label {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.9);
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 15px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
         
         .daily-verse-reference {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: white;
             margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
         }
         
         .daily-verse-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
+            font-size: 1.15rem;
+            line-height: 1.9;
             color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 5px rgba(0,0,0,0.3);
             font-weight: 400;
         }
         
         .daily-verse-scroll-hint {
             position: absolute;
-            bottom: 25px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
             animation: bounce 2s infinite;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
         
         .daily-verse-scroll-hint svg {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
         }
         
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-8px); }
-            60% { transform: translateX(-50%) translateY(-4px); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
         }
         
         /* 快速連結區塊 */
         .home-cards-section {
-            padding: 30px 0;
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        
-        .home-cards-section.enhanced {
-            opacity: 1;
-            transform: translateY(0);
+            min-height: 100vh;
+            padding: 100px 20px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-main);
         }
         
         @media (max-width: 500px) {
-            .daily-verse-section {
-                width: calc(100% + 24px);
-                margin-left: -12px;
-                margin-top: -15px;
-                height: 60vh;
-                min-height: 350px;
-            }
             .daily-verse-content {
                 padding: 20px;
             }
             .daily-verse-reference {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
             }
             .daily-verse-text {
                 font-size: 1rem;
+            }
+            .home-cards-section {
+                padding: 80px 15px 40px;
             }
         }
         
@@ -4951,6 +4978,11 @@
             window.exitCopyMode();
         }
         
+        // 離開首頁時清理
+        if (page !== 'home') {
+            cleanupDailyVerse();
+        }
+        
         if (page === 'home') {
             document.getElementById('homeSection').classList.add('active-section');
             pageTitleEl.textContent = currentLang === 'ko' ? '홈' : '首頁';
@@ -4958,8 +4990,6 @@
             loadWeather();
             // 初始化今日默想
             initDailyVerse();
-            // 滾動到頂部
-            window.scrollTo(0, 0);
         } else if (page === 'daily-faith') {
             document.getElementById('dailyFaithSection').classList.add('active-section');
             document.getElementById('btn-daily-faith')?.classList.add('active');
@@ -5457,17 +5487,16 @@
     // 初始化今日默想區塊
     function initDailyVerse() {
         const section = document.getElementById('dailyVerseSection');
-        const bg = document.getElementById('dailyVerseBg');
+        const contentEl = document.querySelector('.daily-verse-content');
         const labelEl = document.getElementById('dailyVerseLabel');
         const refEl = document.getElementById('dailyVerseReference');
         const textEl = document.getElementById('dailyVerseText');
         const scrollHintEl = document.getElementById('scrollHintText');
-        const cardsSection = document.getElementById('homeCardsSection');
         
-        if (!section || !bg) return;
+        if (!section) return;
         
-        // 設定背景圖片
-        bg.style.backgroundImage = `url('bible-bg.jpeg')`;
+        // 添加首頁透明導航欄 class
+        document.body.classList.add('home-active');
         
         // 取得今日經文
         const verse = getDailyVerse();
@@ -5486,48 +5515,85 @@
             scrollHintEl.textContent = currentLang === 'ko' ? '아래로 스크롤' : '向下滾動';
         }
         
-        // 延遲觸發淡入動畫
+        // 滾動到頂部
+        window.scrollTo(0, 0);
+        
+        // 圖片淡入（延遲100ms）
         setTimeout(() => {
             section.classList.add('loaded');
+            section.classList.remove('scrolled-out');
         }, 100);
         
-        // 監聽滾動
-        setupScrollListener(section, cardsSection);
+        // 文字淡入（延遲1.5秒）
+        setTimeout(() => {
+            if (contentEl) {
+                contentEl.classList.add('show');
+            }
+        }, 1500);
+        
+        // 設定滾動監聽
+        setupHomeScrollListener();
     }
     
-    // 滾動監聽器
-    function setupScrollListener(verseSection, cardsSection) {
-        if (!verseSection) return;
+    // 離開首頁時清理
+    function cleanupDailyVerse() {
+        document.body.classList.remove('home-active');
+        const section = document.getElementById('dailyVerseSection');
+        const contentEl = document.querySelector('.daily-verse-content');
+        if (section) {
+            section.classList.remove('loaded');
+            section.classList.add('scrolled-out');
+        }
+        if (contentEl) {
+            contentEl.classList.remove('show');
+        }
+    }
+    
+    // 首頁滾動監聽器
+    let homeScrollHandler = null;
+    
+    function setupHomeScrollListener() {
+        // 先移除舊的監聽器
+        if (homeScrollHandler) {
+            window.removeEventListener('scroll', homeScrollHandler);
+        }
+        
+        const section = document.getElementById('dailyVerseSection');
+        const scrollHint = document.getElementById('scrollHint');
+        
+        if (!section) return;
         
         let ticking = false;
         
-        const handleScroll = () => {
-            const scrollY = window.scrollY || window.pageYOffset;
-            const verseSectionHeight = verseSection.offsetHeight;
-            
-            // 經文區塊淡出效果
-            const fadeProgress = Math.min(scrollY / (verseSectionHeight * 0.6), 1);
-            verseSection.style.opacity = 1 - fadeProgress * 0.8;
-            verseSection.style.transform = `translateY(-${fadeProgress * 30}px)`;
-            
-            // 隱藏滾動提示
-            const scrollHint = document.getElementById('scrollHint');
-            if (scrollHint) {
-                scrollHint.style.opacity = scrollY > 50 ? 0 : 1;
-            }
-            
-            ticking = false;
-        };
-        
-        window.addEventListener('scroll', () => {
+        homeScrollHandler = () => {
             if (!ticking) {
-                requestAnimationFrame(handleScroll);
+                requestAnimationFrame(() => {
+                    const scrollY = window.scrollY || window.pageYOffset;
+                    const windowHeight = window.innerHeight;
+                    const scrollThreshold = windowHeight * 0.3;
+                    
+                    // 向下滾動：今日默想淡出
+                    if (scrollY > scrollThreshold) {
+                        section.classList.add('scrolled-out');
+                        document.body.classList.remove('home-active');
+                    } else {
+                        // 向上滾動：今日默想淡入
+                        section.classList.remove('scrolled-out');
+                        document.body.classList.add('home-active');
+                    }
+                    
+                    // 滾動提示隱藏
+                    if (scrollHint) {
+                        scrollHint.style.opacity = scrollY > 50 ? '0' : '1';
+                    }
+                    
+                    ticking = false;
+                });
                 ticking = true;
             }
-        }, { passive: true });
+        };
         
-        // 初始狀態
-        handleScroll();
+        window.addEventListener('scroll', homeScrollHandler, { passive: true });
     }
     
     // 檢查並更新今日經文（每日0時）
@@ -5541,6 +5607,8 @@
             scheduleDailyVerseUpdate(); // 遞迴設定下一次
         }, msUntilMidnight);
     }
+    
+    function scheduleWeatherUpdate() {
         if (weatherUpdateTimer) {
             clearTimeout(weatherUpdateTimer);
         }
