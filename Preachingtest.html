@@ -324,10 +324,10 @@
             border-color: rgba(255,255,255,0.3) !important;
         }
         
-        .home-container {
+        /* 首頁容器 - 可滾動 */
+        #homeSection .home-container {
             padding: 0;
             margin: 0;
-            /* 防止選字/複製 */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -335,30 +335,23 @@
             -webkit-touch-callout: none;
         }
         
-        /* 今日默想區塊 - 全滿版 */
+        /* 今日默想區塊 - 全滿版但可滾動 */
         .daily-verse-section {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100vw;
             height: 100vh;
+            margin-left: calc(-50vw + 50%);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10;
             opacity: 0;
             transition: opacity 1s ease;
         }
         
         .daily-verse-section.loaded {
             opacity: 1;
-        }
-        
-        .daily-verse-section.scrolled-out {
-            opacity: 0;
-            pointer-events: none;
         }
         
         .daily-verse-bg {
@@ -379,7 +372,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(67, 160, 71, 0.15);
+            background: rgba(67, 160, 71, 0.12);
             z-index: 2;
         }
         
@@ -404,33 +397,44 @@
             color: rgba(255, 255, 255, 0.9);
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
         
         .daily-verse-reference {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.4);
         }
         
         .daily-verse-text {
-            font-size: 1.15rem;
-            line-height: 1.9;
+            font-size: 1.1rem;
+            line-height: 2;
             color: rgba(255, 255, 255, 0.95);
             text-shadow: 0 1px 5px rgba(0,0,0,0.3);
             font-weight: 400;
         }
         
+        .daily-verse-text .verse-ko {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .daily-verse-text .verse-zh {
+            display: block;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
         .daily-verse-scroll-hint {
             position: absolute;
-            bottom: 40px;
+            bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
             font-size: 0.85rem;
             display: flex;
             flex-direction: column;
@@ -454,7 +458,7 @@
         /* 快速連結區塊 */
         .home-cards-section {
             min-height: 100vh;
-            padding: 100px 20px 50px;
+            padding: 60px 20px 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -466,13 +470,16 @@
                 padding: 20px;
             }
             .daily-verse-reference {
-                font-size: 1.2rem;
+                font-size: 1.15rem;
             }
             .daily-verse-text {
                 font-size: 1rem;
             }
+            .daily-verse-scroll-hint {
+                bottom: 80px;
+            }
             .home-cards-section {
-                padding: 80px 15px 40px;
+                padding: 40px 15px 40px;
             }
         }
         
@@ -5498,21 +5505,35 @@
         // 添加首頁透明導航欄 class
         document.body.classList.add('home-active');
         
+        // 設定瀏覽器主題色（配合圖片的淡綠棕色）
+        const themeColorMeta = document.getElementById('themeColorMeta');
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', '#8a9a7a');
+        }
+        
         // 取得今日經文
         const verse = getDailyVerse();
         
-        // 根據語言顯示
+        // 雙語顯示標籤
         if (labelEl) {
-            labelEl.textContent = currentLang === 'ko' ? '오늘의 묵상' : '今日默想';
+            labelEl.innerHTML = '<span>오늘의 묵상</span> · <span>今日默想</span>';
         }
+        
+        // 雙語顯示章節引用
         if (refEl) {
-            refEl.textContent = verse.reference[currentLang] || verse.reference.ko;
+            refEl.innerHTML = `${verse.reference.ko} / ${verse.reference.zh}`;
         }
+        
+        // 雙語顯示經文內容
         if (textEl) {
-            textEl.textContent = verse.text[currentLang] || verse.text.ko;
+            textEl.innerHTML = `
+                <span class="verse-ko">${verse.text.ko}</span>
+                <span class="verse-zh">${verse.text.zh}</span>
+            `;
         }
+        
         if (scrollHintEl) {
-            scrollHintEl.textContent = currentLang === 'ko' ? '아래로 스크롤' : '向下滾動';
+            scrollHintEl.textContent = '↓';
         }
         
         // 滾動到頂部
@@ -5521,7 +5542,6 @@
         // 圖片淡入（延遲100ms）
         setTimeout(() => {
             section.classList.add('loaded');
-            section.classList.remove('scrolled-out');
         }, 100);
         
         // 文字淡入（延遲1.5秒）
@@ -5530,70 +5550,26 @@
                 contentEl.classList.add('show');
             }
         }, 1500);
-        
-        // 設定滾動監聽
-        setupHomeScrollListener();
     }
     
     // 離開首頁時清理
     function cleanupDailyVerse() {
         document.body.classList.remove('home-active');
+        
+        // 恢復預設主題色
+        const themeColorMeta = document.getElementById('themeColorMeta');
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', '#c8e6c9');
+        }
+        
         const section = document.getElementById('dailyVerseSection');
         const contentEl = document.querySelector('.daily-verse-content');
         if (section) {
             section.classList.remove('loaded');
-            section.classList.add('scrolled-out');
         }
         if (contentEl) {
             contentEl.classList.remove('show');
         }
-    }
-    
-    // 首頁滾動監聽器
-    let homeScrollHandler = null;
-    
-    function setupHomeScrollListener() {
-        // 先移除舊的監聽器
-        if (homeScrollHandler) {
-            window.removeEventListener('scroll', homeScrollHandler);
-        }
-        
-        const section = document.getElementById('dailyVerseSection');
-        const scrollHint = document.getElementById('scrollHint');
-        
-        if (!section) return;
-        
-        let ticking = false;
-        
-        homeScrollHandler = () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    const scrollY = window.scrollY || window.pageYOffset;
-                    const windowHeight = window.innerHeight;
-                    const scrollThreshold = windowHeight * 0.3;
-                    
-                    // 向下滾動：今日默想淡出
-                    if (scrollY > scrollThreshold) {
-                        section.classList.add('scrolled-out');
-                        document.body.classList.remove('home-active');
-                    } else {
-                        // 向上滾動：今日默想淡入
-                        section.classList.remove('scrolled-out');
-                        document.body.classList.add('home-active');
-                    }
-                    
-                    // 滾動提示隱藏
-                    if (scrollHint) {
-                        scrollHint.style.opacity = scrollY > 50 ? '0' : '1';
-                    }
-                    
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
-        
-        window.addEventListener('scroll', homeScrollHandler, { passive: true });
     }
     
     // 檢查並更新今日經文（每日0時）
