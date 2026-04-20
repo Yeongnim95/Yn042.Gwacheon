@@ -327,12 +327,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            transition: opacity 1.2s ease;
-        }
-        
-        .daily-verse-section.loaded {
             opacity: 1;
+            transition: opacity 0.5s ease;
         }
         
         .daily-verse-bg {
@@ -343,6 +339,7 @@
             height: 100%;
             background-size: cover;
             background-position: center;
+            background-image: url('bible-bg.jpeg');
             z-index: 1;
         }
         
@@ -365,14 +362,9 @@
             padding: 30px;
             max-width: 600px;
             text-align: center;
-            opacity: 0;
-            transform: translateX(-30px);
-            transition: opacity 0.8s ease 0.5s, transform 0.8s ease 0.5s;
-        }
-        
-        .daily-verse-section.loaded .daily-verse-content {
             opacity: 1;
             transform: translateX(0);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
         
         .daily-verse-label {
