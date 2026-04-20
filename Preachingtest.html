@@ -428,12 +428,12 @@
         /* 快速連結區塊 */
         .home-cards-section {
             padding: 30px 0;
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 1;
+            transform: translateY(0);
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
         
-        .home-cards-section.visible {
+        .home-cards-section.enhanced {
             opacity: 1;
             transform: translateY(0);
         }
@@ -5505,18 +5505,13 @@
     
     // 滾動監聽器
     function setupScrollListener(verseSection, cardsSection) {
-        if (!verseSection || !cardsSection) return;
+        if (!verseSection) return;
         
-        const container = document.querySelector('.container');
-        if (!container) return;
-        
-        let lastScrollY = 0;
         let ticking = false;
         
         const handleScroll = () => {
             const scrollY = window.scrollY || window.pageYOffset;
             const verseSectionHeight = verseSection.offsetHeight;
-            const scrollThreshold = verseSectionHeight * 0.3;
             
             // 經文區塊淡出效果
             const fadeProgress = Math.min(scrollY / (verseSectionHeight * 0.6), 1);
@@ -5527,13 +5522,6 @@
             const scrollHint = document.getElementById('scrollHint');
             if (scrollHint) {
                 scrollHint.style.opacity = scrollY > 50 ? 0 : 1;
-            }
-            
-            // 卡片區塊顯示
-            if (scrollY > scrollThreshold) {
-                cardsSection.classList.add('visible');
-            } else {
-                cardsSection.classList.remove('visible');
             }
             
             ticking = false;
