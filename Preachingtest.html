@@ -303,10 +303,13 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁底色黑色 */
-        body.home-active,
+        /* 首頁時背景直接用圖片色填滿 */
+        body.home-active {
+            background: #8a9a7a !important; /* 第一頁圖片邊緣色 */
+        }
+        
         body.home-cards-active {
-            background: #000 !important;
+            background: #3c4632 !important; /* 第二頁圖片邊緣色 */
         }
         
         body.home-active .container,
@@ -381,14 +384,14 @@
             background: white;
         }
         
-        /* 今日默想區塊 - 第一張投影片（全滿版） */
+        /* 今日默想區塊 - 第一張投影片（完全全屏） */
         .daily-verse-section {
             position: relative;
             width: 100vw;
             height: 100vh;
             height: 100dvh;
             margin-left: calc(-50vw + 50%);
-            overflow: visible; /* 讓氣氛效果延伸到外面 */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -398,7 +401,8 @@
             flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
-            background-color: #000;
+            /* 圖片邊緣色作為底色，瀏覽器邊緣會顯示這個顏色 */
+            background-color: #8a9a7a;
         }
         
         .daily-verse-section.loaded {
@@ -415,24 +419,6 @@
             background-size: cover;
             background-position: center;
             z-index: 1;
-        }
-        
-        /* 氣氛模式 - 淡淡的圖片邊緣色向瀏覽器邊緣擴散 */
-        .daily-verse-section::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            left: -50px;
-            right: -50px;
-            bottom: -100px;
-            background: radial-gradient(ellipse 120% 100% at center, 
-                transparent 45%, 
-                rgba(138, 154, 122, 0.15) 65%, 
-                rgba(138, 154, 122, 0.25) 80%, 
-                rgba(138, 154, 122, 0.35) 100%
-            );
-            z-index: 0;
-            pointer-events: none;
         }
         
         .daily-verse-overlay {
@@ -528,7 +514,7 @@
             60% { transform: translateX(-50%) translateY(-6px); }
         }
         
-        /* 快速連結區塊 - 第二張投影片（全滿版） */
+        /* 快速連結區塊 - 第二張投影片（完全全屏） */
         .home-cards-section {
             position: relative;
             width: 100vw;
@@ -540,8 +526,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: visible; /* 讓氣氛效果延伸到外面 */
-            background-color: #000;
+            overflow: hidden;
+            /* 圖片邊緣色作為底色 */
+            background-color: #3c4632;
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
@@ -550,33 +537,15 @@
             flex-shrink: 0;
         }
         
-        /* 氣氛模式 - 淡淡的圖片邊緣色向瀏覽器邊緣擴散 */
-        .home-cards-section::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            left: -50px;
-            right: -50px;
-            bottom: -100px;
-            background: radial-gradient(ellipse 120% 100% at center, 
-                transparent 45%, 
-                rgba(60, 70, 50, 0.12) 65%, 
-                rgba(60, 70, 50, 0.2) 80%, 
-                rgba(60, 70, 50, 0.3) 100%
-            );
-            z-index: 0;
-            pointer-events: none;
-        }
-        
         /* 輕微暗色覆蓋層 */
-        .home-cards-section::after {
+        .home-cards-section::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.08);
+            background: rgba(0, 0, 0, 0.1);
             z-index: 1;
             pointer-events: none;
         }
@@ -5760,14 +5729,14 @@
                     
                     // 根據滾動位置控制導航欄和主題色
                     if (scrollY > scrollThreshold) {
-                        // 滾動到卡片區域 - 導航欄變回正常
+                        // 滾動到卡片區域 - 使用第二張圖片的邊緣色
                         document.body.classList.remove('home-active');
                         document.body.classList.add('home-cards-active');
                         if (themeColorMeta) {
-                            themeColorMeta.setAttribute('content', '#fafafa');
+                            themeColorMeta.setAttribute('content', '#3c4632');
                         }
                     } else {
-                        // 在圖片區域 - 導航欄透明
+                        // 在圖片區域 - 使用第一張圖片的邊緣色
                         document.body.classList.add('home-active');
                         document.body.classList.remove('home-cards-active');
                         if (themeColorMeta) {
