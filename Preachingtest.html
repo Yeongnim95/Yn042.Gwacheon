@@ -349,11 +349,15 @@
             -webkit-touch-callout: none;
         }
         
-        /* 導航欄透明模式 - 完全融入背景 */
+        /* 導航欄透明模式 - 完全融入背景（加強優先級） */
         body.home-active nav,
-        body.home-cards-active nav {
+        body.home-cards-active nav,
+        html:has(body.home-active) nav,
+        html:has(body.home-cards-active) nav {
             background: transparent !important;
+            background-color: transparent !important;
             box-shadow: none !important;
+            border: none !important;
             transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         
@@ -366,7 +370,14 @@
         body.home-active nav .menu-toggle,
         body.home-cards-active nav .menu-toggle {
             background: rgba(255,255,255,0.15) !important;
+            background-color: rgba(255,255,255,0.15) !important;
             color: white !important;
+        }
+        
+        body.home-active nav .menu-toggle:hover,
+        body.home-cards-active nav .menu-toggle:hover {
+            background: rgba(255,255,255,0.25) !important;
+            background-color: rgba(255,255,255,0.25) !important;
         }
         
         body.home-active nav .hamburger-icon,
@@ -5681,6 +5692,10 @@
         document.body.classList.add('home-active');
         document.body.classList.remove('home-cards-active');
         
+        // 直接設定html和body背景色（確保over-scroll時顏色正確）
+        document.documentElement.style.background = '#8a9a7a';
+        document.body.style.background = '#8a9a7a';
+        
         // 設定瀏覽器主題色（配合圖片的淡綠棕色）
         if (themeColorMeta) {
             themeColorMeta.setAttribute('content', '#8a9a7a');
@@ -5756,6 +5771,8 @@
                         // 滾動到卡片區域 - 使用第二張圖片的邊緣色
                         document.body.classList.remove('home-active');
                         document.body.classList.add('home-cards-active');
+                        document.documentElement.style.background = '#3c4632';
+                        document.body.style.background = '#3c4632';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#3c4632');
                         }
@@ -5763,6 +5780,8 @@
                         // 在圖片區域 - 使用第一張圖片的邊緣色
                         document.body.classList.add('home-active');
                         document.body.classList.remove('home-cards-active');
+                        document.documentElement.style.background = '#8a9a7a';
+                        document.body.style.background = '#8a9a7a';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#8a9a7a');
                         }
@@ -5798,7 +5817,10 @@
         document.body.classList.remove('home-active');
         document.body.classList.remove('home-cards-active');
         
-        // 恢復預設主題色
+        // 恢復預設背景色和主題色
+        document.documentElement.style.background = '';
+        document.body.style.background = '';
+        
         const themeColorMeta = document.getElementById('themeColorMeta');
         if (themeColorMeta) {
             themeColorMeta.setAttribute('content', '#c8e6c9');
