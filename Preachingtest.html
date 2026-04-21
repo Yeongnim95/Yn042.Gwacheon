@@ -303,8 +303,14 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁時隱藏container的背景 */
-        body.home-active .container {
+        /* 首頁時隱藏html/body的背景 */
+        body.home-active,
+        body.home-cards-active {
+            background: transparent !important;
+        }
+        
+        body.home-active .container,
+        body.home-cards-active .container {
             background: transparent !important;
             box-shadow: none !important;
             padding: 0 !important;
@@ -332,24 +338,34 @@
             -webkit-touch-callout: none;
         }
         
-        /* 導航欄透明模式 */
+        /* 導航欄透明模式 - 完全融入背景 */
         body.home-active nav {
             background: transparent !important;
             box-shadow: none !important;
             transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         
-        body.home-active nav .nav-title,
-        body.home-active nav .menu-toggle,
-        body.home-active nav .dropdown-arrow {
+        body.home-active nav .nav-title {
             color: white !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        body.home-active nav .menu-toggle {
+            background: rgba(255,255,255,0.2) !important;
+            color: white !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        body.home-active nav .hamburger-icon,
+        body.home-active nav #current-page-title,
+        body.home-active nav .dropdown-arrow {
+            color: white !important;
         }
         
         body.home-active nav .lang-select {
             color: white !important;
             background: rgba(255,255,255,0.2) !important;
-            border-color: rgba(255,255,255,0.4) !important;
+            border-color: rgba(255,255,255,0.3) !important;
         }
         
         body.home-active nav .lang-select option {
@@ -357,32 +373,49 @@
             background: white;
         }
         
-        /* 導航欄在卡片頁時變回正常 */
+        /* 導航欄在卡片頁時也透明融入 */
         body.home-cards-active nav {
-            background: white !important;
-            box-shadow: 0 2px 10px var(--shadow-color) !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
         
-        body.home-cards-active nav .nav-title,
-        body.home-cards-active nav .menu-toggle,
+        body.home-cards-active nav .nav-title {
+            color: white !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+        
+        body.home-cards-active nav .menu-toggle {
+            background: rgba(255,255,255,0.25) !important;
+            color: white !important;
+        }
+        
+        body.home-cards-active nav .hamburger-icon,
+        body.home-cards-active nav #current-page-title,
         body.home-cards-active nav .dropdown-arrow {
-            color: var(--primary-green) !important;
-            text-shadow: none !important;
+            color: white !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         
         body.home-cards-active nav .lang-select {
-            color: var(--text-color) !important;
-            background: white !important;
-            border-color: var(--border-color) !important;
+            color: white !important;
+            background: rgba(255,255,255,0.25) !important;
+            border-color: rgba(255,255,255,0.4) !important;
         }
         
-        /* 今日默想區塊 - 第一張投影片 */
+        body.home-cards-active nav .lang-select option {
+            color: #333;
+            background: white;
+        }
+        
+        /* 今日默想區塊 - 第一張投影片（全滿版） */
         .daily-verse-section {
             position: relative;
             width: 100vw;
             height: 100vh;
             height: 100dvh;
             margin-left: calc(-50vw + 50%);
+            margin-top: -60px; /* 補償導航欄高度，讓圖片延伸到最上方 */
+            padding-top: 60px; /* 內容向下推，避免被導航欄遮住 */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -500,21 +533,22 @@
             60% { transform: translateX(-50%) translateY(-6px); }
         }
         
-        /* 快速連結區塊 - 第二張投影片 */
+        /* 快速連結區塊 - 第二張投影片（全滿版） */
         .home-cards-section {
             position: relative;
             width: 100vw;
             min-height: 100vh;
             min-height: 100dvh;
             margin-left: calc(-50vw + 50%);
-            padding: 70px 25px 120px;
+            margin-top: -60px; /* 補償導航欄高度 */
+            padding: 100px 25px 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             background-image: url('cards-bg.jpeg');
             background-size: cover;
-            background-position: center top;
+            background-position: center;
             scroll-snap-align: start;
             scroll-snap-stop: always;
             flex-shrink: 0;
@@ -527,7 +561,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.2);
             z-index: 1;
         }
         
@@ -536,26 +570,25 @@
             z-index: 2;
         }
         
-        /* 版權區塊 */
+        /* 版權區塊 - 全寬延伸到底 */
         .home-copyright {
             position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 0;
+            left: 0;
+            right: 0;
             z-index: 2;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 12px 24px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .home-copyright-main {
             font-size: 0.8rem;
             color: #333;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: 500;
         }
         
@@ -578,11 +611,11 @@
                 bottom: 80px;
             }
             .home-cards-section {
-                padding: 60px 15px 110px;
+                padding: 90px 15px 70px;
             }
             .home-copyright {
-                bottom: 25px;
-                padding: 10px 20px;
+                padding: 12px 15px;
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
             }
         }
         
@@ -655,15 +688,15 @@
         }
         
         .home-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(80, 80, 80, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 16px;
             padding: 25px 15px;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             /* 防止選字/複製 */
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -674,21 +707,21 @@
         }
         
         .home-card:hover {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: rgba(80, 80, 80, 0.75);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
             transform: translateY(-3px);
         }
         
         .home-card:active {
             transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         
         .home-card-icon {
             width: 56px;
             height: 56px;
             margin: 0 auto 12px;
-            color: #333;
+            color: rgba(255, 255, 255, 0.95);
             transition: color 0.3s;
             pointer-events: none;
         }
@@ -699,21 +732,23 @@
         }
         
         .home-card:hover .home-card-icon {
-            color: var(--primary-green);
+            color: white;
         }
         
         .home-card-title {
             font-weight: 700;
             font-size: 1rem;
-            color: var(--text-primary);
+            color: white;
             margin-bottom: 5px;
             pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .home-card-desc {
             font-size: 0.8rem;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.85);
             pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         @media (max-width: 500px) {
