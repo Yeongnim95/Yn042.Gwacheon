@@ -303,13 +303,21 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁時背景直接用圖片色填滿 */
+        /* 首頁時背景直接用圖片色填滿（包含html元素） */
+        html:has(body.home-active) {
+            background: #8a9a7a !important;
+        }
+        
+        html:has(body.home-cards-active) {
+            background: #3c4632 !important;
+        }
+        
         body.home-active {
-            background: #8a9a7a !important; /* 第一頁圖片邊緣色 */
+            background: #8a9a7a !important;
         }
         
         body.home-cards-active {
-            background: #3c4632 !important; /* 第二頁圖片邊緣色 */
+            background: #3c4632 !important;
         }
         
         body.home-active .container,
@@ -673,9 +681,12 @@
         
         .home-quick-links {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            max-width: 340px;
+            /* 電腦版：一行四個 */
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(12px, 2vw, 20px);
+            max-width: 900px;
+            width: 90%;
+            padding: 0 20px;
         }
         
         .home-card {
@@ -683,8 +694,8 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 25px 15px;
+            border-radius: clamp(12px, 2vw, 20px);
+            padding: clamp(18px, 3vw, 30px) clamp(12px, 2vw, 20px);
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -709,9 +720,9 @@
         }
         
         .home-card-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 12px;
+            width: clamp(40px, 6vw, 70px);
+            height: clamp(40px, 6vw, 70px);
+            margin: 0 auto clamp(8px, 1.5vw, 15px);
             color: rgba(255, 255, 255, 0.95);
             transition: color 0.3s;
             pointer-events: none;
@@ -728,24 +739,37 @@
         
         .home-card-title {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
             color: white;
-            margin-bottom: 5px;
+            margin-bottom: clamp(3px, 0.5vw, 8px);
             pointer-events: none;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .home-card-desc {
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 1.2vw, 0.95rem);
             color: rgba(255, 255, 255, 0.85);
             pointer-events: none;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
+        /* 平板和手機：兩行兩列 */
+        @media (max-width: 768px) {
+            .home-quick-links {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 380px;
+                gap: 15px;
+            }
+        }
+        
         @media (max-width: 500px) {
             .weather-temp { font-size: 2.8rem; }
             .weather-icon { width: 60px; height: 60px; }
-            .home-quick-links { grid-template-columns: repeat(2, 1fr); }
+            .home-quick-links { 
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 340px;
+                gap: 12px;
+            }
         }
 
         h2 {
