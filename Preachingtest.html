@@ -303,13 +303,10 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁時背景使用圖片色 */
-        body.home-active {
-            background: #8a9a7a !important; /* 第一頁圖片主色 */
-        }
-        
+        /* 首頁底色黑色 */
+        body.home-active,
         body.home-cards-active {
-            background: #3c4632 !important; /* 第二頁圖片主色 */
+            background: #000 !important;
         }
         
         body.home-active .container,
@@ -391,7 +388,7 @@
             height: 100vh;
             height: 100dvh;
             margin-left: calc(-50vw + 50%);
-            overflow: hidden;
+            overflow: visible; /* 讓氣氛效果延伸到外面 */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -401,7 +398,7 @@
             flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
-            background-color: #8a9a7a; /* 圖片主色作為底色 */
+            background-color: #000;
         }
         
         .daily-verse-section.loaded {
@@ -420,28 +417,21 @@
             z-index: 1;
         }
         
-        /* YouTube風格邊緣模糊 - 上下左右漸層 */
+        /* 氣氛模式 - 淡淡的圖片邊緣色向瀏覽器邊緣擴散 */
         .daily-verse-section::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: linear-gradient(to bottom, #8a9a7a 0%, transparent 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-        
-        .daily-verse-section::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: linear-gradient(to top, #8a9a7a 0%, transparent 100%);
-            z-index: 2;
+            top: -100px;
+            left: -50px;
+            right: -50px;
+            bottom: -100px;
+            background: radial-gradient(ellipse 120% 100% at center, 
+                transparent 45%, 
+                rgba(138, 154, 122, 0.15) 65%, 
+                rgba(138, 154, 122, 0.25) 80%, 
+                rgba(138, 154, 122, 0.35) 100%
+            );
+            z-index: 0;
             pointer-events: none;
         }
         
@@ -451,7 +441,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(60, 80, 60, 0.03);
+            background: transparent;
             z-index: 2;
             pointer-events: none;
         }
@@ -550,7 +540,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #3c4632; /* 圖片主色作為底色 */
+            overflow: visible; /* 讓氣氛效果延伸到外面 */
+            background-color: #000;
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
@@ -559,29 +550,34 @@
             flex-shrink: 0;
         }
         
-        /* 暗色覆蓋層 */
+        /* 氣氛模式 - 淡淡的圖片邊緣色向瀏覽器邊緣擴散 */
         .home-cards-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -50px;
+            right: -50px;
+            bottom: -100px;
+            background: radial-gradient(ellipse 120% 100% at center, 
+                transparent 45%, 
+                rgba(60, 70, 50, 0.12) 65%, 
+                rgba(60, 70, 50, 0.2) 80%, 
+                rgba(60, 70, 50, 0.3) 100%
+            );
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* 輕微暗色覆蓋層 */
+        .home-cards-section::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.12);
+            background: rgba(0, 0, 0, 0.08);
             z-index: 1;
-            pointer-events: none;
-        }
-        
-        /* YouTube風格邊緣模糊 - 上方漸層 */
-        .home-cards-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: linear-gradient(to bottom, #3c4632 0%, transparent 100%);
-            z-index: 2;
             pointer-events: none;
         }
         
