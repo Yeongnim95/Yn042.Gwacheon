@@ -303,10 +303,36 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁時隱藏html/body的背景 */
+        /* 首頁時背景全黑 + 氣氛模式 */
         body.home-active,
         body.home-cards-active {
-            background: transparent !important;
+            background: #000 !important;
+        }
+        
+        /* 氣氛模式 - 第一頁（聖經圖片的邊緣色） */
+        body.home-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(138, 154, 122, 0.6) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* 氣氛模式 - 第二頁（人群圖片的邊緣色） */
+        body.home-cards-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(60, 70, 50, 0.7) 100%);
+            pointer-events: none;
+            z-index: -1;
         }
         
         body.home-active .container,
@@ -339,56 +365,28 @@
         }
         
         /* 導航欄透明模式 - 完全融入背景 */
-        body.home-active nav {
+        body.home-active nav,
+        body.home-cards-active nav {
             background: transparent !important;
             box-shadow: none !important;
             transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         
-        body.home-active nav .nav-title {
-            color: white !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        
-        body.home-active nav .menu-toggle {
-            background: rgba(255,255,255,0.2) !important;
-            color: white !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-        
-        body.home-active nav .hamburger-icon,
-        body.home-active nav #current-page-title,
-        body.home-active nav .dropdown-arrow {
-            color: white !important;
-        }
-        
-        body.home-active nav .lang-select {
-            color: white !important;
-            background: rgba(255,255,255,0.2) !important;
-            border-color: rgba(255,255,255,0.3) !important;
-        }
-        
-        body.home-active nav .lang-select option {
-            color: #333;
-            background: white;
-        }
-        
-        /* 導航欄在卡片頁時也透明融入 */
-        body.home-cards-active nav {
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-        
+        body.home-active nav .nav-title,
         body.home-cards-active nav .nav-title {
             color: white !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         
+        body.home-active nav .menu-toggle,
         body.home-cards-active nav .menu-toggle {
-            background: rgba(255,255,255,0.25) !important;
+            background: rgba(255,255,255,0.15) !important;
             color: white !important;
         }
         
+        body.home-active nav .hamburger-icon,
+        body.home-active nav #current-page-title,
+        body.home-active nav .dropdown-arrow,
         body.home-cards-active nav .hamburger-icon,
         body.home-cards-active nav #current-page-title,
         body.home-cards-active nav .dropdown-arrow {
@@ -396,12 +394,14 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         
+        body.home-active nav .lang-select,
         body.home-cards-active nav .lang-select {
             color: white !important;
-            background: rgba(255,255,255,0.25) !important;
-            border-color: rgba(255,255,255,0.4) !important;
+            background: rgba(255,255,255,0.15) !important;
+            border-color: rgba(255,255,255,0.3) !important;
         }
         
+        body.home-active nav .lang-select option,
         body.home-cards-active nav .lang-select option {
             color: #333;
             background: white;
@@ -414,8 +414,6 @@
             height: 100vh;
             height: 100dvh;
             margin-left: calc(-50vw + 50%);
-            margin-top: -60px; /* 補償導航欄高度，讓圖片延伸到最上方 */
-            padding-top: 60px; /* 內容向下推，避免被導航欄遮住 */
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -426,6 +424,7 @@
             flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
+            background-color: #000;
         }
         
         .daily-verse-section.loaded {
@@ -434,14 +433,18 @@
         
         .daily-verse-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
             background-image: url('bible-bg.jpeg');
             background-size: cover;
             background-position: center;
             z-index: 1;
+            /* 確保圖片填滿並裁切多餘部分 */
         }
         
         .daily-verse-overlay {
@@ -450,7 +453,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(60, 80, 60, 0.08);
+            background: rgba(60, 80, 60, 0.05);
             z-index: 2;
         }
         
@@ -540,12 +543,12 @@
             min-height: 100vh;
             min-height: 100dvh;
             margin-left: calc(-50vw + 50%);
-            margin-top: -60px; /* 補償導航欄高度 */
-            padding: 100px 25px 80px;
+            padding: 80px 25px 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background-color: #000;
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
@@ -561,7 +564,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             z-index: 1;
         }
         
@@ -570,31 +573,35 @@
             z-index: 2;
         }
         
-        /* 版權區塊 - 全寬延伸到底 */
+        /* 版權區塊 - 懸浮在圖片內、灰色半透明 */
         .home-copyright {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 25px;
+            left: 20px;
+            right: 20px;
             z-index: 2;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            background: rgba(80, 80, 80, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         
         .home-copyright-main {
             font-size: 0.8rem;
-            color: #333;
+            color: white;
             margin-bottom: 3px;
             font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .home-copyright-sub {
             font-size: 0.7rem;
-            color: #666;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         @media (max-width: 500px) {
@@ -611,11 +618,13 @@
                 bottom: 80px;
             }
             .home-cards-section {
-                padding: 90px 15px 70px;
+                padding: 70px 15px 90px;
             }
             .home-copyright {
-                padding: 12px 15px;
-                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+                bottom: 20px;
+                left: 15px;
+                right: 15px;
+                padding: 10px 15px;
             }
         }
         
