@@ -320,9 +320,10 @@
         }
         
         #homeSection .home-container {
-            margin-top: -60px; /* 向上延伸到nav底下 */
+            margin-top: -60px;
             padding-top: 0;
             overflow-y: auto;
+            scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
             -webkit-user-select: none;
             user-select: none;
@@ -462,6 +463,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
             flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
@@ -594,6 +597,8 @@
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
             flex-shrink: 0;
             flex-shrink: 0;
         }
