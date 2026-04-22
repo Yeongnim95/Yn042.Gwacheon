@@ -347,6 +347,16 @@
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
+            /* 禁用over-scroll彈性效果，避免顯示底部綠色 */
+            overscroll-behavior: none;
+            -webkit-overscroll-behavior: none;
+            /* 背景色配合第一頁圖片 */
+            background-color: #8a9a7a;
+        }
+        
+        /* 當滾動到第二頁時，背景色配合第二頁 */
+        body.home-cards-active #homeSection .home-container {
+            background-color: #3c4632;
         }
         
         /* 導航欄透明模式 - 完全融入背景（加強優先級） */
@@ -359,6 +369,19 @@
             box-shadow: none !important;
             border: none !important;
             transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        /* 首頁時整個html/body/container都要有正確的底色 */
+        body.home-active,
+        body.home-active #homeSection,
+        body.home-active #homeSection .home-container {
+            background-color: #8a9a7a !important;
+        }
+        
+        body.home-cards-active,
+        body.home-cards-active #homeSection,
+        body.home-cards-active #homeSection .home-container {
+            background-color: #3c4632 !important;
         }
         
         body.home-active nav .nav-title,
@@ -5695,6 +5718,7 @@
         // 直接設定html和body背景色（確保over-scroll時顏色正確）
         document.documentElement.style.background = '#8a9a7a';
         document.body.style.background = '#8a9a7a';
+        homeContainer.style.background = '#8a9a7a';
         
         // 設定瀏覽器主題色（配合圖片的淡綠棕色）
         if (themeColorMeta) {
@@ -5773,6 +5797,7 @@
                         document.body.classList.add('home-cards-active');
                         document.documentElement.style.background = '#3c4632';
                         document.body.style.background = '#3c4632';
+                        container.style.background = '#3c4632';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#3c4632');
                         }
@@ -5782,6 +5807,7 @@
                         document.body.classList.remove('home-cards-active');
                         document.documentElement.style.background = '#8a9a7a';
                         document.body.style.background = '#8a9a7a';
+                        container.style.background = '#8a9a7a';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#8a9a7a');
                         }
