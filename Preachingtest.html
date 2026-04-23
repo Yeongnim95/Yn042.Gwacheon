@@ -302,10 +302,10 @@
         
         /* 首頁時 html/body 背景色配合圖片（Safari上下邊界會顯示此色） */
         html:has(body.home-active) {
-            background-color: #8a9a7a !important;
+            background-color: #cecfbc !important;
         }
         html:has(body.home-cards-active) {
-            background-color: #3c4632 !important;
+            background-color: #141413 !important;
         }
         
         /* 首頁時container無背景 */
@@ -478,7 +478,7 @@
             flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
-            background-color: #8a9a7a;
+            background-color: #cecfbc;
         }
         
         .daily-verse-section.loaded {
@@ -603,7 +603,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background-color: #3c4632;
+            background-color: #141413;
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
@@ -5750,11 +5750,11 @@
         document.body.classList.remove('home-cards-active');
         
         // 設定html背景色配合圖片（Safari上下邊界）
-        document.documentElement.style.backgroundColor = '#8a9a7a';
+        document.documentElement.style.backgroundColor = '#cecfbc';
         
         // 設定瀏覽器主題色（配合圖片的淡綠棕色）
         if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', '#8a9a7a');
+            themeColorMeta.setAttribute('content', '#cecfbc');
         }
         
         // 取得今日經文
@@ -5827,17 +5827,17 @@
                         // 滾動到卡片區域
                         document.body.classList.remove('home-active');
                         document.body.classList.add('home-cards-active');
-                        document.documentElement.style.backgroundColor = '#3c4632';
+                        document.documentElement.style.backgroundColor = '#141413';
                         if (themeColorMeta) {
-                            themeColorMeta.setAttribute('content', '#3c4632');
+                            themeColorMeta.setAttribute('content', '#141413');
                         }
                     } else {
                         // 在圖片區域
                         document.body.classList.add('home-active');
                         document.body.classList.remove('home-cards-active');
-                        document.documentElement.style.backgroundColor = '#8a9a7a';
+                        document.documentElement.style.backgroundColor = '#cecfbc';
                         if (themeColorMeta) {
-                            themeColorMeta.setAttribute('content', '#8a9a7a');
+                            themeColorMeta.setAttribute('content', '#cecfbc');
                         }
                     }
                     
