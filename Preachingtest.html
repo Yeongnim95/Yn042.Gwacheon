@@ -300,6 +300,14 @@
 
         /* ===== 首頁樣式 ===== */
         
+        /* 首頁時 html/body 背景色配合圖片（Safari上下邊界會顯示此色） */
+        html:has(body.home-active) {
+            background-color: #8a9a7a !important;
+        }
+        html:has(body.home-cards-active) {
+            background-color: #3c4632 !important;
+        }
+        
         /* 首頁時container無背景 */
         body.home-active .container,
         body.home-cards-active .container {
@@ -5741,7 +5749,8 @@
         document.body.classList.add('home-active');
         document.body.classList.remove('home-cards-active');
         
-        // nav改為fixed（疊在圖片上方）已由CSS處理
+        // 設定html背景色配合圖片（Safari上下邊界）
+        document.documentElement.style.backgroundColor = '#8a9a7a';
         
         // 設定瀏覽器主題色（配合圖片的淡綠棕色）
         if (themeColorMeta) {
@@ -5818,6 +5827,7 @@
                         // 滾動到卡片區域
                         document.body.classList.remove('home-active');
                         document.body.classList.add('home-cards-active');
+                        document.documentElement.style.backgroundColor = '#3c4632';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#3c4632');
                         }
@@ -5825,6 +5835,7 @@
                         // 在圖片區域
                         document.body.classList.add('home-active');
                         document.body.classList.remove('home-cards-active');
+                        document.documentElement.style.backgroundColor = '#8a9a7a';
                         if (themeColorMeta) {
                             themeColorMeta.setAttribute('content', '#8a9a7a');
                         }
@@ -5859,6 +5870,9 @@
         
         document.body.classList.remove('home-active');
         document.body.classList.remove('home-cards-active');
+        
+        // 恢復html背景色為白色
+        document.documentElement.style.backgroundColor = 'white';
         
         // 恢復nav為sticky
         const navEl = document.querySelector('nav');
