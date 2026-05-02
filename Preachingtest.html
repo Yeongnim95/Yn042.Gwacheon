@@ -962,7 +962,8 @@
             outline: none;
             box-sizing: border-box; 
             min-width: 0;
-            /* 確保輸入框內也能正確顯示 Emoji */
+            background-color: var(--card-bg);
+            color: var(--text-primary);
             font-family: inherit;
         }
         
@@ -1051,14 +1052,14 @@
         /* --- 後台列表 --- */
         .backend-toolbar {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; padding: 10px; background: #fafafa; border-radius: 8px; flex-wrap: wrap; gap: 10px;
-            min-height: 50px;
+            margin-bottom: 15px; padding: 10px; background: var(--card-bg); border-radius: 8px; flex-wrap: wrap; gap: 10px;
+            min-height: 50px; border: 1px solid var(--border-lightest);
         }
         
         .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: #555; flex-wrap: wrap; }
         
         .stat-item { display: flex; align-items: center; white-space: nowrap; }
-        .stat-divider { margin: 0 8px; color: #ccc; }
+        .stat-divider { margin: 0 8px; color: var(--border-light); }
         .highlight-stat { color: #2e7d32; }
 
         .edit-controls { display: none; align-items: center; gap: 10px; }
