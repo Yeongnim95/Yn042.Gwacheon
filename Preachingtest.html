@@ -336,7 +336,9 @@
             top: 0;
             left: 0;
             right: 0;
-            background: transparent !important;
+            background: rgba(0,0,0,0.15) !important;
+            backdrop-filter: blur(12px) saturate(1.5);
+            -webkit-backdrop-filter: blur(12px) saturate(1.5);
             box-shadow: none !important;
             z-index: 100;
         }
@@ -459,7 +461,7 @@
             font-weight: 900;
             color: #f5f0e8;
             letter-spacing: clamp(8px, 2.5vw, 20px);
-            text-shadow: 0 3px 15px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
+            text-shadow: none;
             text-align: center;
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.95);
@@ -563,11 +565,30 @@
             filter: brightness(0.97);
         }
         
-        /* 圖片佔一半 */
+        /* 圖片佔一半 + 雙線紋路邊框 */
         .home-feature-img {
             flex: 0 0 50%;
             position: relative;
             overflow: hidden;
+            padding: 6px;
+        }
+        
+        .home-feature-img::before {
+            content: '';
+            position: absolute;
+            top: 6px; left: 6px; right: 6px; bottom: 6px;
+            border: 2px solid rgba(180, 170, 150, 0.5);
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .home-feature-img::after {
+            content: '';
+            position: absolute;
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
+            border: 1px solid rgba(180, 170, 150, 0.35);
+            z-index: 2;
+            pointer-events: none;
         }
         
         .home-feature-img img {
@@ -580,6 +601,66 @@
         
         .home-feature:hover .home-feature-img img {
             transform: scale(1.03);
+        }
+        
+        /* ===== 選項由左/右淡入動畫 ===== */
+        .home-feature {
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease, filter 0.3s;
+        }
+        
+        /* 圖左文右 → 從左邊滑入 */
+        .home-feature:not(.reverse) {
+            transform: translateX(-60px);
+        }
+        
+        /* 圖右文左 → 從右邊滑入 */
+        .home-feature.reverse {
+            transform: translateX(60px);
+        }
+        
+        .home-feature.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* ===== 第一頁→第二頁狹管縮放過渡 ===== */
+        .home-pinch-transition {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            height: clamp(80px, 15vh, 150px);
+            background: #f5f0e8;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .home-pinch-transition::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(180,170,150,0.3) 30%, 
+                rgba(180,170,150,0.5) 50%, 
+                rgba(180,170,150,0.3) 70%, 
+                transparent 100%
+            );
+        }
+        
+        .home-pinch-transition .pinch-ornament {
+            width: clamp(8px, 1.5vw, 12px);
+            height: clamp(8px, 1.5vw, 12px);
+            border: 1.5px solid rgba(180,170,150,0.5);
+            transform: rotate(45deg);
+            background: #f5f0e8;
+            z-index: 1;
         }
         
         /* 文字佔一半 */
@@ -608,8 +689,8 @@
         .home-feature-title {
             font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
                 "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
-            font-size: clamp(1.3rem, 3.5vw, 2rem);
-            font-weight: 800;
+            font-size: clamp(1.6rem, 4.5vw, 2.5rem);
+            font-weight: 900;
             color: #3a3530;
             margin-bottom: clamp(8px, 1.5vh, 15px);
             letter-spacing: 0.5px;
@@ -667,7 +748,8 @@
         
         /* 手機版：圖文改為上下排列 */
         @media (max-width: 600px) {
-            .home-feature {
+            .home-feature,
+            .home-feature.reverse {
                 flex-direction: column !important;
                 min-height: auto;
             }
@@ -678,6 +760,14 @@
             .home-feature-text {
                 flex: 0 0 auto;
                 padding: clamp(20px, 5vw, 30px);
+            }
+            /* 手機版動畫統一從下方淡入 */
+            .home-feature:not(.reverse),
+            .home-feature.reverse {
+                transform: translateY(40px) !important;
+            }
+            .home-feature.visible {
+                transform: translateY(0) !important;
             }
         }
         
@@ -3061,6 +3151,11 @@
                     <div class="home-verse-ref" id="dailyVerseReference">--</div>
                     <div class="home-verse-body" id="dailyVerseText">--</div>
                 </div>
+            </div>
+            
+            <!-- 狹管過渡效果 -->
+            <div class="home-pinch-transition">
+                <div class="pinch-ornament"></div>
             </div>
             
             <!-- 第二張投影片：三個選項圖文交替 -->
@@ -5826,9 +5921,33 @@
         setTimeout(() => {
             slide1.classList.add('verse-show');
         }, 1200);
+        
+        // 初始化第二頁選項淡入動畫
+        initHomeFeatureAnimations();
     }
     
     function setupHomeScrollListener(container) {}
+    
+    // 首頁選項滾動淡入動畫
+    function initHomeFeatureAnimations() {
+        const features = document.querySelectorAll('.home-feature');
+        if (!features.length) return;
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    // 依序延遲淡入
+                    const delay = Array.from(features).indexOf(entry.target) * 200;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        
+        features.forEach(f => observer.observe(f));
+    }
     
     // 離開首頁時清理
     function cleanupDailyVerse() {
