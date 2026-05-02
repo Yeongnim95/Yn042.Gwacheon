@@ -547,8 +547,14 @@
         
         /* 大螢幕限制寬度，居中顯示 */
         .home-features-wrapper {
-            max-width: 1100px;
+            max-width: 90vw;
             margin: 0 auto;
+        }
+        
+        @media (min-width: 1600px) {
+            .home-features-wrapper {
+                max-width: 1500px;
+            }
         }
         
         /* 每個選項區塊 */
