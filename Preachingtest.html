@@ -28,8 +28,8 @@
             --text-color: #333;
             --danger-red: #e53935;
             
-            --bg-color: #ffffff;
-            --bg-secondary: rgba(255, 255, 255, 0.98);
+            --bg-color: #f5f0e8;
+            --bg-secondary: rgba(245, 240, 232, 0.98);
             --card-bg: white;
             --text-primary: #333;
             --text-secondary: #555;
@@ -39,7 +39,7 @@
             --border-lightest: #eee;
             --shadow-color: rgba(0, 0, 0, 0.1);
             --input-bg: white;
-            --nav-bg: white;
+            --nav-bg: #f5f0e8;
         }
         
         * { box-sizing: border-box; }
@@ -49,7 +49,7 @@
             min-height: -webkit-fill-available;
             margin: 0;
             padding: 0;
-            background-color: white;
+            background-color: #f5f0e8;
         }
 
         body {
@@ -300,17 +300,13 @@
 
         /* ===== 首頁樣式 ===== */
         
-        /* 首頁時 html/body 背景色配合圖片（Safari上下邊界會顯示此色） */
+        /* 首頁時Safari邊界色 */
         html:has(body.home-active) {
-            background-color: #cecfbc !important;
-        }
-        html:has(body.home-cards-active) {
-            background-color: #141413 !important;
+            background-color: #f5f0e8 !important;
         }
         
         /* 首頁時container無背景 */
-        body.home-active .container,
-        body.home-cards-active .container {
+        body.home-active .container {
             background: transparent !important;
             box-shadow: none !important;
             padding: 0 !important;
@@ -321,28 +317,13 @@
             min-height: auto !important;
         }
         
-        /* 首頁容器 - 投影片式滾動（佔滿全螢幕包含nav區域） */
         #homeSection.page-section {
             padding: 0 !important;
             margin: 0 !important;
         }
         
-        #homeSection .home-container {
-            height: calc(100vh + 60px);
-            height: calc(100dvh + 60px);
-            margin-top: -60px;
-            padding-top: 0;
-            overflow-y: auto;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-        
-        /* 首頁時 nav 固定在最上方、疊在圖片上方 */
-        body.home-active nav,
-        body.home-cards-active nav {
+        /* 首頁時 nav 固定疊在圖片上方 */
+        body.home-active nav {
             position: fixed !important;
             top: 0;
             left: 0;
@@ -352,49 +333,40 @@
             z-index: 100;
         }
         
-        body.home-active nav .nav-title,
-        body.home-cards-active nav .nav-title {
+        body.home-active nav .nav-title {
             color: white !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         
-        body.home-active nav .menu-toggle,
-        body.home-cards-active nav .menu-toggle {
+        body.home-active nav .menu-toggle {
             background: rgba(255,255,255,0.15) !important;
             color: white !important;
         }
         
-        body.home-active nav .menu-toggle:hover,
-        body.home-cards-active nav .menu-toggle:hover {
+        body.home-active nav .menu-toggle:hover {
             background: rgba(255,255,255,0.25) !important;
         }
         
         body.home-active nav .hamburger-icon,
         body.home-active nav #current-page-title,
-        body.home-active nav .dropdown-arrow,
-        body.home-cards-active nav .hamburger-icon,
-        body.home-cards-active nav #current-page-title,
-        body.home-cards-active nav .dropdown-arrow {
+        body.home-active nav .dropdown-arrow {
             color: white !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
         
-        body.home-active nav .lang-select,
-        body.home-cards-active nav .lang-select {
+        body.home-active nav .lang-select {
             color: white !important;
             background: rgba(255,255,255,0.15) !important;
             border-color: rgba(255,255,255,0.3) !important;
         }
         
-        body.home-active nav .lang-select option,
-        body.home-cards-active nav .lang-select option {
+        body.home-active nav .lang-select option {
             color: #333;
-            background: white;
+            background: #f5f0e8;
         }
         
         /* 首頁時選單使用霧面玻璃效果 */
-        body.home-active .menu-dropdown,
-        body.home-cards-active .menu-dropdown {
+        body.home-active .menu-dropdown {
             background: rgba(40, 40, 40, 0.75) !important;
             backdrop-filter: blur(20px) saturate(1.8);
             -webkit-backdrop-filter: blur(20px) saturate(1.8);
@@ -402,80 +374,79 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
         }
         
-        body.home-active .menu-category-title,
-        body.home-cards-active .menu-category-title {
+        body.home-active .menu-category-title {
             color: rgba(255, 255, 255, 0.9) !important;
         }
         
-        body.home-active .menu-category-title:hover,
-        body.home-cards-active .menu-category-title:hover {
+        body.home-active .menu-category-title:hover {
             background: rgba(255, 255, 255, 0.1) !important;
         }
         
-        body.home-active .menu-category-title.home-link,
-        body.home-cards-active .menu-category-title.home-link {
+        body.home-active .menu-category-title.home-link {
             background: rgba(255, 255, 255, 0.08) !important;
         }
         
-        body.home-active .menu-category-title.home-link:hover,
-        body.home-cards-active .menu-category-title.home-link:hover {
+        body.home-active .menu-category-title.home-link:hover {
             background: rgba(255, 255, 255, 0.2) !important;
             color: white !important;
         }
         
-        body.home-active .menu-category,
-        body.home-cards-active .menu-category {
+        body.home-active .menu-category {
             border-bottom-color: rgba(255, 255, 255, 0.1) !important;
         }
         
-        body.home-active .menu-btn,
-        body.home-cards-active .menu-btn {
+        body.home-active .menu-btn {
             color: rgba(255, 255, 255, 0.85) !important;
         }
         
-        body.home-active .menu-btn:hover,
-        body.home-cards-active .menu-btn:hover {
+        body.home-active .menu-btn:hover {
             background: rgba(255, 255, 255, 0.12) !important;
             color: white !important;
         }
         
-        body.home-active .submenu-arrow,
-        body.home-cards-active .submenu-arrow {
+        body.home-active .submenu-arrow {
             color: rgba(255, 255, 255, 0.6) !important;
         }
         
-        body.home-active .dev-badge,
-        body.home-cards-active .dev-badge {
+        body.home-active .dev-badge {
             background: rgba(255, 152, 0, 0.8) !important;
         }
         
-        /* 首頁時天氣區塊也使用霧面效果 */
-        body.home-active .menu-weather-section,
-        body.home-cards-active .menu-weather-section {
+        body.home-active .menu-weather-section {
             background: rgba(255, 255, 255, 0.08) !important;
             border-bottom-color: rgba(255, 255, 255, 0.1) !important;
         }
         
-        body.home-active .menu-weather-section *,
-        body.home-cards-active .menu-weather-section * {
+        body.home-active .menu-weather-section * {
             color: rgba(255, 255, 255, 0.9) !important;
         }
         
-        /* 今日默想區塊 - 第一張投影片（完全全屏，包含nav區域） */
+        /* 圓黑體字體 */
+        .daily-verse-section,
+        .daily-verse-section * {
+            font-family: 
+                "Apple SD Gothic Neo", 
+                "Noto Sans KR",
+                "Noto Sans TC",
+                "Malgun Gothic",
+                "Microsoft JhengHei",
+                "Segoe UI",
+                -apple-system, BlinkMacSystemFont,
+                sans-serif !important;
+        }
+        
+        /* ===== 首頁圖片區塊（上70%） ===== */
         .daily-verse-section {
             position: relative;
             width: 100vw;
-            height: calc(100vh + 60px);
-            height: calc(100dvh + 60px);
             margin-left: calc(-50vw + 50%);
+            height: 70vh;
+            height: 70dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            flex-shrink: 0;
             opacity: 0;
             transition: opacity 1s ease;
             background-color: #cecfbc;
@@ -503,101 +474,89 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: transparent;
+            background: rgba(0,0,0,0.15);
             z-index: 2;
             pointer-events: none;
         }
         
+        /* 圖片中的標題「每日默想」 */
         .daily-verse-content {
             position: relative;
             z-index: 5;
-            padding: clamp(20px, 5vw, 40px);
-            max-width: 650px;
+            padding-top: calc(60px + clamp(30px, 6vh, 60px)); /* nav高度 + 上方間距 */
             text-align: center;
             opacity: 0;
-            transform: translateX(-40px);
+            transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
         
         .daily-verse-content.show {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
         }
         
         .daily-verse-label {
-            font-family: 'Noto Serif KR', 'Noto Serif TC', serif;
-            font-size: clamp(0.9rem, 2.5vw, 1.15rem);
-            color: rgba(255, 255, 255, 0.85);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: clamp(15px, 3vh, 25px);
-            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-        }
-        
-        .daily-verse-reference {
-            font-family: 'Noto Serif KR', 'Noto Serif TC', serif;
-            font-size: clamp(1.6rem, 5vw, 2.5rem);
-            font-weight: 600;
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 800;
             color: white;
-            margin-bottom: clamp(20px, 4vh, 35px);
+            letter-spacing: 6px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         
-        .daily-verse-text {
-            font-family: 'Noto Serif KR', 'Noto Serif TC', serif;
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-            line-height: 2.2;
-            color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            font-weight: 400;
-        }
-        
-        .daily-verse-text .verse-ko {
-            display: block;
-            margin-bottom: clamp(12px, 2vh, 20px);
-        }
-        
-        .daily-verse-text .verse-zh {
-            display: block;
-            font-size: clamp(1.15rem, 3vw, 1.6rem);
-            opacity: 0.9;
-        }
-        
+        /* 隱藏舊的滾動提示 */
         .daily-verse-scroll-hint {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 3;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
+            display: none;
+        }
+        
+        /* ===== 經文區塊（下30%） ===== */
+        .daily-verse-text-section {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            min-height: 30vh;
+            min-height: 30dvh;
+            background-color: #f5f0e8;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
-            animation: bounce 2s infinite;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+            padding: clamp(25px, 5vh, 50px) clamp(20px, 5vw, 40px);
         }
         
-        .daily-verse-scroll-hint svg {
-            width: 24px;
-            height: 24px;
+        .daily-verse-ref {
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: 800;
+            color: #3a3a3a;
+            margin-bottom: clamp(15px, 3vh, 25px);
+            text-align: center;
+            letter-spacing: 1px;
         }
         
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-12px); }
-            60% { transform: translateX(-50%) translateY(-6px); }
+        .daily-verse-body {
+            font-size: clamp(1.05rem, 2.5vw, 1.4rem);
+            line-height: 2;
+            color: #555;
+            text-align: center;
+            max-width: 600px;
         }
         
-        /* 快速連結區塊 - 第二張投影片（完全全屏，包含nav區域） */
+        .daily-verse-body .verse-ko {
+            display: block;
+            margin-bottom: clamp(8px, 1.5vh, 15px);
+            color: #3a3a3a;
+        }
+        
+        .daily-verse-body .verse-zh {
+            display: block;
+            color: #666;
+            font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+        }
+        
+        /* 快速連結區塊 - 暫時保留不動 */
         .home-cards-section {
             position: relative;
             width: 100vw;
-            min-height: calc(100vh + 60px);
-            min-height: calc(100dvh + 60px);
             margin-left: calc(-50vw + 50%);
-            padding: 100px 25px 100px;
+            padding: 50px 25px 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -607,13 +566,9 @@
             background-image: url('cards-bg.jpeg');
             background-size: cover;
             background-position: center;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            flex-shrink: 0;
-            flex-shrink: 0;
         }
         
-        /* 輕微暗色覆蓋層 */
+        /* 暗色覆蓋層 */
         .home-cards-section::before {
             content: '';
             position: absolute;
@@ -631,12 +586,10 @@
             z-index: 3;
         }
         
-        /* 版權區塊 - 懸浮在圖片內、灰色半透明 */
+        /* 版權區塊 */
         .home-copyright {
-            position: absolute;
-            bottom: 25px;
-            left: 20px;
-            right: 20px;
+            position: relative;
+            margin-top: 30px;
             z-index: 5;
             background: rgba(80, 80, 80, 0.65);
             backdrop-filter: blur(12px);
@@ -663,26 +616,8 @@
         }
         
         @media (max-width: 500px) {
-            .daily-verse-content {
-                padding: 20px;
-            }
-            .daily-verse-reference {
-                font-size: 1.05rem;
-            }
-            .daily-verse-text {
-                font-size: 0.95rem;
-            }
-            .daily-verse-scroll-hint {
-                bottom: 80px;
-            }
             .home-cards-section {
-                padding: 70px 15px 90px;
-            }
-            .home-copyright {
-                bottom: 20px;
-                left: 15px;
-                right: 15px;
-                padding: 10px 15px;
+                padding: 40px 15px 60px;
             }
         }
         
@@ -3041,25 +2976,22 @@
 <div class="container">
     <!-- 首頁 -->
     <div id="homeSection" class="page-section active-section">
-        <div class="home-container">
-            <!-- 今日默想區塊 - 固定背景 -->
+            <!-- 圖片區塊（上70%） - 標題「每日默想」 -->
             <div class="daily-verse-section" id="dailyVerseSection">
                 <div class="daily-verse-bg" id="dailyVerseBg"></div>
                 <div class="daily-verse-overlay"></div>
                 <div class="daily-verse-content">
-                    <div class="daily-verse-label" id="dailyVerseLabel">오늘의 묵상</div>
-                    <div class="daily-verse-reference" id="dailyVerseReference">--</div>
-                    <div class="daily-verse-text" id="dailyVerseText">--</div>
-                </div>
-                <div class="daily-verse-scroll-hint" id="scrollHint">
-                    <span id="scrollHintText">↓</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M7 10l5 5 5-5"/>
-                    </svg>
+                    <div class="daily-verse-label" id="dailyVerseLabel">매일 묵상</div>
                 </div>
             </div>
             
-            <!-- 快速連結 - 從底部滑入覆蓋 -->
+            <!-- 經文區塊（下30%） -->
+            <div class="daily-verse-text-section">
+                <div class="daily-verse-ref" id="dailyVerseReference">--</div>
+                <div class="daily-verse-body" id="dailyVerseText">--</div>
+            </div>
+            
+            <!-- 快速連結 -->
             <div class="home-cards-section" id="homeCardsSection">
                 <div class="home-quick-links">
                     <div class="home-card" onclick="window.switchPage('bible')">
@@ -3128,7 +3060,6 @@
                     <div class="home-copyright-sub">Personal property of Yeongnim</div>
                 </div>
             </div>
-        </div>
     </div>
     
     <!-- 每日信仰記錄 (開發中) -->
@@ -5728,49 +5659,46 @@
         };
     }
     
-    // 首頁滾動監聽器
+    // 首頁（不再需要滾動監聽器）
     let homeScrollHandler = null;
     let homeScrollContainer = null;
     
     // 初始化今日默想區塊
     function initDailyVerse() {
         const section = document.getElementById('dailyVerseSection');
-        const homeContainer = document.querySelector('#homeSection .home-container');
         const contentEl = document.querySelector('.daily-verse-content');
         const labelEl = document.getElementById('dailyVerseLabel');
         const refEl = document.getElementById('dailyVerseReference');
         const textEl = document.getElementById('dailyVerseText');
-        const scrollHintEl = document.getElementById('scrollHintText');
         const themeColorMeta = document.getElementById('themeColorMeta');
         
-        if (!section || !homeContainer) return;
+        if (!section) return;
         
-        // 添加首頁透明導航欄 class
+        // 添加首頁class
         document.body.classList.add('home-active');
-        document.body.classList.remove('home-cards-active');
         
-        // 設定html背景色配合圖片（Safari上下邊界）
-        document.documentElement.style.backgroundColor = '#cecfbc';
+        // 設定html背景色
+        document.documentElement.style.backgroundColor = '#f5f0e8';
         
-        // 設定瀏覽器主題色（配合圖片的淡綠棕色）
+        // 設定瀏覽器主題色
         if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', '#cecfbc');
+            themeColorMeta.setAttribute('content', '#f5f0e8');
         }
         
         // 取得今日經文
         const verse = getDailyVerse();
         
-        // 雙語顯示標籤
+        // 標題
         if (labelEl) {
-            labelEl.innerHTML = '<span>오늘의 묵상</span> · <span>今日默想</span>';
+            labelEl.innerHTML = currentLang === 'ko' ? '매일 묵상' : '每日默想';
         }
         
-        // 雙語顯示章節引用
+        // 經文章節引用
         if (refEl) {
             refEl.innerHTML = `${verse.reference.ko} / ${verse.reference.zh}`;
         }
         
-        // 雙語顯示經文內容
+        // 經文內容
         if (textEl) {
             textEl.innerHTML = `
                 <span class="verse-ko">${verse.text.ko}</span>
@@ -5778,112 +5706,33 @@
             `;
         }
         
-        if (scrollHintEl) {
-            scrollHintEl.textContent = '↓';
-        }
-        
-        // 滾動到頂部
-        homeContainer.scrollTo(0, 0);
-        
-        // 圖片淡入（延遲100ms）
+        // 圖片淡入
         setTimeout(() => {
             section.classList.add('loaded');
         }, 100);
         
-        // 文字淡入（延遲1.5秒）
+        // 文字淡入
         setTimeout(() => {
             if (contentEl) {
                 contentEl.classList.add('show');
             }
-        }, 1500);
-        
-        // 設定滾動監聽 - 監聽 home-container 的滾動
-        setupHomeScrollListener(homeContainer);
+        }, 800);
     }
     
-    function setupHomeScrollListener(container) {
-        // 先移除舊的監聽器
-        if (homeScrollHandler && homeScrollContainer) {
-            homeScrollContainer.removeEventListener('scroll', homeScrollHandler);
-        }
-        
-        if (!container) return;
-        
-        homeScrollContainer = container;
-        const scrollHint = document.getElementById('scrollHint');
-        const themeColorMeta = document.getElementById('themeColorMeta');
-        
-        let ticking = false;
-        
-        homeScrollHandler = () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    const scrollY = container.scrollTop;
-                    const windowHeight = window.innerHeight;
-                    const scrollThreshold = windowHeight * 0.5; // 滾動到 50% 時切換
-                    
-                    // 根據滾動位置控制導航欄和主題色
-                    if (scrollY > scrollThreshold) {
-                        // 滾動到卡片區域
-                        document.body.classList.remove('home-active');
-                        document.body.classList.add('home-cards-active');
-                        document.documentElement.style.backgroundColor = '#141413';
-                        if (themeColorMeta) {
-                            themeColorMeta.setAttribute('content', '#141413');
-                        }
-                    } else {
-                        // 在圖片區域
-                        document.body.classList.add('home-active');
-                        document.body.classList.remove('home-cards-active');
-                        document.documentElement.style.backgroundColor = '#cecfbc';
-                        if (themeColorMeta) {
-                            themeColorMeta.setAttribute('content', '#cecfbc');
-                        }
-                    }
-                    
-                    // 滾動提示隱藏
-                    if (scrollHint) {
-                        scrollHint.style.opacity = scrollY > 50 ? '0' : '1';
-                        scrollHint.style.transition = 'opacity 0.3s ease';
-                    }
-                    
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
-        
-        container.addEventListener('scroll', homeScrollHandler, { passive: true });
-        
-        // 立即執行一次
-        homeScrollHandler();
-    }
+    // 不再需要滾動監聽
+    function setupHomeScrollListener(container) {}
     
     // 離開首頁時清理
     function cleanupDailyVerse() {
-        // 移除滾動監聽器
-        if (homeScrollHandler && homeScrollContainer) {
-            homeScrollContainer.removeEventListener('scroll', homeScrollHandler);
-            homeScrollHandler = null;
-            homeScrollContainer = null;
-        }
-        
         document.body.classList.remove('home-active');
-        document.body.classList.remove('home-cards-active');
         
-        // 恢復html背景色為白色
-        document.documentElement.style.backgroundColor = 'white';
-        
-        // 恢復nav為sticky
-        const navEl = document.querySelector('nav');
-        if (navEl) {
-            navEl.style.position = '';
-        }
+        // 恢復html背景色
+        document.documentElement.style.backgroundColor = '#f5f0e8';
         
         // 恢復預設主題色
         const themeColorMeta = document.getElementById('themeColorMeta');
         if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', '#c8e6c9');
+            themeColorMeta.setAttribute('content', '#f5f0e8');
         }
         
         const section = document.getElementById('dailyVerseSection');
