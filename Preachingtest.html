@@ -102,14 +102,15 @@
             align-items: center;
             gap: 8px;
             padding: 8px 15px;
-            background: var(--bg-secondary);
+            background: transparent;
+            border: 1px solid var(--border-light);
             border-radius: 25px;
             cursor: pointer;
             margin-left: 15px;
             transition: all 0.3s;
         }
         .menu-toggle:hover {
-            background: var(--border-lightest);
+            background: var(--bg-secondary);
         }
         .hamburger-icon {
             font-size: 1.2rem;
@@ -511,8 +512,8 @@
         }
         
         .home-verse-ref {
-            font-size: clamp(1.7rem, 5vw, 2.8rem);
-            font-weight: 800;
+            font-size: clamp(2rem, 6vw, 3.2rem);
+            font-weight: 900;
             color: var(--primary-green);
             margin-bottom: clamp(10px, 2vh, 20px);
             text-align: center;
@@ -520,7 +521,7 @@
         }
         
         .home-verse-body {
-            font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+            font-size: clamp(1.5rem, 4.5vw, 2.3rem);
             line-height: 1.9;
             color: var(--primary-green);
             text-align: center;
@@ -528,15 +529,8 @@
             font-weight: 500;
         }
         
-        .home-verse-body .verse-ko {
-            display: block;
-            margin-bottom: clamp(5px, 1vh, 12px);
-        }
-        
         .home-verse-body .verse-zh {
-            display: block;
-            font-size: clamp(1.15rem, 3vw, 1.7rem);
-            opacity: 0.85;
+            display: none;
         }
         
         /* ===== 第二張投影片 - 三選項圖文交替 ===== */
@@ -1239,9 +1233,27 @@
         .message-points-section {
             margin-top: 15px;
             padding: 15px;
-            background: var(--light-green-bg);
+            background: #f1f8e9;
             border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #c5e1a5;
+        }
+        
+        /* 需確認訊息用橙色 */
+        #confirmPointsSection {
+            background: #fff8e1;
+            border-color: #ffe082;
+        }
+        
+        #confirmPointsSection .message-points-title {
+            color: #e65100;
+        }
+        
+        #confirmPointsSection .message-points-add-btn {
+            background: #ff9800;
+        }
+        
+        #confirmPointsSection .message-points-add-btn:hover {
+            background: #e65100;
         }
         
         .message-points-header {
@@ -3089,7 +3101,6 @@
                 </div>
                 <div class="menu-submenu" id="submenu-faith">
                     <button class="menu-btn" onclick="window.switchPage('faithAuto')" id="btn-faith-auto">신앙 자동화 관리 <span class="dev-badge">개발 중</span></button>
-                    <button class="menu-btn" onclick="window.switchPage('dailyFaith')" id="btn-daily-faith">매일 신앙 기록 <span class="dev-badge">개발 중</span></button>
                 </div>
             </div>
             <!-- 書籍 子選單 -->
@@ -3109,10 +3120,8 @@
                     <span class="submenu-arrow">▶</span>
                 </div>
                 <div class="menu-submenu" id="submenu-fruit">
-                    <button class="menu-btn" onclick="window.switchPage('entry')" id="btn-entry">온라인 등록</button>
-                    <button class="menu-btn" onclick="window.switchPage('offline-entry')" id="btn-offline-entry">오프라인 등록</button>
-                    <button class="menu-btn" onclick="window.switchPage('backend')" id="btn-backend">온라인 데이터</button>
-                    <button class="menu-btn" onclick="window.switchPage('offline-backend')" id="btn-offline-backend">오프라인 데이터</button>
+                    <button class="menu-btn" onclick="window.switchPage('entry')" id="btn-entry">등록 시스템</button>
+                    <button class="menu-btn" onclick="window.switchPage('backend')" id="btn-backend">백엔드 관리</button>
                     <button class="menu-btn" onclick="window.switchPage('profile')" id="btn-profile">개인정보</button>
                 </div>
             </div>
@@ -3212,15 +3221,6 @@
                 </div>
             </div>
         </div> <!-- home-container -->
-    </div>
-    
-    <!-- 每日信仰記錄 (開發中) -->
-    <div id="dailyFaithSection" class="page-section">
-        <h2 id="txt-daily-faith-header">매일 신앙 기록</h2>
-        <div class="faith-content">
-            <p id="txt-daily-faith-desc">이 페이지에서 매일의 신앙 생활을 기록할 수 있습니다.</p>
-            <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
-        </div>
     </div>
     
     <!-- 信仰自動化管理 (開發中) -->
@@ -3839,14 +3839,14 @@
             txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
             txtBibleBack: "뒤로",
             // 果子資訊
-            btnEntry: "온라인 등록", btnOfflineEntry: "오프라인 등록", 
+            btnEntry: "등록 시스템", btnOfflineEntry: "오프라인 등록", 
             btnProfile: "개인정보", 
-            btnBackend: "온라인 데이터", btnOfflineBackend: "오프라인 데이터",
-            headerEntry: "온라인 전도 등록", lblId: "번호", lblName: "이름",
+            btnBackend: "백엔드 관리", btnOfflineBackend: "오프라인 데이터",
+            headerEntry: "등록 시스템", lblId: "번호", lblName: "이름",
             lblDate: "날짜", lblType: "회신 유형", lblContent: "내용",
             optMe: "내가 회신", optOther: "상대방 회신",
             phId: "0000-4999 사이의 4자리 번호 입력", phName: "예: 김철수", phContent: "대화 내용이나 기도 제목 입력...",
-            btnSubmit: "등록하기", headerBackend: "온라인 데이터 관리",
+            btnSubmit: "등록하기", headerBackend: "백엔드 관리",
             txtSelectAll: "전체 선택", txtTotal: "섭외자: ", txtPerson: "명",
             txtWeeklyInteraction: "주간 교류: ",
             btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
@@ -3917,10 +3917,10 @@
             txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
             txtBibleBack: "返回",
             // 果子資訊
-            btnEntry: "線上登錄", btnOfflineEntry: "線下登錄", 
+            btnEntry: "登錄系統", btnOfflineEntry: "線下登錄", 
             btnProfile: "個人資料", 
-            btnBackend: "線上後台", btnOfflineBackend: "線下後台",
-            headerEntry: "線上傳道登錄", lblId: "編號", lblName: "姓名",
+            btnBackend: "後台管理", btnOfflineBackend: "線下後台",
+            headerEntry: "登錄系統", lblId: "編號", lblName: "姓名",
             lblDate: "日期", lblType: "回覆類型", lblContent: "回覆內容",
             optMe: "我回覆", optOther: "對方回覆",
             phId: "請輸入0000-4999間的4位編號", phName: "例: 金大中", phContent: "請輸入對話重點或備忘...",
@@ -5884,28 +5884,14 @@
             labelEl.textContent = currentLang === 'ko' ? '매일묵상' : '每日默想';
         }
         
-        // 經文章節引用（隨語言變動）
+        // 經文章節引用（只顯示當前語言）
         if (refEl) {
-            if (currentLang === 'ko') {
-                refEl.textContent = verse.reference.ko;
-            } else {
-                refEl.textContent = verse.reference.zh;
-            }
+            refEl.textContent = currentLang === 'ko' ? verse.reference.ko : verse.reference.zh;
         }
         
-        // 經文內容（隨語言顯示順序變動）
+        // 經文內容（只顯示當前語言）
         if (textEl) {
-            if (currentLang === 'ko') {
-                textEl.innerHTML = `
-                    <span class="verse-ko">${verse.text.ko}</span>
-                    <span class="verse-zh">${verse.text.zh}</span>
-                `;
-            } else {
-                textEl.innerHTML = `
-                    <span class="verse-ko">${verse.text.zh}</span>
-                    <span class="verse-zh">${verse.text.ko}</span>
-                `;
-            }
+            textEl.textContent = currentLang === 'ko' ? verse.text.ko : verse.text.zh;
         }
         
         // 滾動到頂部
