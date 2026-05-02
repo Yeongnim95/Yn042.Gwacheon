@@ -457,14 +457,14 @@
         /* 標題「每日默想」 */
         .home-hero-title {
             position: absolute;
-            top: 50%;
+            top: 38%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
-            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-size: clamp(3rem, 10vw, 6rem);
             font-weight: 900;
             color: #f5f0e8;
-            letter-spacing: clamp(6px, 2vw, 16px);
+            letter-spacing: clamp(8px, 2.5vw, 20px);
             text-shadow: 0 3px 15px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
             text-align: center;
             opacity: 0;
@@ -482,14 +482,16 @@
             position: relative;
             width: 100%;
             flex: 0 0 auto;
-            margin-top: -80px;
+            margin-top: -2px;
             z-index: 10;
+            line-height: 0;
+            background-color: #f5f0e8;
         }
         
         .home-wave-transition svg {
             display: block;
             width: 100%;
-            height: auto;
+            height: clamp(60px, 10vh, 100px);
         }
         
         /* 經文區（下方） */
@@ -512,16 +514,16 @@
         }
         
         .home-verse-ref {
-            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            font-size: clamp(1.7rem, 5vw, 2.8rem);
             font-weight: 800;
             color: var(--primary-green);
-            margin-bottom: clamp(8px, 1.5vh, 18px);
+            margin-bottom: clamp(10px, 2vh, 20px);
             text-align: center;
             letter-spacing: 1px;
         }
         
         .home-verse-body {
-            font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+            font-size: clamp(1.3rem, 3.5vw, 1.9rem);
             line-height: 1.9;
             color: var(--primary-green);
             text-align: center;
@@ -536,7 +538,7 @@
         
         .home-verse-body .verse-zh {
             display: block;
-            font-size: clamp(1rem, 2.5vw, 1.35rem);
+            font-size: clamp(1.15rem, 3vw, 1.7rem);
             opacity: 0.85;
         }
         
@@ -2976,13 +2978,11 @@
                     <div class="daily-verse-overlay"></div>
                     <div class="home-hero-title" id="dailyVerseLabel">매일 묵상</div>
                 </div>
-                <!-- 雙色波浪過渡 -->
+                <!-- 波浪過渡（圖片→底色） -->
                 <div class="home-wave-transition">
-                    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- 後層波浪（圖片邊緣色） -->
-                        <path d="M0,20 C240,80 480,0 720,50 C960,100 1200,30 1440,60 L1440,0 L0,0 Z" fill="rgba(180,175,150,0.5)"/>
-                        <!-- 前層波浪（底色） -->
-                        <path d="M0,60 C320,10 640,90 960,40 C1120,20 1280,70 1440,30 L1440,120 L0,120 Z" fill="#f5f0e8"/>
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,0 L1440,0 L1440,40 C1200,90 960,10 720,50 C480,90 240,20 0,60 Z" fill="rgba(160,158,140,0.4)"/>
+                        <path d="M0,30 C240,80 480,15 720,55 C960,95 1200,25 1440,60 L1440,100 L0,100 Z" fill="#f5f0e8"/>
                     </svg>
                 </div>
                 <!-- 經文區 -->
