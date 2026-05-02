@@ -324,12 +324,7 @@
         
         /* 首頁投影片式滾動容器 */
         #homeSection .home-container {
-            height: 100vh;
-            height: 100dvh;
             margin-top: -60px;
-            overflow-y: auto;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
             -webkit-user-select: none;
             user-select: none;
             -webkit-touch-callout: none;
@@ -408,16 +403,14 @@
         
         /* ===== 首頁第一張投影片 ===== */
         .home-slide {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
             flex-shrink: 0;
         }
         
         .home-slide-1 {
             position: relative;
             width: 100vw;
-            height: calc(100vh + 60px);
-            height: calc(100dvh + 60px);
+            min-height: 100vh;
+            min-height: 100dvh;
             margin-left: calc(-50vw + 50%);
             overflow: hidden;
             display: flex;
@@ -3085,13 +3078,6 @@
                     </div>
                 </div>
                 
-                <!-- 波浪分隔1 -->
-                <div class="home-feature-wave">
-                    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0,30 C360,70 720,0 1080,40 C1260,55 1380,25 1440,35 L1440,80 L0,80 Z" fill="#f5f0e8"/>
-                        <path d="M0,0 L1440,0 L1440,25 C1200,55 960,5 720,35 C480,65 240,15 0,40 Z" fill="rgba(200,195,180,0.25)"/>
-                    </svg>
-                </div>
                 
                 <!-- 選項2：信仰自動化管理（圖右文左） -->
                 <div class="home-feature reverse" onclick="window.switchPage('faithAuto')">
@@ -3107,13 +3093,6 @@
                     </div>
                 </div>
                 
-                <!-- 波浪分隔2 -->
-                <div class="home-feature-wave">
-                    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M0,25 C480,65 960,5 1440,40 L1440,80 L0,80 Z" fill="#f5f0e8"/>
-                        <path d="M0,0 L1440,0 L1440,30 C960,60 480,10 0,45 Z" fill="rgba(200,195,180,0.25)"/>
-                    </svg>
-                </div>
                 
                 <!-- 選項3：資料管理（圖左文右） -->
                 <div class="home-feature" onclick="window.switchPage('backend')">
