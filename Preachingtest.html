@@ -542,75 +542,147 @@
             opacity: 0.85;
         }
         
-        /* 快速連結區塊 - 第二張投影片 */
+        /* ===== 第二張投影片 - 三選項圖文交替 ===== */
         .home-slide-2 {
-            position: relative;
             width: 100vw;
-            min-height: calc(100vh + 60px);
-            min-height: calc(100dvh + 60px);
             margin-left: calc(-50vw + 50%);
-            padding: 80px 25px 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background-color: #141413;
-            background-image: url('cards-bg.jpeg');
-            background-size: cover;
-            background-position: center;
+            background-color: #f5f0e8;
         }
         
-        /* 暗色覆蓋層 */
-        .home-cards-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* 每個選項區塊 */
+        .home-feature {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            min-height: 33vh;
+            cursor: pointer;
+            overflow: hidden;
+            transition: filter 0.3s;
+        }
+        
+        .home-feature:hover {
+            filter: brightness(1.03);
+        }
+        
+        .home-feature:active {
+            filter: brightness(0.97);
+        }
+        
+        /* 圖片佔一半 */
+        .home-feature-img {
+            flex: 0 0 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .home-feature-img img {
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.1);
-            z-index: 1;
-            pointer-events: none;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
         }
         
-        .home-cards-section .home-quick-links {
-            position: relative;
-            z-index: 3;
+        .home-feature:hover .home-feature-img img {
+            transform: scale(1.03);
         }
         
-        /* 版權區塊 */
-        .home-copyright {
+        /* 文字佔一半 */
+        .home-feature-text {
+            flex: 0 0 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(20px, 4vw, 50px);
+            background-color: #f5f0e8;
+        }
+        
+        .home-feature-icon {
+            width: clamp(32px, 5vw, 48px);
+            height: clamp(32px, 5vw, 48px);
+            margin-bottom: clamp(10px, 2vh, 18px);
+            color: var(--primary-green);
+            opacity: 0.7;
+        }
+        
+        .home-feature-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .home-feature-title {
+            font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
+                "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: 800;
+            color: #3a3530;
+            margin-bottom: clamp(8px, 1.5vh, 15px);
+            letter-spacing: 0.5px;
+        }
+        
+        .home-feature-desc {
+            font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
+                "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+            font-size: clamp(0.85rem, 2vw, 1.05rem);
+            line-height: 1.8;
+            color: #8a8070;
+            font-weight: 400;
+        }
+        
+        /* 反轉排列（圖右文左） */
+        .home-feature.reverse {
+            flex-direction: row-reverse;
+        }
+        
+        /* 波浪分隔 */
+        .home-feature-wave {
             position: relative;
-            margin-top: 30px;
+            width: 100%;
+            line-height: 0;
+            background-color: #f5f0e8;
+            margin-top: -2px;
             z-index: 5;
-            background: rgba(80, 80, 80, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 20px;
-            border-radius: 12px;
+        }
+        
+        .home-feature-wave svg {
+            display: block;
+            width: 100%;
+            height: clamp(40px, 6vh, 70px);
+        }
+        
+        /* 版權區塊 - 簡潔文字 */
+        .home-copyright-section {
+            width: 100%;
+            padding: clamp(20px, 3vh, 35px) 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            background-color: #f5f0e8;
         }
         
         .home-copyright-main {
-            font-size: 0.8rem;
-            color: white;
-            margin-bottom: 3px;
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+            color: #b0a898;
+            margin-bottom: 4px;
             font-weight: 500;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .home-copyright-sub {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.85);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            font-size: clamp(0.65rem, 1.2vw, 0.75rem);
+            color: #c5b8aa;
         }
         
-        @media (max-width: 500px) {
-            .home-cards-section {
-                padding: 40px 15px 60px;
+        /* 手機版：圖文改為上下排列 */
+        @media (max-width: 600px) {
+            .home-feature {
+                flex-direction: column !important;
+                min-height: auto;
+            }
+            .home-feature-img {
+                flex: 0 0 auto;
+                height: 45vw;
+            }
+            .home-feature-text {
+                flex: 0 0 auto;
+                padding: clamp(20px, 5vw, 30px);
             }
         }
         
@@ -2926,9 +2998,13 @@
             </div>
             <!-- 我的信仰 子選單 (開發中) -->
             <div class="menu-category" id="menu-category-faith">
-                <div class="menu-category-title disabled">
+                <div class="menu-category-title" onclick="window.toggleSubMenu('faith')">
                     <span id="menu-faith-title">나의 신앙</span>
-                    <span class="dev-badge">개발 중</span>
+                    <span class="submenu-arrow">▶</span>
+                </div>
+                <div class="menu-submenu" id="submenu-faith">
+                    <button class="menu-btn" onclick="window.switchPage('faithAuto')" id="btn-faith-auto">신앙 자동화 관리 <span class="dev-badge">개발 중</span></button>
+                    <button class="menu-btn" onclick="window.switchPage('dailyFaith')" id="btn-daily-faith">매일 신앙 기록 <span class="dev-badge">개발 중</span></button>
                 </div>
             </div>
             <!-- 書籍 子選單 -->
@@ -2992,71 +3068,69 @@
                 </div>
             </div>
             
-            <!-- 第二張投影片：四個選項卡片 -->
+            <!-- 第二張投影片：三個選項圖文交替 -->
             <div class="home-slide home-slide-2" id="homeCardsSection">
-                <div class="home-quick-links">
-                    <div class="home-card" onclick="window.switchPage('bible')">
-                        <div class="home-card-icon">
-                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 52l2 2h48l2-2" stroke-width="2.5"/>
-                                <path d="M6 50l2 2h48l2-2" stroke-width="1.5" opacity="0.6"/>
-                                <path d="M6 48l2 2h48l2-2" stroke-width="1" opacity="0.3"/>
-                                <path d="M32 8v46" stroke-width="3"/>
-                                <path d="M32 10C28 8 20 6 6 8v44c14-2 22 0 26 4" stroke-width="2.5"/>
-                                <path d="M10 16c10-1 16 0 20 2" stroke-width="1.5"/>
-                                <path d="M10 24c10-1 16 0 20 2" stroke-width="1.5"/>
-                                <path d="M10 32c10-1 16 0 20 2" stroke-width="1.5"/>
-                                <path d="M10 40c8-1 14 0 18 2" stroke-width="1.5"/>
-                                <path d="M32 10C36 8 44 6 58 8v44c-14-2-22 0-26 4" stroke-width="2.5"/>
-                                <path d="M54 16c-10-1-16 0-20 2" stroke-width="1.5"/>
-                                <path d="M54 24c-10-1-16 0-20 2" stroke-width="1.5"/>
-                                <path d="M54 32c-10-1-16 0-20 2" stroke-width="1.5"/>
-                                <path d="M54 40c-8-1-14 0-18 2" stroke-width="1.5"/>
-                                <path d="M4 8v46l2 2V10z" fill="currentColor" stroke="none"/>
-                                <path d="M58 8v46l2 2V10z" fill="currentColor" stroke="none"/>
-                            </svg>
-                        </div>
-                        <div class="home-card-title" id="home-card-bible">성경</div>
-                        <div class="home-card-desc" id="home-card-bible-desc">말씀을 읽고 복사하세요</div>
+                
+                <!-- 選項1：聖經（圖左文右） -->
+                <div class="home-feature" onclick="window.switchPage('bible')">
+                    <div class="home-feature-img">
+                        <img src="home-bible.png" alt="Bible">
                     </div>
-                    <div class="home-card" onclick="window.switchPage('entry')">
-                        <div class="home-card-icon">
-                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M46 8L56 18L24 50L12 54L16 42L46 8Z"/>
-                                <path d="M40 14L50 24"/>
-                                <path d="M16 42L24 50"/>
-                                <path d="M8 58h32"/>
-                            </svg>
+                    <div class="home-feature-text">
+                        <div class="home-feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M24 6v36M24 8C21 6 15 5 6 7v32c9-2 15-1 18 3m0-34C27 6 33 5 42 7v32c-9-2-15-1-18 3"/></svg>
                         </div>
-                        <div class="home-card-title" id="home-card-entry">온라인 등록</div>
-                        <div class="home-card-desc" id="home-card-entry-desc">새로운 만남을 기록하세요</div>
-                    </div>
-                    <div class="home-card" onclick="window.switchPage('backend')">
-                        <div class="home-card-icon">
-                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="8" y="16" width="48" height="40" rx="2"/>
-                                <path d="M8 16l6-8h20l6 8"/>
-                                <path d="M16 28h32"/>
-                                <path d="M16 38h24"/>
-                                <path d="M16 48h16"/>
-                            </svg>
-                        </div>
-                        <div class="home-card-title" id="home-card-backend">데이터 관리</div>
-                        <div class="home-card-desc" id="home-card-backend-desc">기록된 데이터를 확인하세요</div>
-                    </div>
-                    <div class="home-card" onclick="window.switchPage('profile')">
-                        <div class="home-card-icon">
-                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="32" cy="20" r="12"/>
-                                <path d="M12 58c0-14 9-22 20-22s20 8 20 22"/>
-                            </svg>
-                        </div>
-                        <div class="home-card-title" id="home-card-profile">개인정보</div>
-                        <div class="home-card-desc" id="home-card-profile-desc">프로필을 설정하세요</div>
+                        <div class="home-feature-title" id="home-feat-bible-title">성경</div>
+                        <div class="home-feature-desc" id="home-feat-bible-desc">말씀을 읽고, 묵상하고,<br>마음에 새기는 시간</div>
                     </div>
                 </div>
-                <!-- 版權區塊 -->
-                <div class="home-copyright">
+                
+                <!-- 波浪分隔1 -->
+                <div class="home-feature-wave">
+                    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,30 C360,70 720,0 1080,40 C1260,55 1380,25 1440,35 L1440,80 L0,80 Z" fill="#f5f0e8"/>
+                        <path d="M0,0 L1440,0 L1440,25 C1200,55 960,5 720,35 C480,65 240,15 0,40 Z" fill="rgba(200,195,180,0.25)"/>
+                    </svg>
+                </div>
+                
+                <!-- 選項2：信仰自動化管理（圖右文左） -->
+                <div class="home-feature reverse" onclick="window.switchPage('faithAuto')">
+                    <div class="home-feature-img">
+                        <img src="home-auto.jpeg" alt="Faith Automation">
+                    </div>
+                    <div class="home-feature-text">
+                        <div class="home-feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="24" cy="24" r="8"/><path d="M24 4v6m0 28v6m20-20h-6M10 24H4m34.1-14.1l-4.2 4.2M18.1 29.9l-4.2 4.2m24.2 0l-4.2-4.2M18.1 18.1l-4.2-4.2"/></svg>
+                        </div>
+                        <div class="home-feature-title" id="home-feat-auto-title">신앙 자동화 관리</div>
+                        <div class="home-feature-desc" id="home-feat-auto-desc">신앙 생활을 체계적으로<br>관리하고 성장하는 도구</div>
+                    </div>
+                </div>
+                
+                <!-- 波浪分隔2 -->
+                <div class="home-feature-wave">
+                    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0,25 C480,65 960,5 1440,40 L1440,80 L0,80 Z" fill="#f5f0e8"/>
+                        <path d="M0,0 L1440,0 L1440,30 C960,60 480,10 0,45 Z" fill="rgba(200,195,180,0.25)"/>
+                    </svg>
+                </div>
+                
+                <!-- 選項3：資料管理（圖左文右） -->
+                <div class="home-feature" onclick="window.switchPage('backend')">
+                    <div class="home-feature-img">
+                        <img src="cards-bg.jpeg" alt="Data Management">
+                    </div>
+                    <div class="home-feature-text">
+                        <div class="home-feature-icon">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 12l4-6h24l4 6M14 22h20M14 30h16M14 38h10"/></svg>
+                        </div>
+                        <div class="home-feature-title" id="home-feat-data-title">데이터 관리</div>
+                        <div class="home-feature-desc" id="home-feat-data-desc">기록된 데이터를 확인하고<br>열매를 관리하세요</div>
+                    </div>
+                </div>
+                
+                <!-- 版權 -->
+                <div class="home-copyright-section">
                     <div class="home-copyright-main" id="copyrightMain">Yeongnim 개인 소유</div>
                     <div class="home-copyright-sub">Personal property of Yeongnim</div>
                 </div>
@@ -3069,6 +3143,15 @@
         <h2 id="txt-daily-faith-header">매일 신앙 기록</h2>
         <div class="faith-content">
             <p id="txt-daily-faith-desc">이 페이지에서 매일의 신앙 생활을 기록할 수 있습니다.</p>
+            <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
+        </div>
+    </div>
+    
+    <!-- 信仰自動化管理 (開發中) -->
+    <div id="faithAutoSection" class="page-section">
+        <h2 id="txt-faith-auto-header">신앙 자동화 관리</h2>
+        <div class="faith-content">
+            <p id="txt-faith-auto-desc">신앙 생활을 체계적으로 관리하고 성장할 수 있는 자동화 도구입니다.</p>
             <p style="color: #888; margin-top: 20px;">(기능 개발 중...)</p>
         </div>
     </div>
@@ -3664,6 +3747,10 @@
             homeCardProfile: "개인정보", homeCardProfileDesc: "프로필을 설정하세요",
             homeStatTotal: "총 섭외자", homeStatWeek: "주간 교류",
             copyrightMain: "Yeongnim 개인 소유",
+            // 首頁第二頁
+            homeFeatBibleTitle: "성경", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
+            homeFeatAutoTitle: "신앙 자동화 관리", homeFeatAutoDesc: "신앙 생활을 체계적으로\n관리하고 성장하는 도구",
+            homeFeatDataTitle: "데이터 관리", homeFeatDataDesc: "기록된 데이터를 확인하고\n열매를 관리하세요",
             // 今日默想
             dailyVerseLabel: "오늘의 묵상", scrollHint: "아래로 스크롤",
             // 我的信仰
@@ -3738,6 +3825,10 @@
             homeCardProfile: "個人資料", homeCardProfileDesc: "設定個人檔案",
             homeStatTotal: "總涉外者", homeStatWeek: "週間交流",
             copyrightMain: "Yeongnim個人所有",
+            // 首頁第二頁
+            homeFeatBibleTitle: "聖經", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
+            homeFeatAutoTitle: "信仰自動化管理", homeFeatAutoDesc: "系統化管理信仰生活，\n持續成長的工具",
+            homeFeatDataTitle: "資料管理", homeFeatDataDesc: "確認記錄的數據，\n管理結出的果子",
             // 今日默想
             dailyVerseLabel: "今日默想", scrollHint: "向下滾動",
             // 我的信仰
@@ -4009,12 +4100,32 @@
             else if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
             else if (sectionId === 'offlineEntrySection') pageTitleEl.textContent = t.btnOfflineEntry;
             else if (sectionId === 'profileSection') pageTitleEl.textContent = t.btnProfile;
+            else if (sectionId === 'faithAutoSection') pageTitleEl.textContent = currentLang === 'ko' ? '신앙 자동화 관리' : '信仰自動化管理';
             else if (sectionId === 'backendSection') pageTitleEl.textContent = t.btnBackend;
             else if (sectionId === 'offlineBackendSection') pageTitleEl.textContent = t.btnOfflineBackend;
         }
         
         updateCounter();
         updateOfflineCounter();
+        
+        // 首頁第二頁翻譯
+        const featBibleTitle = document.getElementById('home-feat-bible-title');
+        const featBibleDesc = document.getElementById('home-feat-bible-desc');
+        const featAutoTitle = document.getElementById('home-feat-auto-title');
+        const featAutoDesc = document.getElementById('home-feat-auto-desc');
+        const featDataTitle = document.getElementById('home-feat-data-title');
+        const featDataDesc = document.getElementById('home-feat-data-desc');
+        if (featBibleTitle) featBibleTitle.textContent = t.homeFeatBibleTitle;
+        if (featBibleDesc) featBibleDesc.innerHTML = t.homeFeatBibleDesc.replace(/\n/g, '<br>');
+        if (featAutoTitle) featAutoTitle.textContent = t.homeFeatAutoTitle;
+        if (featAutoDesc) featAutoDesc.innerHTML = t.homeFeatAutoDesc.replace(/\n/g, '<br>');
+        if (featDataTitle) featDataTitle.textContent = t.homeFeatDataTitle;
+        if (featDataDesc) featDataDesc.innerHTML = t.homeFeatDataDesc.replace(/\n/g, '<br>');
+        
+        // 首頁第一頁標題和經文也更新
+        if (document.getElementById('homeSection').classList.contains('active-section')) {
+            initDailyVerse();
+        }
         
         // 如果在首頁，重新載入天氣（更新語言）
         if (document.getElementById('homeSection').classList.contains('active-section')) {
@@ -5172,6 +5283,11 @@
             document.getElementById('btn-daily-faith')?.classList.add('active');
             document.getElementById('menu-category-faith').classList.add('open');
             pageTitleEl.textContent = t.btnDailyFaith;
+        } else if (page === 'faithAuto') {
+            document.getElementById('faithAutoSection').classList.add('active-section');
+            document.getElementById('btn-faith-auto')?.classList.add('active');
+            document.getElementById('menu-category-faith').classList.add('open');
+            pageTitleEl.textContent = currentLang === 'ko' ? '신앙 자동화 관리' : '信仰自動化管理';
         } else if (page === 'faith-chart') {
             document.getElementById('faithChartSection').classList.add('active-section');
             document.getElementById('btn-faith-chart')?.classList.add('active');
