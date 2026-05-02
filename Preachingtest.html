@@ -23,23 +23,23 @@
         :root {
             --primary-green: #43a047;
             --dark-green: #2e7d32;
-            --light-green-bg: #f1f8e9;
-            --border-color: #c5e1a5;
+            --light-green-bg: #f0ede5;
+            --border-color: #d5cfc5;
             --text-color: #333;
             --danger-red: #e53935;
             
             --bg-color: #f5f0e8;
-            --bg-secondary: rgba(245, 240, 232, 0.98);
-            --card-bg: white;
+            --bg-secondary: #ece7df;
+            --card-bg: #faf8f4;
             --text-primary: #333;
             --text-secondary: #555;
-            --text-muted: #888;
-            --border-light: #ccc;
-            --border-lighter: #ddd;
-            --border-lightest: #eee;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --input-bg: white;
-            --nav-bg: #f5f0e8;
+            --text-muted: #999;
+            --border-light: #d5cfc5;
+            --border-lighter: #e0dbd3;
+            --border-lightest: #eae5dd;
+            --shadow-color: rgba(80, 60, 40, 0.08);
+            --input-bg: #faf8f4;
+            --nav-bg: #ece7df;
         }
         
         * { box-sizing: border-box; }
@@ -102,14 +102,14 @@
             align-items: center;
             gap: 8px;
             padding: 8px 15px;
-            background: #f5f5f5;
+            background: var(--bg-secondary);
             border-radius: 25px;
             cursor: pointer;
             margin-left: 15px;
             transition: all 0.3s;
         }
         .menu-toggle:hover {
-            background: #e8f5e9;
+            background: var(--border-lightest);
         }
         .hamburger-icon {
             font-size: 1.2rem;
@@ -134,7 +134,7 @@
             position: absolute;
             top: 50px;
             left: 40px;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 10px;
@@ -154,7 +154,7 @@
         
         /* 選單分類標題 */
         .menu-category {
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             padding-bottom: 8px;
             margin-bottom: 5px;
         }
@@ -1095,7 +1095,7 @@
             position: absolute;
             top: 45px;
             left: 0;
-            background: white;
+            background: var(--card-bg);
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             padding: 15px;
@@ -1116,7 +1116,7 @@
             display: flex;
             justify-content: space-between;
             padding: 6px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             font-size: 0.9rem;
         }
         .profile-popup-item:last-child {
@@ -1177,7 +1177,7 @@
         
         .sortable { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 5px; }
 
-        .user-card { border: 1px solid #eee; border-top: none; background: white; }
+        .user-card { border: 1px solid var(--border-lightest); border-top: none; background: var(--card-bg); }
         .user-card:last-child { border-radius: 0 0 8px 8px; }
 
         .user-summary { cursor: pointer; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
@@ -1189,7 +1189,7 @@
         .user-details { display: none; background: #fafafa; }
         .user-details.show { display: block; }
 
-        .detail-row { border-bottom: 1px solid #eee; background: #fff; color: #555; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
+        .detail-row { border-bottom: 1px solid var(--border-lightest); background: var(--card-bg); color: #555; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
         .detail-row:last-child { border-bottom: none; }
         
         /* detail-row 專用grid佈局，對齊user-summary的狀態欄位 */
@@ -1222,7 +1222,7 @@
 
         .editable { cursor: default; }
         .list-container.edit-mode .editable { 
-            cursor: pointer; border: 1px dashed #ccc; border-radius: 4px; padding: 2px 4px; background: #fff;
+            cursor: pointer; border: 1px dashed #ccc; border-radius: 4px; padding: 2px 4px; background: var(--card-bg);
         }
         .list-container.edit-mode .editable:hover { border-color: #2196f3; background: #e3f2fd; }
 
@@ -1289,10 +1289,10 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            background: white;
+            background: var(--card-bg);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-lighter);
             position: relative;
         }
         
@@ -1309,7 +1309,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.9rem;
-            background: white;
+            background: var(--card-bg);
         }
         
         .message-point-content {
@@ -1354,7 +1354,7 @@
         .log-points-container {
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px dashed #ddd;
+            border-top: 1px dashed var(--border-lighter);
         }
         
         .log-points-section {
@@ -1554,7 +1554,7 @@
         }
         
         .bible-book-btn {
-            background: white;
+            background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 12px 8px;
@@ -1605,8 +1605,8 @@
         }
         
         .bible-chapter-btn {
-            background: white;
-            border: 1px solid #ddd;
+            background: var(--card-bg);
+            border: 1px solid var(--border-lighter);
             border-radius: 6px;
             padding: 10px 5px;
             text-align: center;
@@ -1758,7 +1758,7 @@
             font-size: 0.75rem;
             color: #999;
             padding: 20px 10px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border-lightest);
             margin-top: 20px;
         }
         
@@ -1766,7 +1766,7 @@
         .bible-copy-menu {
             display: none;
             position: fixed;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.25);
             z-index: 1000;
@@ -1782,7 +1782,7 @@
             padding: 14px 18px;
             cursor: pointer;
             font-size: 0.95rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             transition: background 0.2s;
         }
         
@@ -1831,7 +1831,7 @@
         }
         
         .bible-partial-copy-bubble {
-            background: white;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 20px;
             width: 90%;
@@ -2109,7 +2109,7 @@
         }
         
         .bible-range-copy-box {
-            background: white;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 25px;
             width: 90%;
@@ -2205,7 +2205,7 @@
             padding: 10px 8px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: white;
+            background: var(--card-bg);
             font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.2s;
@@ -2224,7 +2224,7 @@
             right: -280px;
             width: 260px;
             max-height: calc(100vh - 80px);
-            background: white;
+            background: var(--card-bg);
             border-radius: 16px 0 0 16px;
             box-shadow: -4px 0 20px rgba(0,0,0,0.15);
             z-index: 180;
@@ -2424,7 +2424,7 @@
             width: 100%;
             max-width: 400px;
             height: 100%;
-            background: white;
+            background: var(--card-bg);
             z-index: 200;
             transition: right 0.3s ease;
             display: flex;
@@ -2455,7 +2455,7 @@
             display: flex;
             align-items: center;
             padding: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             gap: 10px;
         }
         
@@ -2514,7 +2514,7 @@
             color: #888;
             margin: 15px 0 10px;
             padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
         }
         
         .bible-search-history {
@@ -2543,7 +2543,7 @@
         
         .bible-search-result-item {
             padding: 12px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -2596,7 +2596,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: white;
+            background: var(--card-bg);
             z-index: 201;
             flex-direction: column;
         }
@@ -2609,7 +2609,7 @@
             display: flex;
             align-items: center;
             padding: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-lightest);
             gap: 10px;
         }
         
@@ -2744,7 +2744,7 @@
         }
         
         .ai-modal {
-            background: var(--card-bg, white);
+            background: var(--card-bg);
             border-radius: 16px;
             width: 90%;
             max-width: 500px;
@@ -2798,7 +2798,7 @@
             padding: 20px;
             max-height: 50vh;
             overflow-y: auto;
-            background: var(--card-bg, white);
+            background: var(--card-bg);
         }
         
         .ai-modal-content {
@@ -2816,7 +2816,7 @@
         .ai-modal-loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--border-light, #eee);
+            border: 3px solid var(--border-lightest);
             border-top-color: var(--primary-green);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -2833,11 +2833,11 @@
         
         .ai-modal-footer {
             padding: 15px 20px;
-            border-top: 1px solid var(--border-light, #eee);
+            border-top: 1px solid var(--border-lightest);
             display: flex;
             gap: 10px;
             justify-content: flex-end;
-            background: var(--card-bg, white);
+            background: var(--card-bg);
         }
         
         .ai-modal-btn {
@@ -2924,7 +2924,7 @@
         }
         
         .delete-options-modal {
-            background: var(--card-bg, white);
+            background: var(--card-bg);
             border-radius: 16px;
             width: 90%;
             max-width: 400px;
@@ -2978,7 +2978,7 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid var(--border-light, #eee);
+            border: 1px solid var(--border-lightest);
         }
         
         .delete-option-item:hover {
@@ -3006,7 +3006,7 @@
         
         .delete-options-footer {
             padding: 15px 20px;
-            border-top: 1px solid var(--border-light, #eee);
+            border-top: 1px solid var(--border-lightest);
             display: flex;
             gap: 10px;
             justify-content: flex-end;
