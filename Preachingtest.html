@@ -4054,20 +4054,51 @@
         }
     }
 
+    // Hash → Page 映射
+    function getPageFromHash() {
+        const hash = window.location.hash.replace('#/', '').replace('#', '');
+        if (!hash) return 'home';
+        const reverseMap = {
+            'home': 'home',
+            'bible': 'bible',
+            'entry': 'entry',
+            'backend': 'backend',
+            'profile': 'profile',
+            'faith-auto': 'faithAuto',
+            'faith-chart': 'faith-chart',
+            'daily-faith': 'daily-faith',
+            'offline-entry': 'offline-entry',
+            'offline-backend': 'offline-backend'
+        };
+        return reverseMap[hash] || null;
+    }
+    
+    // 監聽瀏覽器上一頁/下一頁
+    window.addEventListener('popstate', () => {
+        const page = getPageFromHash();
+        if (page) {
+            switchPage(page);
+        }
+    });
+    
     window.onload = function() {
         document.querySelector('.lang-select').value = currentLang;
         
-        // 載入儲存的頁面（帶超時檢查），預設為首頁
-        const savedPage = loadSavedPage();
-        if (savedPage) {
-            switchPage(savedPage);
+        // 優先讀取 URL hash，其次讀取 localStorage
+        const hashPage = getPageFromHash();
+        if (hashPage) {
+            switchPage(hashPage);
         } else {
-            // 預設顯示首頁
-            switchPage('home');
+            const savedPage = loadSavedPage();
+            if (savedPage) {
+                switchPage(savedPage);
+            } else {
+                switchPage('home');
+            }
         }
         
         applyLanguage();
-        updateDateInput(); // 使用新的日期更新函數
+        updateDateInput();
     };
 
     window.setLanguage = (lang) => {
@@ -5321,6 +5352,26 @@
         // 關閉選單
         document.getElementById('menuDropdown').classList.remove('show');
         document.querySelector('.menu-toggle').classList.remove('open');
+        
+        // 更新 URL hash
+        const hashMap = {
+            'home': '/home',
+            'bible': '/bible',
+            'entry': '/entry',
+            'backend': '/backend',
+            'profile': '/profile',
+            'faithAuto': '/faith-auto',
+            'faith-chart': '/faith-chart',
+            'daily-faith': '/daily-faith',
+            'offline-entry': '/offline-entry',
+            'offline-backend': '/offline-backend'
+        };
+        const newHash = page === 'home' ? '' : (hashMap[page] || '/' + page);
+        if (page === 'home') {
+            history.pushState(null, '', window.location.pathname);
+        } else if (window.location.hash !== '#' + newHash) {
+            history.pushState(null, '', '#' + newHash);
+        }
         
         // 儲存當前頁面到 localStorage（帶時間戳，12小時後過期）
         saveCurrentPage(page);
