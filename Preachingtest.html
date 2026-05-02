@@ -322,6 +322,19 @@
             margin: 0 !important;
         }
         
+        /* 首頁投影片式滾動容器 */
+        #homeSection .home-container {
+            height: 100vh;
+            height: 100dvh;
+            margin-top: -60px;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        
         /* 首頁時 nav 固定疊在圖片上方 */
         body.home-active nav {
             position: fixed !important;
@@ -365,7 +378,7 @@
             background: #f5f0e8;
         }
         
-        /* 首頁時選單使用霧面玻璃效果 */
+        /* 首頁選單霧面玻璃效果 */
         body.home-active .menu-dropdown {
             background: rgba(40, 40, 40, 0.75) !important;
             backdrop-filter: blur(20px) saturate(1.8);
@@ -373,190 +386,168 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
         }
-        
-        body.home-active .menu-category-title {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
-        
-        body.home-active .menu-category-title:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        body.home-active .menu-category-title.home-link {
-            background: rgba(255, 255, 255, 0.08) !important;
-        }
-        
-        body.home-active .menu-category-title.home-link:hover {
-            background: rgba(255, 255, 255, 0.2) !important;
-            color: white !important;
-        }
-        
-        body.home-active .menu-category {
-            border-bottom-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        body.home-active .menu-btn {
-            color: rgba(255, 255, 255, 0.85) !important;
-        }
-        
-        body.home-active .menu-btn:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
-            color: white !important;
-        }
-        
-        body.home-active .submenu-arrow {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-        
-        body.home-active .dev-badge {
-            background: rgba(255, 152, 0, 0.8) !important;
-        }
-        
-        body.home-active .menu-weather-section {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-bottom-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        body.home-active .menu-weather-section * {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
+        body.home-active .menu-category-title { color: rgba(255,255,255,0.9) !important; }
+        body.home-active .menu-category-title:hover { background: rgba(255,255,255,0.1) !important; }
+        body.home-active .menu-category-title.home-link { background: rgba(255,255,255,0.08) !important; }
+        body.home-active .menu-category-title.home-link:hover { background: rgba(255,255,255,0.2) !important; color: white !important; }
+        body.home-active .menu-category { border-bottom-color: rgba(255,255,255,0.1) !important; }
+        body.home-active .menu-btn { color: rgba(255,255,255,0.85) !important; }
+        body.home-active .menu-btn:hover { background: rgba(255,255,255,0.12) !important; color: white !important; }
+        body.home-active .submenu-arrow { color: rgba(255,255,255,0.6) !important; }
+        body.home-active .dev-badge { background: rgba(255,152,0,0.8) !important; }
+        body.home-active .menu-weather-section { background: rgba(255,255,255,0.08) !important; border-bottom-color: rgba(255,255,255,0.1) !important; }
+        body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !important; }
         
         /* 圓黑體字體 */
-        .daily-verse-section,
-        .daily-verse-section * {
+        .home-slide, .home-slide * {
             font-family: 
-                "Apple SD Gothic Neo", 
-                "Noto Sans KR",
-                "Noto Sans TC",
-                "Malgun Gothic",
-                "Microsoft JhengHei",
-                "Segoe UI",
-                -apple-system, BlinkMacSystemFont,
-                sans-serif !important;
+                "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
+                "Malgun Gothic", "Microsoft JhengHei", "Segoe UI",
+                -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
         
-        /* ===== 首頁圖片區塊（上70%） ===== */
-        .daily-verse-section {
+        /* ===== 首頁第一張投影片 ===== */
+        .home-slide {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            flex-shrink: 0;
+        }
+        
+        .home-slide-1 {
             position: relative;
             width: 100vw;
+            height: calc(100vh + 60px);
+            height: calc(100dvh + 60px);
             margin-left: calc(-50vw + 50%);
-            height: 70vh;
-            height: 70dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
             opacity: 0;
             transition: opacity 1s ease;
-            background-color: #cecfbc;
         }
         
-        .daily-verse-section.loaded {
-            opacity: 1;
-        }
+        .home-slide-1.loaded { opacity: 1; }
         
-        .daily-verse-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* 圖片區（上方約65%） */
+        .home-hero-image {
+            position: relative;
             width: 100%;
-            height: 100%;
+            flex: 0 0 65%;
+            overflow: hidden;
+        }
+        
+        .home-hero-image .daily-verse-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background-image: url('bible-bg.jpeg');
             background-size: cover;
             background-position: center;
-            z-index: 1;
         }
         
-        .daily-verse-overlay {
+        .home-hero-image .daily-verse-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.15);
-            z-index: 2;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.12);
+            z-index: 1;
             pointer-events: none;
         }
         
-        /* 圖片中的標題「每日默想」 */
-        .daily-verse-content {
-            position: relative;
+        /* 標題「每日默想」 */
+        .home-hero-title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 5;
-            padding-top: calc(60px + clamp(30px, 6vh, 60px)); /* nav高度 + 上方間距 */
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            color: #f5f0e8;
+            letter-spacing: clamp(6px, 2vw, 16px);
+            text-shadow: 0 3px 15px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
             text-align: center;
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translate(-50%, -50%) scale(0.95);
+            transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
         }
         
-        .daily-verse-content.show {
+        .home-slide-1.loaded .home-hero-title {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, -50%) scale(1);
         }
         
-        .daily-verse-label {
-            font-size: clamp(1.6rem, 5vw, 2.8rem);
-            font-weight: 800;
-            color: white;
-            letter-spacing: 6px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        /* 波浪過渡區 */
+        .home-wave-transition {
+            position: relative;
+            width: 100%;
+            flex: 0 0 auto;
+            margin-top: -80px;
+            z-index: 10;
         }
         
-        /* 隱藏舊的滾動提示 */
-        .daily-verse-scroll-hint {
-            display: none;
+        .home-wave-transition svg {
+            display: block;
+            width: 100%;
+            height: auto;
         }
         
-        /* ===== 經文區塊（下30%） ===== */
-        .daily-verse-text-section {
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
-            min-height: 30vh;
-            min-height: 30dvh;
+        /* 經文區（下方） */
+        .home-verse-area {
+            flex: 1;
             background-color: #f5f0e8;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: clamp(25px, 5vh, 50px) clamp(20px, 5vw, 40px);
+            padding: clamp(10px, 2vh, 25px) clamp(20px, 5vw, 40px) clamp(20px, 3vh, 40px);
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
         
-        .daily-verse-ref {
-            font-size: clamp(1.3rem, 3.5vw, 2rem);
+        .home-slide-1.verse-show .home-verse-area {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .home-verse-ref {
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
             font-weight: 800;
-            color: #3a3a3a;
-            margin-bottom: clamp(15px, 3vh, 25px);
+            color: var(--primary-green);
+            margin-bottom: clamp(8px, 1.5vh, 18px);
             text-align: center;
             letter-spacing: 1px;
         }
         
-        .daily-verse-body {
-            font-size: clamp(1.05rem, 2.5vw, 1.4rem);
-            line-height: 2;
-            color: #555;
+        .home-verse-body {
+            font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+            line-height: 1.9;
+            color: var(--primary-green);
             text-align: center;
-            max-width: 600px;
+            max-width: 650px;
+            font-weight: 500;
         }
         
-        .daily-verse-body .verse-ko {
+        .home-verse-body .verse-ko {
             display: block;
-            margin-bottom: clamp(8px, 1.5vh, 15px);
-            color: #3a3a3a;
+            margin-bottom: clamp(5px, 1vh, 12px);
         }
         
-        .daily-verse-body .verse-zh {
+        .home-verse-body .verse-zh {
             display: block;
-            color: #666;
-            font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+            font-size: clamp(1rem, 2.5vw, 1.35rem);
+            opacity: 0.85;
         }
         
-        /* 快速連結區塊 - 暫時保留不動 */
-        .home-cards-section {
+        /* 快速連結區塊 - 第二張投影片 */
+        .home-slide-2 {
             position: relative;
             width: 100vw;
+            min-height: calc(100vh + 60px);
+            min-height: calc(100dvh + 60px);
             margin-left: calc(-50vw + 50%);
-            padding: 50px 25px 80px;
+            padding: 80px 25px 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -2976,23 +2967,33 @@
 <div class="container">
     <!-- 首頁 -->
     <div id="homeSection" class="page-section active-section">
-            <!-- 圖片區塊（上70%） - 標題「每日默想」 -->
-            <div class="daily-verse-section" id="dailyVerseSection">
-                <div class="daily-verse-bg" id="dailyVerseBg"></div>
-                <div class="daily-verse-overlay"></div>
-                <div class="daily-verse-content">
-                    <div class="daily-verse-label" id="dailyVerseLabel">매일 묵상</div>
+        <div class="home-container">
+            <!-- 第一張投影片：圖片+波浪+經文 -->
+            <div class="home-slide home-slide-1" id="dailyVerseSection">
+                <!-- 圖片區 -->
+                <div class="home-hero-image">
+                    <div class="daily-verse-bg" id="dailyVerseBg"></div>
+                    <div class="daily-verse-overlay"></div>
+                    <div class="home-hero-title" id="dailyVerseLabel">매일 묵상</div>
+                </div>
+                <!-- 雙色波浪過渡 -->
+                <div class="home-wave-transition">
+                    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- 後層波浪（圖片邊緣色） -->
+                        <path d="M0,20 C240,80 480,0 720,50 C960,100 1200,30 1440,60 L1440,0 L0,0 Z" fill="rgba(180,175,150,0.5)"/>
+                        <!-- 前層波浪（底色） -->
+                        <path d="M0,60 C320,10 640,90 960,40 C1120,20 1280,70 1440,30 L1440,120 L0,120 Z" fill="#f5f0e8"/>
+                    </svg>
+                </div>
+                <!-- 經文區 -->
+                <div class="home-verse-area">
+                    <div class="home-verse-ref" id="dailyVerseReference">--</div>
+                    <div class="home-verse-body" id="dailyVerseText">--</div>
                 </div>
             </div>
             
-            <!-- 經文區塊（下30%） -->
-            <div class="daily-verse-text-section">
-                <div class="daily-verse-ref" id="dailyVerseReference">--</div>
-                <div class="daily-verse-body" id="dailyVerseText">--</div>
-            </div>
-            
-            <!-- 快速連結 -->
-            <div class="home-cards-section" id="homeCardsSection">
+            <!-- 第二張投影片：四個選項卡片 -->
+            <div class="home-slide home-slide-2" id="homeCardsSection">
                 <div class="home-quick-links">
                     <div class="home-card" onclick="window.switchPage('bible')">
                         <div class="home-card-icon">
@@ -3060,6 +3061,7 @@
                     <div class="home-copyright-sub">Personal property of Yeongnim</div>
                 </div>
             </div>
+        </div> <!-- home-container -->
     </div>
     
     <!-- 每日信仰記錄 (開發中) -->
@@ -5665,22 +5667,19 @@
     
     // 初始化今日默想區塊
     function initDailyVerse() {
-        const section = document.getElementById('dailyVerseSection');
-        const contentEl = document.querySelector('.daily-verse-content');
+        const slide1 = document.getElementById('dailyVerseSection');
         const labelEl = document.getElementById('dailyVerseLabel');
         const refEl = document.getElementById('dailyVerseReference');
         const textEl = document.getElementById('dailyVerseText');
         const themeColorMeta = document.getElementById('themeColorMeta');
         
-        if (!section) return;
+        if (!slide1) return;
         
         // 添加首頁class
         document.body.classList.add('home-active');
         
-        // 設定html背景色
+        // 設定html背景色和主題色
         document.documentElement.style.backgroundColor = '#f5f0e8';
-        
-        // 設定瀏覽器主題色
         if (themeColorMeta) {
             themeColorMeta.setAttribute('content', '#f5f0e8');
         }
@@ -5688,60 +5687,67 @@
         // 取得今日經文
         const verse = getDailyVerse();
         
-        // 標題
+        // 標題（隨語言變動）
         if (labelEl) {
-            labelEl.innerHTML = currentLang === 'ko' ? '매일 묵상' : '每日默想';
+            labelEl.textContent = currentLang === 'ko' ? '매일 묵상' : '每日默想';
         }
         
-        // 經文章節引用
+        // 經文章節引用（隨語言變動）
         if (refEl) {
-            refEl.innerHTML = `${verse.reference.ko} / ${verse.reference.zh}`;
+            if (currentLang === 'ko') {
+                refEl.textContent = verse.reference.ko;
+            } else {
+                refEl.textContent = verse.reference.zh;
+            }
         }
         
-        // 經文內容
+        // 經文內容（隨語言顯示順序變動）
         if (textEl) {
-            textEl.innerHTML = `
-                <span class="verse-ko">${verse.text.ko}</span>
-                <span class="verse-zh">${verse.text.zh}</span>
-            `;
+            if (currentLang === 'ko') {
+                textEl.innerHTML = `
+                    <span class="verse-ko">${verse.text.ko}</span>
+                    <span class="verse-zh">${verse.text.zh}</span>
+                `;
+            } else {
+                textEl.innerHTML = `
+                    <span class="verse-ko">${verse.text.zh}</span>
+                    <span class="verse-zh">${verse.text.ko}</span>
+                `;
+            }
         }
         
-        // 圖片淡入
+        // 滾動到頂部
+        const homeContainer = document.querySelector('#homeSection .home-container');
+        if (homeContainer) homeContainer.scrollTo(0, 0);
+        
+        // 動畫：先淡入圖片+標題
         setTimeout(() => {
-            section.classList.add('loaded');
+            slide1.classList.add('loaded');
         }, 100);
         
-        // 文字淡入
+        // 動畫：經文由左而右淡入
         setTimeout(() => {
-            if (contentEl) {
-                contentEl.classList.add('show');
-            }
-        }, 800);
+            slide1.classList.add('verse-show');
+        }, 1200);
     }
     
-    // 不再需要滾動監聽
     function setupHomeScrollListener(container) {}
     
     // 離開首頁時清理
     function cleanupDailyVerse() {
         document.body.classList.remove('home-active');
         
-        // 恢復html背景色
         document.documentElement.style.backgroundColor = '#f5f0e8';
         
-        // 恢復預設主題色
         const themeColorMeta = document.getElementById('themeColorMeta');
         if (themeColorMeta) {
             themeColorMeta.setAttribute('content', '#f5f0e8');
         }
         
-        const section = document.getElementById('dailyVerseSection');
-        const contentEl = document.querySelector('.daily-verse-content');
-        if (section) {
-            section.classList.remove('loaded');
-        }
-        if (contentEl) {
-            contentEl.classList.remove('show');
+        const slide1 = document.getElementById('dailyVerseSection');
+        if (slide1) {
+            slide1.classList.remove('loaded');
+            slide1.classList.remove('verse-show');
         }
     }
     
