@@ -16,10 +16,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
-    <!-- Google Fonts - 思源宋體 (Noto Serif) -->
+    <!-- Google Fonts - 思源宋體 + 思源黑體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;600&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
     
     <title>Discourse dissemination Tracker</title>
     <style>
@@ -399,11 +399,13 @@
         body.home-active .menu-weather-section { background: rgba(255,255,255,0.08) !important; border-bottom-color: rgba(255,255,255,0.1) !important; }
         body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !important; }
         
-        /* 圓黑體字體 */
-        .home-slide, .home-slide * {
-            font-family: 
-                "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
-                "Malgun Gothic", "Microsoft JhengHei", "Segoe UI",
+        /* 思源黑體 - 首頁全面使用 */
+        .home-slide, .home-slide *,
+        .home-hero-title,
+        .home-verse-area, .home-verse-area *,
+        .home-pinch-transition {
+            font-family: "Noto Sans KR", "Noto Sans TC",
+                "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei",
                 -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
         
@@ -543,12 +545,19 @@
             background-color: #f5f0e8;
         }
         
+        /* 大螢幕限制寬度，居中顯示 */
+        .home-features-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
         /* 每個選項區塊 */
         .home-feature {
             position: relative;
             display: flex;
             align-items: stretch;
-            min-height: 33vh;
+            min-height: 280px;
+            max-height: 450px;
             cursor: pointer;
             overflow: hidden;
             transition: filter 0.3s;
@@ -684,8 +693,8 @@
         }
         
         .home-feature-title {
-            font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
-                "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+            font-family: "Noto Sans KR", "Noto Sans TC",
+                "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
             font-size: clamp(1.6rem, 4.5vw, 2.5rem);
             font-weight: 900;
             color: #3a3530;
@@ -694,8 +703,8 @@
         }
         
         .home-feature-desc {
-            font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans TC",
-                "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+            font-family: "Noto Sans KR", "Noto Sans TC",
+                "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
             font-size: clamp(0.85rem, 2vw, 1.05rem);
             line-height: 1.8;
             color: #8a8070;
@@ -749,10 +758,11 @@
             .home-feature.reverse {
                 flex-direction: column !important;
                 min-height: auto;
+                max-height: none;
             }
             .home-feature-img {
                 flex: 0 0 auto;
-                height: 45vw;
+                height: 55vw;
             }
             .home-feature-text {
                 flex: 0 0 auto;
@@ -3172,6 +3182,7 @@
             
             <!-- 第二張投影片：三個選項圖文交替 -->
             <div class="home-slide home-slide-2" id="homeCardsSection">
+                <div class="home-features-wrapper">
                 
                 <!-- 選項1：聖經（圖左文右） -->
                 <div class="home-feature" onclick="window.switchPage('bible')">
@@ -3216,6 +3227,8 @@
                         <div class="home-feature-desc" id="home-feat-data-desc">기록된 데이터를 확인하고<br>열매를 관리하세요</div>
                     </div>
                 </div>
+                
+                </div> <!-- home-features-wrapper -->
                 
                 <!-- 版權 -->
                 <div class="home-copyright-section">
