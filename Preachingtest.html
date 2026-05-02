@@ -421,11 +421,12 @@
         
         .home-slide-1.loaded { opacity: 1; }
         
-        /* 圖片區（上方約65%） */
+        /* 圖片區（上方約65vh） */
         .home-hero-image {
             position: relative;
             width: 100%;
-            flex: 0 0 65%;
+            height: 65vh;
+            height: 65dvh;
             overflow: hidden;
         }
         
@@ -489,13 +490,14 @@
         
         /* 經文區（下方） */
         .home-verse-area {
-            flex: 1;
+            min-height: 35vh;
+            min-height: 35dvh;
             background-color: #f5f0e8;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: clamp(10px, 2vh, 25px) clamp(20px, 5vw, 40px) clamp(20px, 3vh, 40px);
+            padding: clamp(20px, 3vh, 40px) clamp(20px, 5vw, 40px);
             opacity: 0;
             transform: translateX(-40px);
             transition: opacity 0.8s ease, transform 0.8s ease;
