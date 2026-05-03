@@ -441,6 +441,54 @@
             vertical-align: middle;
         }
 
+        /* ===== 版本更新提醒 ===== */
+        .version-update-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            z-index: 9999;
+            background: var(--card-bg);
+            border: 1px solid var(--primary-green);
+            border-radius: 14px;
+            padding: 14px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.4s ease;
+            max-width: calc(100vw - 40px);
+        }
+        .version-update-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .version-update-text {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        .version-update-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-green);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .version-update-btn:hover { filter: brightness(1.1); }
+        .version-update-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
         /* --- 容器 --- */
         .container {
             width: calc(100% - 30px);
@@ -2010,9 +2058,17 @@
         
         /* 首頁時回頂按鈕半透明 */
         body.home-active .scroll-top-btn {
-            background: rgba(67, 160, 71, 0.5);
+            background: rgba(67, 160, 71, 0.45);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* 首頁時AI面板按鈕也半透明 */
+        body.home-active .ai-panel {
+            background: rgba(250, 248, 244, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
         
         .bible-copyright {
@@ -4120,6 +4176,9 @@
 </div>
 
 <script type="module">
+    // --- APP VERSION ---
+    const APP_VERSION = '2026.05.04.01';
+    
     // --- FIREBASE SETUP ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -4499,6 +4558,10 @@
         
         applyLanguage();
         updateDateInput();
+        
+        // 版本檢查（每5分鐘檢查一次）
+        checkForUpdates();
+        setInterval(checkForUpdates, 5 * 60 * 1000);
     };
 
     window.setLanguage = (lang) => {
@@ -6297,30 +6360,19 @@
         const selectedIndex = Math.floor(seededRandom(todaySeed * 7 + 13) * candidates.length);
         const selected = candidates[selectedIndex];
         
-        // 選擇1-2節連續經文
+        // 選擇1節經文
         const startIdx = Math.floor(seededRandom(todaySeed * 3 + 7) * selected.verses.length);
-        const count = Math.min(
-            Math.floor(seededRandom(todaySeed * 5 + 11) * 2) + 1,
-            selected.verses.length - startIdx
-        );
-        const pickedVerses = selected.verses.slice(startIdx, startIdx + count);
-        
-        const verseRange = count === 1
-            ? pickedVerses[0].verse
-            : `${pickedVerses[0].verse}-${pickedVerses[count - 1].verse}`;
-        
-        // 使用 bookAbbreviations 取得縮寫
-        const abbr = bookAbbreviations?.[selected.bookId] || { ko: selected.bookId, zh: selected.bookId };
+        const pickedVerse = selected.verses[startIdx];
         
         const result = {
             seed: todaySeed,
             reference: {
-                ko: `${selected.bookKo} ${selected.chapter}:${verseRange}`,
-                zh: `${selected.bookZh} ${selected.chapter}:${verseRange}`
+                ko: `${selected.bookKo} ${selected.chapter}:${pickedVerse.verse}`,
+                zh: `${selected.bookZh} ${selected.chapter}:${pickedVerse.verse}`
             },
             text: {
-                ko: pickedVerses.map(v => v.ko).join(' '),
-                zh: pickedVerses.map(v => v.zh).join(' ')
+                ko: pickedVerse.ko,
+                zh: pickedVerse.zh
             }
         };
         
@@ -6442,6 +6494,26 @@
     }
     
     // 檢查並更新今日經文（每日0時）
+    // 版本檢查函數 - 每5分鐘檢查一次是否有新版本
+    async function checkForUpdates() {
+        try {
+            const res = await fetch(window.location.href, { cache: 'no-store', method: 'HEAD' });
+            const etag = res.headers.get('etag') || res.headers.get('last-modified') || '';
+            const savedEtag = localStorage.getItem('app_etag');
+            
+            if (savedEtag && etag && savedEtag !== etag) {
+                const toast = document.getElementById('versionUpdateToast');
+                const text = document.getElementById('versionUpdateText');
+                const btn = document.getElementById('versionUpdateBtn');
+                if (text) text.textContent = currentLang === 'ko' ? '새 버전이 있습니다. 업데이트해 주세요' : '有新版本可用，請更新網頁';
+                if (btn) btn.textContent = currentLang === 'ko' ? '업데이트' : '更新';
+                if (toast) toast.classList.add('show');
+            }
+            
+            if (etag) localStorage.setItem('app_etag', etag);
+        } catch (e) {}
+    }
+    
     function scheduleDailyVerseUpdate() {
         const now = new Date();
         const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
@@ -9042,5 +9114,12 @@ ${bookRef}
     })();
 
 </script>
+<!-- 版本更新提醒 -->
+<div class="version-update-toast" id="versionUpdateToast">
+    <div class="version-update-text" id="versionUpdateText">有新版本可用，請更新</div>
+    <button class="version-update-btn" onclick="location.reload(true)" id="versionUpdateBtn">更新</button>
+    <button class="version-update-close" onclick="document.getElementById('versionUpdateToast').classList.remove('show')">✕</button>
+</div>
+
 </body>
 </html>
