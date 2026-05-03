@@ -6269,6 +6269,13 @@
     const DAILY_VERSE_KEY = 'daily_verse_cache';
     const DAILY_VERSE_HISTORY_KEY = 'daily_verse_history'; // 60天歷史記錄
     
+    // 一次性清除舊版快取（版本升級時觸發）
+    const VERSE_CACHE_VERSION = '2026.05.04';
+    if (localStorage.getItem('verse_cache_version') !== VERSE_CACHE_VERSION) {
+        localStorage.removeItem(DAILY_VERSE_KEY);
+        localStorage.setItem('verse_cache_version', VERSE_CACHE_VERSION);
+    }
+    
     // 取得今日種子（基於日期）
     function getDailySeed() {
         const today = new Date();
