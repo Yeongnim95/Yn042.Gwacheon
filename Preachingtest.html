@@ -253,6 +253,194 @@
             gap: 10px;
         }
 
+        /* ===== Nav AI 按鈕 ===== */
+        .nav-ai-btn {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 5px 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 5px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .nav-ai-btn:hover { background: var(--bg-secondary); }
+        .nav-ai-text {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        .nav-ai-btn svg { color: var(--text-secondary); }
+        
+        /* 首頁時AI按鈕白色 */
+        body.home-active .nav-ai-btn {
+            border-color: rgba(255,255,255,0.3) !important;
+            background: rgba(255,255,255,0.15) !important;
+        }
+        body.home-active .nav-ai-text { color: white !important; }
+        body.home-active .nav-ai-btn svg { color: white !important; }
+        
+        /* ===== AI 助手面板 ===== */
+        .ai-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .ai-panel-overlay.show { opacity: 1; visibility: visible; }
+        
+        .ai-panel {
+            position: fixed;
+            top: 65px;
+            right: 15px;
+            width: min(380px, calc(100vw - 30px));
+            max-height: 70vh;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.97);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .ai-panel.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        
+        .ai-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-lightest);
+        }
+        .ai-panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .ai-panel-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .ai-panel-close:hover { background: var(--bg-secondary); }
+        
+        .ai-panel-body {
+            padding: 16px 18px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .ai-panel-input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        .ai-panel-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border-light);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            outline: none;
+            font-family: inherit;
+        }
+        .ai-panel-input:focus { border-color: var(--primary-green); }
+        .ai-panel-input::placeholder { color: var(--text-muted); font-size: 12px; }
+        
+        .ai-panel-send {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary-green);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .ai-panel-send:hover { filter: brightness(1.1); }
+        .ai-panel-send:disabled { opacity: 0.4; }
+        
+        .ai-panel-note { margin-top: 10px; }
+        
+        .ai-panel-result {
+            margin-top: 12px;
+        }
+        
+        .ai-panel-result-item {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .ai-panel-result-item.success {
+            background: rgba(67,160,71,0.08);
+            border: 1px solid rgba(67,160,71,0.15);
+        }
+        .ai-panel-result-item.error {
+            background: rgba(229,57,53,0.08);
+            border: 1px solid rgba(229,57,53,0.15);
+            color: var(--danger-red);
+        }
+        .ai-panel-result-item .result-query {
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 6px;
+        }
+        .ai-panel-result-item .result-text {
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .ai-panel-result-item .result-copied {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--primary-green);
+            font-weight: 600;
+        }
+        .ai-panel-result-item .result-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .ai-panel-loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+        }
+        .ai-panel-loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid var(--border-light);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: smartSpin 0.6s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
         /* --- 容器 --- */
         .container {
             width: calc(100% - 30px);
@@ -3288,12 +3476,44 @@
     </div>
     
     <div class="settings-group">
+        <!-- AI 助手按鈕 -->
+        <button class="nav-ai-btn" onclick="window.toggleAiPanel()" title="AI Assistant">
+            <span class="nav-ai-text">AI</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+        </button>
         <select class="lang-select" onchange="window.setLanguage(this.value)">
             <option value="ko">한국어</option>
             <option value="zh">中文</option>
         </select>
     </div>
 </nav>
+
+<!-- AI 助手面板 -->
+<div class="ai-panel-overlay" id="aiPanelOverlay" onclick="window.toggleAiPanel()"></div>
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+        <span class="ai-panel-title">🤖 AI 助手</span>
+        <button class="ai-panel-close" onclick="window.toggleAiPanel()">✕</button>
+    </div>
+    <div class="ai-panel-body">
+        <div class="ai-panel-input-wrap">
+            <input type="text" class="ai-panel-input" id="aiPanelInput" 
+                   placeholder="輸入經文如：創1:1-3 中文"
+                   onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
+            <button class="ai-panel-send" onclick="window.aiPanelSearch()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="ai-panel-note">
+            <span style="color: var(--danger-red); font-size: 11px;">⚠ 目前僅支援聖經經文智能複製功能</span>
+        </div>
+        <div class="ai-panel-result" id="aiPanelResult"></div>
+    </div>
+</div>
 
 <div class="container">
     <!-- 首頁 -->
@@ -7386,7 +7606,7 @@
     });
     
     // ===== 新複製模式系統 =====
-    const LONG_PRESS_DURATION = 600; // 長按時間延長到 600ms
+    const LONG_PRESS_DURATION = 300; // 長按時間 300ms（快速觸發）
     const COPY_LANG_PREF_KEY = 'copy_lang_preference';
     let longPressTimer = null;
     let longPressElement = null;
@@ -7829,7 +8049,185 @@
         });
     }
     
-    // ===== AI 智能複製功能 =====
+    // ===== AI 助手面板 =====
+    const AI_PANEL_CACHE_KEY = 'ai_panel_results';
+    const AI_PANEL_CACHE_DURATION = 60 * 60 * 1000; // 1小時
+    
+    window.toggleAiPanel = () => {
+        const panel = document.getElementById('aiPanel');
+        const overlay = document.getElementById('aiPanelOverlay');
+        const isOpen = panel.classList.contains('show');
+        
+        if (isOpen) {
+            panel.classList.remove('show');
+            overlay.classList.remove('show');
+        } else {
+            panel.classList.add('show');
+            overlay.classList.add('show');
+            document.getElementById('aiPanelInput').focus();
+            // 載入快取結果
+            loadAiPanelCache();
+        }
+    };
+    
+    function loadAiPanelCache() {
+        try {
+            const cached = JSON.parse(localStorage.getItem(AI_PANEL_CACHE_KEY) || '[]');
+            const now = Date.now();
+            // 過濾掉超過1小時的結果
+            const valid = cached.filter(item => (now - item.timestamp) < AI_PANEL_CACHE_DURATION);
+            localStorage.setItem(AI_PANEL_CACHE_KEY, JSON.stringify(valid));
+            renderAiPanelResults(valid);
+        } catch (e) {
+            renderAiPanelResults([]);
+        }
+    }
+    
+    function renderAiPanelResults(results) {
+        const container = document.getElementById('aiPanelResult');
+        if (!results.length) {
+            container.innerHTML = '';
+            return;
+        }
+        container.innerHTML = results.map(r => `
+            <div class="ai-panel-result-item ${r.success ? 'success' : 'error'}">
+                <div class="result-query">🔍 ${r.query}</div>
+                <div class="result-text">${r.text}</div>
+                ${r.success ? `<div class="result-copied">✅ ${currentLang === 'ko' ? '복사됨' : '已複製'}</div>` : ''}
+                <div class="result-time">${new Date(r.timestamp).toLocaleTimeString()}</div>
+            </div>
+        `).join('');
+    }
+    
+    window.aiPanelSearch = async () => {
+        const input = document.getElementById('aiPanelInput');
+        const sendBtn = document.querySelector('.ai-panel-send');
+        const resultContainer = document.getElementById('aiPanelResult');
+        
+        const query = input.value.trim();
+        if (!query) return;
+        
+        // 顯示loading
+        sendBtn.disabled = true;
+        const loadingEl = document.createElement('div');
+        loadingEl.className = 'ai-panel-loading';
+        loadingEl.textContent = currentLang === 'ko' ? 'AI 분석 중' : 'AI 分析中';
+        resultContainer.prepend(loadingEl);
+        
+        try {
+            // 構建書卷對照表
+            const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+            const bookRef = allBooks.map(b => {
+                const abbr = bookAbbreviations[b.id] || {};
+                return `${b.id}:${b.ko}(${abbr.ko||''})/${b.zh}(${abbr.zh||''})`;
+            }).join(', ');
+            
+            const prompt = `你是聖經經文解析助手。解析用戶輸入的經文引用。
+
+書卷ID: ${bookRef}
+
+返回純JSON（不要markdown）：
+{"queries":[{"bookId":"gen","chapter":1,"verses":[1,2,3]}],"language":"both"}
+
+規則：
+- bookId用上方ID(gen,exo,mat,rev等)
+- verses是數字陣列，範圍展開如1-5→[1,2,3,4,5]
+- language: "ko"韓文,"zh"中文,"both"兩者
+- "全部"/"전체"→verses設為"all"
+- 無法解析→{"error":"無法識別"}
+- 語言推斷：中文輸入→zh，韓文→ko，混合/未指定→both
+
+用戶：${query}`;
+            
+            const response = await fetch(AI_WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            
+            if (!response.ok) throw new Error('API Error');
+            
+            const data = await response.json();
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            
+            let parsed;
+            try {
+                parsed = JSON.parse(aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim());
+            } catch (e) {
+                throw new Error('AI 回應格式錯誤');
+            }
+            
+            if (parsed.error) throw new Error(parsed.error);
+            
+            // 提取經文
+            const lang = parsed.language || 'both';
+            let fullText = '';
+            let foundCount = 0;
+            
+            for (const q of parsed.queries) {
+                const bookData = bibleContent[q.bookId];
+                if (!bookData || !bookData[q.chapter]) {
+                    const bookInfo = allBooks.find(b => b.id === q.bookId);
+                    const name = bookInfo ? (currentLang === 'ko' ? bookInfo.ko : bookInfo.zh) : q.bookId;
+                    fullText += `[${name} ${q.chapter}章 - 尚未收錄]\n`;
+                    continue;
+                }
+                
+                const chapterData = bookData[q.chapter];
+                const abbr = bookAbbreviations[q.bookId] || { ko: q.bookId, zh: q.bookId };
+                const verses = q.verses === 'all'
+                    ? chapterData.filter(v => v.verse).map(v => v.verse)
+                    : q.verses;
+                
+                for (const vNum of verses) {
+                    const vd = chapterData.find(v => v.verse === vNum);
+                    if (!vd) continue;
+                    foundCount++;
+                    if (lang === 'ko') {
+                        fullText += `${abbr.ko} ${q.chapter}:${vNum} ${vd.ko}\n`;
+                    } else if (lang === 'zh') {
+                        fullText += `${abbr.zh} ${q.chapter}:${vNum} ${vd.zh}\n`;
+                    } else {
+                        fullText += `${abbr.ko} ${q.chapter}:${vNum} ${vd.ko}\n${abbr.zh} ${q.chapter}:${vNum} ${vd.zh}\n\n`;
+                    }
+                }
+            }
+            
+            fullText = fullText.trim();
+            if (foundCount === 0) throw new Error(currentLang === 'ko' ? '해당 경문을 찾을 수 없습니다' : '找不到對應的經文');
+            
+            // 複製
+            await navigator.clipboard.writeText(fullText);
+            
+            // 快取結果
+            const cacheItem = { query, text: fullText, success: true, timestamp: Date.now() };
+            saveAiPanelResult(cacheItem);
+            
+            input.value = '';
+            
+        } catch (err) {
+            const cacheItem = { query, text: err.message, success: false, timestamp: Date.now() };
+            saveAiPanelResult(cacheItem);
+        } finally {
+            loadingEl.remove();
+            sendBtn.disabled = false;
+        }
+    };
+    
+    function saveAiPanelResult(item) {
+        try {
+            const cached = JSON.parse(localStorage.getItem(AI_PANEL_CACHE_KEY) || '[]');
+            cached.unshift(item);
+            // 最多保留20條
+            const trimmed = cached.slice(0, 20);
+            localStorage.setItem(AI_PANEL_CACHE_KEY, JSON.stringify(trimmed));
+            loadAiPanelCache();
+        } catch (e) {}
+    }
+
+    // ===== 聖經經文相關 =====
+    
+    // ===== AI 智能複製功能（複製模式面板用） =====
     window.smartCopy = async () => {
         const input = document.getElementById('smartCopyInput');
         const btn = document.getElementById('smartCopyBtn');
