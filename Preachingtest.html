@@ -2721,6 +2721,110 @@
             font-family: "Noto Serif TC", "Noto Serif KR", serif;
         }
         
+        /* ===== AI 智能複製 ===== */
+        .smart-copy-section {
+            border-top: 1px solid var(--border-lightest);
+            padding-top: 15px;
+            margin-top: 10px;
+        }
+        
+        .smart-copy-input-wrap {
+            position: relative;
+            margin-top: 8px;
+        }
+        
+        .smart-copy-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-light);
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        .smart-copy-input:focus {
+            border-color: var(--primary-green);
+        }
+        
+        .smart-copy-input::placeholder {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        
+        .smart-copy-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: white;
+        }
+        
+        .smart-copy-btn:hover { filter: brightness(1.1); }
+        .smart-copy-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .smart-copy-btn.loading { position: relative; color: transparent; }
+        .smart-copy-btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 18px; height: 18px;
+            margin: -9px 0 0 -9px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: smartSpin 0.6s linear infinite;
+        }
+        @keyframes smartSpin { to { transform: rotate(360deg); } }
+        
+        .smart-copy-result {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .smart-copy-result.show { display: block; }
+        .smart-copy-result.success {
+            background: rgba(67,160,71,0.1);
+            color: var(--dark-green);
+            border: 1px solid rgba(67,160,71,0.2);
+        }
+        .smart-copy-result.error {
+            background: rgba(229,57,53,0.1);
+            color: var(--danger-red);
+            border: 1px solid rgba(229,57,53,0.2);
+        }
+        .smart-copy-preview {
+            margin-top: 6px;
+            padding: 8px;
+            background: var(--card-bg);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .smart-copy-examples {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
         /* ===== AI整理功能 ===== */
         .ai-summary-btn {
             background: transparent;
@@ -3427,6 +3531,26 @@
                 <button class="copy-mode-btn secondary" id="copyChapterBtn" onclick="window.copyWholeChapter()">
                     <span id="copyChapterBtnText">複製整章經文</span>
                 </button>
+            </div>
+            
+            <!-- AI 智能複製 -->
+            <div class="copy-mode-section smart-copy-section">
+                <div class="copy-mode-section-title">🤖 AI 智能複製</div>
+                <div class="smart-copy-examples" id="smartCopyExamples">
+                    例：創1:1-3 中文 / 창1:1、3、5 / 啟1:1 太1:5-7
+                </div>
+                <div class="smart-copy-input-wrap">
+                    <input type="text" class="smart-copy-input" id="smartCopyInput" 
+                           placeholder="輸入經文如：創1:1-3 中文"
+                           onkeydown="if(event.key==='Enter') window.smartCopy()">
+                </div>
+                <button class="smart-copy-btn" id="smartCopyBtn" onclick="window.smartCopy()">
+                    智能複製
+                </button>
+                <div class="smart-copy-result" id="smartCopyResult">
+                    <div id="smartCopyResultText"></div>
+                    <div class="smart-copy-preview" id="smartCopyPreview"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -7704,6 +7828,159 @@
             window.exitCopyMode();
         });
     }
+    
+    // ===== AI 智能複製功能 =====
+    window.smartCopy = async () => {
+        const input = document.getElementById('smartCopyInput');
+        const btn = document.getElementById('smartCopyBtn');
+        const resultDiv = document.getElementById('smartCopyResult');
+        const resultText = document.getElementById('smartCopyResultText');
+        const previewDiv = document.getElementById('smartCopyPreview');
+        
+        const query = input.value.trim();
+        if (!query) {
+            input.focus();
+            return;
+        }
+        
+        // 構建書卷對照表（給AI用）
+        const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+        const bookRef = allBooks.map(b => {
+            const abbr = bookAbbreviations[b.id] || {};
+            return `${b.id}: ${b.ko}(${abbr.ko||''}) / ${b.zh}(${abbr.zh||''}) [${b.chapters}章]`;
+        }).join('\n');
+        
+        // 構建已有經文資料的書卷清單
+        const availableBooks = Object.keys(bibleContent);
+        const availableChapters = {};
+        availableBooks.forEach(bookId => {
+            availableChapters[bookId] = Object.keys(bibleContent[bookId]).map(Number);
+        });
+        
+        const prompt = `你是一個聖經經文解析助手。用戶輸入了一段文字，請解析出他想要複製的聖經經文。
+
+書卷ID對照表：
+${bookRef}
+
+請務必返回純JSON格式（不要markdown），格式如下：
+{
+  "queries": [
+    { "bookId": "gen", "chapter": 1, "verses": [1,2,3] }
+  ],
+  "language": "both"
+}
+
+規則：
+- bookId 必須使用上方對照表中的ID（如 gen, exo, mat, rev 等）
+- verses 是數字陣列，如 [1,2,3] 或連續範圍展開如 1-5 → [1,2,3,4,5]
+- language: "ko"=只要韓文, "zh"=只要中文, "both"=兩者都要
+- 用戶可能用縮寫（創、창、Gen）、全名（創世記、창세기）或混合語言
+- 如果用戶提到"中文"/"중국어"→language="zh"；"韓文"/"한국어"→language="ko"
+- 如果沒有特別指定語言，根據用戶輸入語言推斷：中文輸入→"zh"，韓文輸入→"ko"，混合→"both"
+- 如果用戶寫"全部"/"전체"/"all"，verses設為"all"
+- 如果無法解析，返回 { "error": "無法識別的經文格式" }
+
+用戶輸入：${query}`;
+        
+        // UI 狀態
+        btn.classList.add('loading');
+        btn.disabled = true;
+        resultDiv.classList.remove('show');
+        
+        try {
+            const response = await fetch(AI_WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            
+            if (!response.ok) throw new Error('API Error');
+            
+            const data = await response.json();
+            const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            
+            // 解析JSON（容錯處理）
+            let parsed;
+            try {
+                const jsonStr = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+                parsed = JSON.parse(jsonStr);
+            } catch (e) {
+                throw new Error('AI 回應格式錯誤');
+            }
+            
+            if (parsed.error) {
+                throw new Error(parsed.error);
+            }
+            
+            // 從 bibleContent 中提取經文
+            const lang = parsed.language || 'both';
+            let fullText = '';
+            let foundCount = 0;
+            
+            for (const q of parsed.queries) {
+                const bookData = bibleContent[q.bookId];
+                if (!bookData) {
+                    const bookInfo = allBooks.find(b => b.id === q.bookId);
+                    const bookName = bookInfo ? (currentLang === 'ko' ? bookInfo.ko : bookInfo.zh) : q.bookId;
+                    fullText += `[${bookName} - 尚未收錄]\n`;
+                    continue;
+                }
+                
+                const chapterData = bookData[q.chapter];
+                if (!chapterData) {
+                    const bookInfo = allBooks.find(b => b.id === q.bookId);
+                    const bookName = bookInfo ? (currentLang === 'ko' ? bookInfo.ko : bookInfo.zh) : q.bookId;
+                    fullText += `[${bookName} ${q.chapter}章 - 尚未收錄]\n`;
+                    continue;
+                }
+                
+                const abbr = bookAbbreviations[q.bookId] || { ko: q.bookId, zh: q.bookId };
+                const verses = q.verses === 'all' 
+                    ? chapterData.filter(v => v.verse).map(v => v.verse)
+                    : q.verses;
+                
+                for (const vNum of verses) {
+                    const verseData = chapterData.find(v => v.verse === vNum);
+                    if (!verseData) continue;
+                    
+                    foundCount++;
+                    if (lang === 'ko') {
+                        fullText += `${abbr.ko} ${q.chapter}:${vNum} ${verseData.ko}\n`;
+                    } else if (lang === 'zh') {
+                        fullText += `${abbr.zh} ${q.chapter}:${vNum} ${verseData.zh}\n`;
+                    } else {
+                        fullText += `${abbr.ko} ${q.chapter}:${vNum} ${verseData.ko}\n`;
+                        fullText += `${abbr.zh} ${q.chapter}:${vNum} ${verseData.zh}\n\n`;
+                    }
+                }
+            }
+            
+            fullText = fullText.trim();
+            
+            if (foundCount === 0) {
+                throw new Error(currentLang === 'ko' ? '해당 경문을 찾을 수 없습니다' : '找不到對應的經文');
+            }
+            
+            // 顯示預覽
+            resultDiv.className = 'smart-copy-result show success';
+            resultText.textContent = currentLang === 'ko' 
+                ? `✅ ${foundCount}절 찾았습니다` 
+                : `✅ 找到 ${foundCount} 節經文`;
+            previewDiv.textContent = fullText.length > 300 ? fullText.substring(0, 300) + '...' : fullText;
+            
+            // 複製到剪貼簿
+            await navigator.clipboard.writeText(fullText);
+            resultText.textContent += currentLang === 'ko' ? ' (복사됨!)' : ' (已複製！)';
+            
+        } catch (err) {
+            resultDiv.className = 'smart-copy-result show error';
+            resultText.textContent = '❌ ' + (err.message || 'Error');
+            previewDiv.textContent = '';
+        } finally {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        }
+    };
     
     // 複製模式下的觸控追蹤
     let copyModeTouchStartX = 0;
