@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     
     <!-- 主題顏色 - 用於瀏覽器UI -->
+    <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#f5f0e8" id="themeColorMeta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
@@ -21,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;600&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
     
-    <title>Admin - Backend</title>
+    <title>Admin Backend</title>
     <style>
         :root {
             --primary-green: #43a047;
@@ -3481,15 +3482,45 @@
         </style>
 </head>
 <body>
-<!-- 密碼鎖 -->
-<div class="lock-screen" id="lockScreen" style="position:fixed;inset:0;z-index:99999;background:#f5f0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-<div style="font-size:3rem;">🔒</div>
-<div style="font-size:1.2rem;font-weight:700;" id="lockTitle">비밀번호를 입력하세요</div>
-<input type="password" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter') window.unlockAdmin()" style="width:250px;padding:12px;border:1.5px solid #d5cfc5;border-radius:10px;font-size:16px;text-align:center;background:#faf8f4;outline:none;-webkit-text-security:disc;">
-<button onclick="window.unlockAdmin()" style="padding:10px 40px;border:none;border-radius:10px;background:#43a047;color:white;font-size:15px;font-weight:600;cursor:pointer;">확인</button>
-<div id="lockError" style="color:#e53935;font-size:0.85rem;min-height:20px;"></div>
+<!-- 密碼鎖畫面 -->
+<div id="pageLockScreen" style="position:fixed;inset:0;z-index:99999;background:#f5f0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+    <div style="font-size:3rem;">🔒</div>
+    <div style="font-size:1.2rem;font-weight:700;color:#333;">비밀번호를 입력하세요</div>
+    <input type="password" id="pageLockInput" placeholder="Password" style="width:250px;padding:12px;border:1.5px solid #d5cfc5;border-radius:10px;font-size:16px;text-align:center;background:#faf8f4;outline:none;-webkit-text-security:disc;font-family:inherit;">
+    <button id="pageLockBtn" style="padding:10px 40px;border:none;border-radius:10px;background:#43a047;color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">확인</button>
+    <div id="pageLockError" style="color:#e53935;font-size:0.85rem;min-height:20px;"></div>
 </div>
-<div id="mainAppWrapper">
+<script>
+(function(){
+    var PW_HASH='15ae303027a01b7e7f4ec6d4104381fe2f597d5c580f3a7fd9052a74bc6a96a8';
+    var STORAGE_KEY='admin_unlocked';
+    var lockScreen=document.getElementById('pageLockScreen');
+    var lockInput=document.getElementById('pageLockInput');
+    var lockBtn=document.getElementById('pageLockBtn');
+    var lockError=document.getElementById('pageLockError');
+    
+    // 1小時內自動解鎖
+    var saved=parseInt(localStorage.getItem(STORAGE_KEY)||'0');
+    if(Date.now()-saved<3600000){ lockScreen.style.display='none'; }
+    
+    async function doUnlock(){
+        var pw=lockInput.value;
+        var enc=new TextEncoder().encode(pw);
+        var buf=await crypto.subtle.digest('SHA-256',enc);
+        var hash=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+        if(hash===PW_HASH){
+            lockScreen.style.display='none';
+            localStorage.setItem(STORAGE_KEY,Date.now().toString());
+        }else{
+            lockError.textContent='비밀번호가 틀립니다 / 密碼錯誤';
+            lockInput.value='';
+            lockInput.focus();
+        }
+    }
+    lockBtn.onclick=doUnlock;
+    lockInput.onkeydown=function(e){if(e.key==='Enter')doUnlock();};
+})();
+</script>
 
 <nav>
     <div class="nav-left">
@@ -4194,29 +4225,6 @@
     // --- APP VERSION ---
     const APP_VERSION = '2026.05.04.01';
     
-    // --- ADMIN PASSWORD LOCK ---
-    const ADMIN_PW_HASH = '15ae303027a01b7e7f4ec6d4104381fe2f597d5c580f3a7fd9052a74bc6a96a8';
-    window.unlockAdmin = async () => {
-        const input = document.getElementById('lockInput').value;
-        const encoder = new TextEncoder();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(input));
-        const hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        if (hash === ADMIN_PW_HASH) {
-            document.getElementById('lockScreen').style.display = 'none';
-            document.getElementById('mainAppWrapper').style.display = 'block';
-            localStorage.setItem('admin_unlocked', Date.now().toString());
-        } else {
-            document.getElementById('lockError').textContent = currentLang === 'ko' ? '비밀번호가 틀립니다' : '密碼錯誤';
-        }
-    };
-    // 1小時內自動解鎖
-    const adminUnlockTime = parseInt(localStorage.getItem('admin_unlocked') || '0');
-    if (Date.now() - adminUnlockTime < 3600000) {
-        document.getElementById('lockScreen').style.display = 'none';
-    } else {
-        document.getElementById('mainAppWrapper').style.display = 'none';
-    }
-    
     // --- FIREBASE SETUP ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -4581,13 +4589,13 @@
     window.onload = function() {
         document.querySelector('.lang-select').value = currentLang;
         
-        // Admin: 強制顯示後台
+        // Admin: 強制顯示後台管理頁面
         switchPage('backend');
         
         applyLanguage();
         updateDateInput();
         
-        // 版本檢查（每5分鐘）- 使用獨立的admin_etag
+        // 版本檢查（獨立admin_etag）
         checkAdminUpdates();
         setInterval(checkAdminUpdates, 5 * 60 * 1000);
     };
@@ -4608,7 +4616,6 @@
             if (etag) localStorage.setItem('admin_etag', etag);
         } catch (e) {}
     }
-    };
 
     window.setLanguage = (lang) => {
         currentLang = lang;
@@ -8762,6 +8769,5 @@ ${bookRef}
     <button class="version-update-close" onclick="document.getElementById('versionUpdateToast').classList.remove('show')">✕</button>
 </div>
 
-</div><!-- mainAppWrapper -->
 </body>
 </html>
