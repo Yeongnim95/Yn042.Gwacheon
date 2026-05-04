@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f5f0e8">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <title>Admin - Backend Management</title>
+    <style>
+        :root {
+            --primary-green: #43a047; --dark-green: #2e7d32;
+            --border-color: #d5cfc5; --bg-color: #f5f0e8; --bg-secondary: #ece7df;
+            --card-bg: #faf8f4; --text-primary: #333; --text-secondary: #555; --text-muted: #999;
+            --border-light: #d5cfc5; --border-lighter: #e0dbd3; --border-lightest: #eae5dd;
+            --shadow-color: rgba(80,60,40,0.08); --input-bg: #faf8f4; --danger-red: #e53935;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { background: #f5f0e8; }
+        body { font-family: "Noto Sans KR","Noto Sans TC","Apple SD Gothic Neo",system-ui,sans-serif; background: #f5f0e8; min-height: 100vh; }
+        
+        .lock-screen { position: fixed; inset: 0; z-index: 9999; background: #f5f0e8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+        .lock-screen.hidden { display: none; }
+        .lock-icon { font-size: 3rem; }
+        .lock-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .lock-input { width: 250px; padding: 12px; border: 1.5px solid var(--border-light); border-radius: 10px; font-size: 16px; text-align: center; background: var(--card-bg); outline: none; -webkit-text-security: disc; }
+        .lock-input:focus { border-color: var(--primary-green); }
+        .lock-btn { padding: 10px 40px; border: none; border-radius: 10px; background: var(--primary-green); color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .lock-error { color: var(--danger-red); font-size: 0.85rem; min-height: 20px; }
+
+        nav { background: var(--bg-secondary); padding: 0 15px; display: flex; align-items: center; justify-content: space-between; height: 55px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px var(--shadow-color); }
+        .nav-title { font-weight: 700; color: var(--primary-green); font-size: 1rem; }
+        .lang-select { padding: 4px 8px; border: 1px solid var(--border-light); border-radius: 5px; background: var(--input-bg); font-size: 0.85rem; color: var(--text-secondary); outline: none; }
+
+        .container { max-width: 1400px; margin: 15px auto; padding: 25px; background: var(--bg-color); border-radius: 16px; box-shadow: 0 10px 30px var(--shadow-color); }
+        h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 1.3rem; border-bottom: 3px solid var(--primary-green); padding-bottom: 10px; }
+
+        .backend-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-lightest); flex-wrap: wrap; gap: 10px; }
+        .toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: bold; color: #555; flex-wrap: wrap; }
+        .stat-item { white-space: nowrap; }
+        .stat-divider { margin: 0 8px; color: var(--border-light); }
+        .highlight-stat { color: #2e7d32; }
+        .edit-controls { display: none; align-items: center; gap: 10px; }
+        .show-edit .edit-controls { display: flex; }
+        .toggle-edit-btn { background: #2196f3; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .toggle-edit-btn.editing { background: var(--primary-green); }
+        .delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+
+        .list-container { overflow-x: auto; }
+        .grid-row { display: grid; grid-template-columns: 30px 40px 55px 50px 1fr auto 30px; gap: 8px; align-items: center; padding: 8px 5px; }
+        .list-header-row { background: var(--primary-green); color: white; border-radius: 8px; font-weight: 600; font-size: 0.85rem; position: sticky; top: 55px; z-index: 10; }
+        .sortable { cursor: pointer; }
+        .check-cell { text-align: center; }
+        .action-cell { text-align: center; }
+
+        .avatar-cell { display: flex; justify-content: center; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 0.8rem; }
+        .user-row { border-bottom: 1px solid var(--border-lightest); cursor: pointer; transition: background 0.2s; }
+        .user-row:hover { background: var(--card-bg); }
+        .user-name { font-weight: 600; font-size: 0.85rem; }
+        .user-date { font-size: 0.8rem; color: var(--primary-green); }
+        .activity-badge { padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+        .activity-high { background: #e8f5e9; color: #2e7d32; }
+        .activity-normal { background: #fff3e0; color: #e65100; }
+        .activity-low { background: #ffebee; color: #c62828; }
+
+        .user-details { display: none; background: var(--card-bg); border-radius: 10px; margin: 5px 0; padding: 12px; }
+        .user-details.open { display: block; }
+        .log-entry { padding: 8px; border-bottom: 1px solid var(--border-lightest); font-size: 0.85rem; }
+        .log-date { color: var(--primary-green); font-weight: 600; }
+        .log-type-badge { padding: 1px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .type-me { background: #e8f5e9; color: #2e7d32; }
+        .type-other { background: #fff3e0; color: #e65100; }
+        .log-content { margin-top: 4px; color: var(--text-secondary); }
+        .log-delete-btn { background: none; border: none; color: var(--danger-red); cursor: pointer; font-size: 0.8rem; float: right; }
+        .log-points { margin-top: 4px; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .log-msg-points { background: #f1f8e9; }
+        .log-confirm-points { background: #fff8e1; }
+        .profile-info { padding: 8px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 8px; font-size: 0.8rem; }
+
+        @media (max-width: 768px) { .container { margin: 10px; padding: 15px; } .grid-row { grid-template-columns: 25px 35px 45px 45px 1fr auto 25px; gap: 4px; font-size: 0.8rem; } }
+    </style>
+</head>
+<body>
+
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title" id="lockTitle">비밀번호를 입력하세요</div>
+    <input type="password" class="lock-input" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter') unlock()">
+    <button class="lock-btn" onclick="unlock()" id="lockBtn">확인</button>
+    <div class="lock-error" id="lockError"></div>
+</div>
+
+<div id="mainApp" style="display:none;">
+<nav>
+    <span class="nav-title">🌱 Admin</span>
+    <select class="lang-select" onchange="setLang(this.value)">
+        <option value="ko">한국어</option>
+        <option value="zh">中文</option>
+    </select>
+</nav>
+
+<div class="container">
+    <h2 id="txt-backend-header">후방 관리</h2>
+    <div class="backend-toolbar" id="backendToolbar">
+        <div class="toolbar-left">
+            <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item highlight-stat" id="txt-interaction-count">주간 교류: 0명</span>
+            <div class="edit-controls" id="editControls">
+                <span class="stat-divider">|</span>
+                <label style="display:flex;align-items:center;cursor:pointer;">
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll()" style="width:18px;height:18px;margin-right:5px;">
+                    <span id="txt-select-all">전체 선택</span>
+                </label>
+                <button class="delete-btn" onclick="deleteSelected()" id="btn-delete">선택 삭제</button>
+            </div>
+        </div>
+        <button class="toggle-edit-btn" onclick="toggleEditMode()" id="btn-toggle-edit">편집</button>
+    </div>
+    <div class="list-container" id="dataListContainer">
+        <div class="list-header-row grid-row">
+            <div class="check-cell"></div>
+            <div></div>
+            <div class="sortable" onclick="toggleSortBy('id')"><span id="col-id">번호</span><span id="sortIconId"></span></div>
+            <div class="sortable" onclick="toggleSortBy('activity')"><span id="col-activity">활동</span><span id="sortIconActivity"></span></div>
+            <div class="sortable" onclick="toggleSortBy('name')"><span id="col-name">이름</span><span id="sortIconName"></span></div>
+            <div class="sortable" onclick="toggleSortBy('date')"><span id="col-date">최근 날짜</span><span id="sortIconDate">▼</span></div>
+            <div class="action-cell"></div>
+        </div>
+        <div id="dataList"><div style="padding:20px;text-align:center;color:#888;">Loading...</div></div>
+    </div>
+</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBXnq1RzY0zxGE0trwLPR-PHtdfFCvRw0A",
+        authDomain: "discourse-dissemination.firebaseapp.com",
+        projectId: "discourse-dissemination",
+        storageBucket: "discourse-dissemination.firebasestorage.app",
+        messagingSenderId: "686407798490",
+        appId: "1:686407798490:web:e41a5f2d007615fb6e5fe3"
+    };
+
+    let dbInstance, cloudEnabled = false, localDb = [];
+    let sortDesc = true, sortBy = 'date', isEditMode = false;
+    const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        dbInstance = getFirestore(app);
+        cloudEnabled = true;
+        onSnapshot(collection(dbInstance, "missionary_data"), (snapshot) => {
+            localDb = [];
+            snapshot.forEach(d => { const data = d.data(); localDb.push({ id: d.id, ...data }); });
+            localDb.sort((a, b) => a.id.localeCompare(b.id));
+            renderBackend();
+            updateCounter();
+        });
+    } catch (e) { console.error("Firebase init failed:", e); }
+
+    let currentLang = localStorage.getItem('app_lang') || 'ko';
+    const i18n = {
+        ko: {
+            lockTitle: "비밀번호를 입력하세요", lockBtn: "확인", lockError: "비밀번호가 틀립니다",
+            headerBackend: "후방 관리", txtTotal: "섭외자: ", txtPerson: "명",
+            txtWeeklyInteraction: "주간 교류: ", txtSelectAll: "전체 선택",
+            btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
+            colId: "번호", colName: "이름", colDate: "최근 날짜", colActivity: "활동",
+            activityHigh: "활발", activityNormal: "보통", activityLow: "저조",
+            alertConfirmDelete: "선택한 섭외자를 삭제하시겠습니까?",
+            alertDeleted: "삭제되었습니다.", alertDeleteLog: "이 기록을 삭제하시겠습니까?",
+            tagMe: "본인", tagOther: "상대", msgEmpty: "(기록 없음)"
+        },
+        zh: {
+            lockTitle: "請輸入密碼", lockBtn: "確認", lockError: "密碼錯誤",
+            headerBackend: "後台管理", txtTotal: "涉外者人數: ", txtPerson: " 人",
+            txtWeeklyInteraction: "週間交流: ", txtSelectAll: "全選",
+            btnDelete: "刪除選取", btnEdit: "編輯", btnDone: "完成",
+            colId: "編號", colName: "姓名", colDate: "最近日期", colActivity: "活躍度",
+            activityHigh: "活躍", activityNormal: "一般", activityLow: "低活躍",
+            alertConfirmDelete: "確定要刪除這些檔案嗎？",
+            alertDeleted: "刪除完成！", alertDeleteLog: "確定要刪除這條紀錄嗎？",
+            tagMe: "我", tagOther: "他", msgEmpty: "(尚無紀錄)"
+        }
+    };
+
+    async function hashPassword(pw) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(pw);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.unlock = async () => {
+        const hash = await hashPassword(document.getElementById('lockInput').value);
+        if (hash === PASSWORD_HASH) {
+            document.getElementById('lockScreen').classList.add('hidden');
+            document.getElementById('mainApp').style.display = 'block';
+            localStorage.setItem('admin_unlocked', Date.now().toString());
+        } else { document.getElementById('lockError').textContent = i18n[currentLang].lockError; }
+    };
+    const unlockTime = parseInt(localStorage.getItem('admin_unlocked') || '0');
+    if (Date.now() - unlockTime < 3600000) { document.getElementById('lockScreen').classList.add('hidden'); document.getElementById('mainApp').style.display = 'block'; }
+
+    window.setLang = (lang) => { currentLang = lang; localStorage.setItem('app_lang', lang); applyLang(); renderBackend(); };
+    function applyLang() {
+        const t = i18n[currentLang];
+        document.querySelector('.lang-select').value = currentLang;
+        document.getElementById('lockTitle').textContent = t.lockTitle;
+        document.getElementById('lockBtn').textContent = t.lockBtn;
+        document.getElementById('txt-backend-header').textContent = t.headerBackend;
+        document.getElementById('col-id').textContent = t.colId;
+        document.getElementById('col-name').textContent = t.colName;
+        document.getElementById('col-date').textContent = t.colDate;
+        document.getElementById('col-activity').textContent = t.colActivity;
+        document.getElementById('txt-select-all').textContent = t.txtSelectAll;
+        document.getElementById('btn-delete').textContent = t.btnDelete;
+        document.getElementById('btn-toggle-edit').textContent = isEditMode ? t.btnDone : t.btnEdit;
+        updateCounter();
+    }
+
+    function updateCounter() {
+        const t = i18n[currentLang];
+        document.getElementById('txt-total-count').textContent = t.txtTotal + localDb.length + t.txtPerson;
+        const oneWeekAgo = new Date(Date.now() - 7*24*60*60*1000);
+        const weekly = localDb.filter(u => u.logs?.some(l => new Date(l.date) >= oneWeekAgo)).length;
+        document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weekly + t.txtPerson;
+    }
+
+    window.toggleEditMode = () => {
+        isEditMode = !isEditMode;
+        const toolbar = document.getElementById('backendToolbar');
+        const btn = document.getElementById('btn-toggle-edit');
+        const t = i18n[currentLang];
+        if (isEditMode) { toolbar.classList.add('show-edit'); btn.textContent = t.btnDone; btn.classList.add('editing'); }
+        else { toolbar.classList.remove('show-edit'); btn.textContent = t.btnEdit; btn.classList.remove('editing'); document.getElementById('selectAll').checked = false; }
+        renderBackend();
+    };
+    window.toggleSelectAll = () => { const m = document.getElementById('selectAll'); document.getElementsByName('selectUser').forEach(c => c.checked = m.checked); };
+    window.toggleSortBy = (field) => { if (sortBy === field) sortDesc = !sortDesc; else { sortBy = field; sortDesc = true; } renderBackend(); };
+
+    window.deleteSelected = async () => {
+        const t = i18n[currentLang];
+        const checked = Array.from(document.getElementsByName('selectUser')).filter(c => c.checked).map(c => c.value);
+        if (!checked.length || !confirm(t.alertConfirmDelete)) return;
+        for (const id of checked) { await deleteDoc(doc(dbInstance, "missionary_data", id)); }
+        alert(t.alertDeleted);
+    };
+
+    window.deleteLog = async (userId, logIndex) => {
+        if (!confirm(i18n[currentLang].alertDeleteLog)) return;
+        const user = localDb.find(u => u.id === userId);
+        if (!user) return;
+        user.logs.splice(logIndex, 1);
+        await updateDoc(doc(dbInstance, "missionary_data", userId), { logs: user.logs });
+    };
+
+    window.toggleUserDetail = (userId) => {
+        const el = document.getElementById('detail-' + userId);
+        if (el) el.classList.toggle('open');
+    };
+
+    function renderBackend() {
+        if (!cloudEnabled) return;
+        const t = i18n[currentLang];
+        const listContainer = document.getElementById('dataList');
+        listContainer.innerHTML = '';
+
+        const sortByDateThenTime = (a, b) => {
+            if (a.date !== b.date) return (b.date || '').localeCompare(a.date || '');
+            return (b.createdAt || 0) - (a.createdAt || 0);
+        };
+
+        const processed = localDb.map(user => {
+            const sortedLogs = [...(user.logs||[])].sort(sortByDateThenTime);
+            return { ...user, logs: sortedLogs, lastLog: sortedLogs[0] || { date: '0000-00-00', content: t.msgEmpty } };
+        });
+
+        processed.sort((a, b) => {
+            let r = 0;
+            if (sortBy === 'date') r = (a.lastLog.date || '').localeCompare(b.lastLog.date || '');
+            else if (sortBy === 'id') r = a.id.localeCompare(b.id);
+            else if (sortBy === 'name') r = (a.name || '').localeCompare(b.name || '');
+            else if (sortBy === 'activity') {
+                const getScore = u => { const d = u.lastLog.date; if (!d || d === '0000-00-00') return 0; const diff = (Date.now() - new Date(d)) / 86400000; return diff <= 7 ? 2 : diff <= 30 ? 1 : 0; };
+                r = getScore(a) - getScore(b);
+            }
+            return sortDesc ? -r : r;
+        });
+
+        ['Id','Activity','Name','Date'].forEach(f => { const el = document.getElementById('sortIcon'+f); if(el) el.textContent = sortBy === f.toLowerCase() ? (sortDesc ? '▼' : '▲') : ''; });
+
+        processed.forEach(user => {
+            const days = user.lastLog.date && user.lastLog.date !== '0000-00-00' ? Math.floor((Date.now() - new Date(user.lastLog.date)) / 86400000) : 999;
+            let actClass, actText;
+            if (days <= 7) { actClass = 'activity-high'; actText = t.activityHigh; }
+            else if (days <= 30) { actClass = 'activity-normal'; actText = t.activityNormal; }
+            else { actClass = 'activity-low'; actText = t.activityLow; }
+
+            const initial = (user.name || '?')[0].toUpperCase();
+            const colors = ['#43a047','#e53935','#1e88e5','#fb8c00','#8e24aa','#00acc1'];
+            const color = colors[user.id.charCodeAt(user.id.length-1) % colors.length];
+
+            let html = `<div class="user-row grid-row" onclick="toggleUserDetail('${user.id}')">`;
+            html += `<div class="check-cell">${isEditMode ? `<input type="checkbox" name="selectUser" value="${user.id}" onclick="event.stopPropagation()" style="width:16px;height:16px;">` : ''}</div>`;
+            html += `<div class="avatar-cell"><div class="user-avatar" style="background:${color}">${initial}</div></div>`;
+            html += `<div>${user.id}</div>`;
+            html += `<div><span class="activity-badge ${actClass}">${actText}</span></div>`;
+            html += `<div class="user-name">${user.name}</div>`;
+            html += `<div class="user-date">${user.lastLog.date !== '0000-00-00' ? user.lastLog.date : '-'}</div>`;
+            html += `<div class="action-cell">▸</div></div>`;
+
+            // Detail section
+            html += `<div class="user-details" id="detail-${user.id}">`;
+            if (user.profile) {
+                const p = user.profile;
+                html += `<div class="profile-info">📋 ${p.location||''} | ${p.phone||''} | ${p.contact||''}: ${p.contactId||''} | ${p.mbti||''} | ${p.job||''}</div>`;
+            }
+            user.logs.forEach((log, i) => {
+                const typeClass = log.type === 'me' ? 'type-me' : 'type-other';
+                const typeText = log.type === 'me' ? t.tagMe : t.tagOther;
+                html += `<div class="log-entry">`;
+                html += `<span class="log-date">${log.date}</span> <span class="log-type-badge ${typeClass}">${typeText}</span>`;
+                if (isEditMode) html += `<button class="log-delete-btn" onclick="event.stopPropagation();deleteLog('${user.id}',${i})">🗑</button>`;
+                html += `<div class="log-content">${log.content}</div>`;
+                if (log.messagePoints?.length) html += `<div class="log-points log-msg-points">📌 ${log.messagePoints.join(' | ')}</div>`;
+                if (log.confirmPoints?.length) html += `<div class="log-points log-confirm-points">❓ ${log.confirmPoints.join(' | ')}</div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+
+            listContainer.innerHTML += html;
+        });
+    }
+
+    window.onload = () => { applyLang(); };
+</script>
+</body>
+</html>

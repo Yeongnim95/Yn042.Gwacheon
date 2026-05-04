@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f5f0e8">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <title>Entry System</title>
+    <style>
+        :root {
+            --primary-green: #43a047;
+            --dark-green: #2e7d32;
+            --border-color: #d5cfc5;
+            --bg-color: #f5f0e8;
+            --bg-secondary: #ece7df;
+            --card-bg: #faf8f4;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #999;
+            --border-light: #d5cfc5;
+            --border-lighter: #e0dbd3;
+            --border-lightest: #eae5dd;
+            --shadow-color: rgba(80, 60, 40, 0.08);
+            --input-bg: #faf8f4;
+            --danger-red: #e53935;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { background-color: #f5f0e8; }
+        body {
+            font-family: "Noto Sans KR", "Noto Sans TC", "Apple SD Gothic Neo", system-ui, sans-serif;
+            background: #f5f0e8;
+            min-height: 100vh;
+        }
+
+        /* 密碼鎖畫面 */
+        .lock-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #f5f0e8;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 16px;
+        }
+        .lock-screen.hidden { display: none; }
+        .lock-icon { font-size: 3rem; margin-bottom: 10px; }
+        .lock-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+        .lock-input {
+            width: 250px; padding: 12px 16px; border: 1.5px solid var(--border-light);
+            border-radius: 10px; font-size: 16px; text-align: center;
+            background: var(--card-bg); outline: none; font-family: inherit;
+            -webkit-text-security: disc;
+        }
+        .lock-input:focus { border-color: var(--primary-green); }
+        .lock-btn {
+            padding: 10px 40px; border: none; border-radius: 10px;
+            background: var(--primary-green); color: white;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            font-family: inherit;
+        }
+        .lock-error { color: var(--danger-red); font-size: 0.85rem; min-height: 20px; }
+
+        /* 導航欄 */
+        nav {
+            background: var(--bg-secondary); padding: 0 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 55px; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+        .nav-title { font-weight: 700; color: var(--primary-green); font-size: 1rem; }
+        .nav-tabs { display: flex; gap: 4px; }
+        .nav-tab {
+            padding: 6px 16px; border: 1px solid var(--border-light);
+            border-radius: 20px; background: transparent; cursor: pointer;
+            font-size: 0.85rem; color: var(--text-secondary); font-family: inherit;
+            transition: all 0.3s;
+        }
+        .nav-tab.active { background: var(--primary-green); color: white; border-color: var(--primary-green); }
+        .lang-select {
+            padding: 4px 8px; border: 1px solid var(--border-light);
+            border-radius: 5px; background: var(--input-bg);
+            font-size: 0.85rem; color: var(--text-secondary); outline: none;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 800px; margin: 15px auto; padding: 25px;
+            background: var(--bg-color); border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        /* 表單 */
+        h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 1.3rem; border-bottom: 3px solid var(--primary-green); padding-bottom: 10px; }
+        .status-bar { padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; font-size: 0.85rem; background: var(--card-bg); color: var(--primary-green); font-weight: 600; min-height: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; margin-bottom: 5px; color: var(--primary-green); font-size: 0.9rem; }
+        .form-full-width { grid-column: 1 / -1; }
+        input, select, textarea {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 15px; outline: none;
+            background: var(--card-bg); color: var(--text-primary); font-family: inherit;
+        }
+        textarea { resize: vertical; min-height: 100px; }
+        .submit-btn {
+            width: 100%; padding: 15px; margin-top: 15px; border: none;
+            background: var(--primary-green); color: white; font-weight: bold;
+            font-size: 1rem; border-radius: 8px; cursor: pointer; font-family: inherit;
+        }
+        .submit-btn:hover { background: var(--dark-green); }
+
+        /* 訊息重點 */
+        .message-points-section { margin-top: 15px; padding: 15px; border-radius: 10px; }
+        #messagePointsSection { background: #f1f8e9; border: 1px solid #c5e1a5; }
+        #confirmPointsSection { background: #fff8e1; border: 1px solid #ffe082; }
+        #confirmPointsSection .message-points-title { color: #e65100; }
+        #confirmPointsSection .message-points-add-btn { background: #ff9800; }
+        .message-points-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .message-points-title { font-weight: 600; font-size: 0.9rem; color: var(--dark-green); }
+        .message-points-add-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--primary-green); color: white; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .message-points-list { display: flex; flex-direction: column; gap: 6px; }
+        .message-points-empty { font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 8px; }
+        .message-point-item { display: flex; align-items: center; gap: 8px; }
+        .message-point-input { flex: 1; padding: 6px 10px; border: 1px solid var(--border-lighter); border-radius: 6px; font-size: 0.85rem; background: white; }
+        .message-point-remove { background: none; border: none; color: var(--danger-red); cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+
+        /* 生日輸入 */
+        .birthday-input-wrapper { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .birthday-input-wrapper input { width: auto; text-align: center; }
+        #profileBirthYear { width: 70px; }
+        #profileBirthMonth, #profileBirthDay { width: 50px; }
+        .birthday-separator { color: var(--text-muted); }
+        .age-input { width: 55px !important; }
+        .age-unit { color: var(--text-muted); font-size: 0.9rem; }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .container { margin: 10px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 密碼鎖畫面 -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title" id="lockTitle">비밀번호를 입력하세요</div>
+    <input type="password" class="lock-input" id="lockInput" placeholder="Password" onkeydown="if(event.key==='Enter') unlock()">
+    <button class="lock-btn" onclick="unlock()" id="lockBtn">확인</button>
+    <div class="lock-error" id="lockError"></div>
+</div>
+
+<!-- 主介面 -->
+<div id="mainApp" style="display:none;">
+<nav>
+    <span class="nav-title">🌱 Entry</span>
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('entry')" id="tabEntry">등록</button>
+        <button class="nav-tab" onclick="switchTab('profile')" id="tabProfile">개인정보</button>
+    </div>
+    <select class="lang-select" onchange="setLang(this.value)">
+        <option value="ko">한국어</option>
+        <option value="zh">中文</option>
+    </select>
+</nav>
+
+<div class="container">
+    <!-- 登錄系統 -->
+    <div id="entryPage" class="page-section active">
+        <h2 id="txt-entry-header">등록 시스템</h2>
+        <div id="statusMsg" class="status-bar"></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-id">번호</label>
+                <input type="text" id="idInput" placeholder="0000-4999" oninput="handleIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-name">이름</label>
+                <input type="text" id="nameInput" placeholder="이름 입력" oninput="handleNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-date">날짜</label>
+                <input type="date" id="recordDate">
+            </div>
+            <div class="form-group">
+                <label id="lbl-type">회신 유형</label>
+                <select id="replyType">
+                    <option value="me" id="opt-me">내가 회신</option>
+                    <option value="other" id="opt-other">상대방 회신</option>
+                </select>
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-content">내용</label>
+                <textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
+            </div>
+            <div class="form-group form-full-width">
+                <div class="message-points-section" id="messagePointsSection">
+                    <div class="message-points-header">
+                        <span class="message-points-title" id="messagePointsTitle">📌 訊息重點</span>
+                        <button class="message-points-add-btn" onclick="addMessagePoint()">+</button>
+                    </div>
+                    <div class="message-points-list" id="messagePointsList">
+                        <div class="message-points-empty" id="messagePointsEmpty">點擊 + 新增訊息重點</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group form-full-width">
+                <div class="message-points-section" id="confirmPointsSection">
+                    <div class="message-points-header">
+                        <span class="message-points-title" id="confirmPointsTitle">❓ 需確認的訊息</span>
+                        <button class="message-points-add-btn" onclick="addConfirmPoint()">+</button>
+                    </div>
+                    <div class="message-points-list" id="confirmPointsList">
+                        <div class="message-points-empty" id="confirmPointsEmpty">點擊 + 新增需確認的訊息</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="submit-btn" onclick="submitData()" id="btn-submit">등록하기</button>
+    </div>
+
+    <!-- 個人資料 -->
+    <div id="profilePage" class="page-section">
+        <h2 id="txt-profile-header">개인정보 등록</h2>
+        <div id="profileStatusMsg" class="status-bar"></div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label id="lbl-profile-id">번호</label>
+                <input type="text" id="profileIdInput" placeholder="9999" oninput="handleProfileIdInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-name">이름</label>
+                <input type="text" id="profileNameInput" placeholder="이름 입력" oninput="handleProfileNameInput()">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-location">거주지</label>
+                <input type="text" id="profileLocation">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-phone">휴대폰</label>
+                <input type="tel" id="profilePhone">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-contact">연락 방법</label>
+                <select id="profileContact">
+                    <option value="" id="opt-contact-none">선택하세요</option>
+                    <option value="FACEBOOK">FACEBOOK</option>
+                    <option value="IG">IG</option>
+                    <option value="SLOWLY">SLOWLY</option>
+                    <option value="LINE">LINE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-contact-id">연락처 ID</label>
+                <input type="text" id="profileContactId">
+            </div>
+            <div class="form-group form-full-width">
+                <label id="lbl-profile-birthday">생일 / 나이</label>
+                <div class="birthday-input-wrapper">
+                    <input type="text" id="profileBirthYear" placeholder="YYYY" maxlength="4" inputmode="numeric" oninput="handleBirthYearInput(this)">
+                    <span class="birthday-separator">/</span>
+                    <input type="text" id="profileBirthMonth" placeholder="MM" maxlength="2" inputmode="numeric" oninput="handleBirthMonthInput(this)">
+                    <span class="birthday-separator">/</span>
+                    <input type="text" id="profileBirthDay" placeholder="DD" maxlength="2" inputmode="numeric" oninput="handleBirthDayInput(this)">
+                    <span class="birthday-separator">,</span>
+                    <input type="text" id="profileAge" placeholder="나이" maxlength="3" inputmode="numeric" class="age-input">
+                    <span class="age-unit" id="age-unit">세</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-mbti">MBTI</label>
+                <input type="text" id="profileMbti" placeholder="MBTI" maxlength="4" style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+                <label id="lbl-profile-job">직업</label>
+                <input type="text" id="profileJob">
+            </div>
+        </div>
+        <button class="submit-btn" onclick="saveProfile()" id="btn-profile-save">저장하기</button>
+    </div>
+</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBXnq1RzY0zxGE0trwLPR-PHtdfFCvRw0A",
+        authDomain: "discourse-dissemination.firebaseapp.com",
+        projectId: "discourse-dissemination",
+        storageBucket: "discourse-dissemination.firebasestorage.app",
+        messagingSenderId: "686407798490",
+        appId: "1:686407798490:web:e41a5f2d007615fb6e5fe3"
+    };
+
+    let dbInstance, cloudEnabled = false, localDb = [];
+    const PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // 'password' 的 SHA-256
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        dbInstance = getFirestore(app);
+        cloudEnabled = true;
+        
+        onSnapshot(collection(dbInstance, "missionary_data"), (snapshot) => {
+            localDb = [];
+            snapshot.forEach(d => { const data = d.data(); localDb.push({ id: d.id, ...data }); });
+            localDb.sort((a, b) => a.id.localeCompare(b.id));
+        });
+    } catch (e) { console.error("Firebase init failed:", e); }
+
+    let currentLang = localStorage.getItem('app_lang') || 'ko';
+
+    const i18n = {
+        ko: {
+            lockTitle: "비밀번호를 입력하세요", lockBtn: "확인", lockError: "비밀번호가 틀립니다",
+            tabEntry: "등록", tabProfile: "개인정보",
+            headerEntry: "등록 시스템", lblId: "번호", lblName: "이름", lblDate: "날짜",
+            lblType: "회신 유형", lblContent: "내용", optMe: "내가 회신", optOther: "상대방 회신",
+            btnSubmit: "등록하기", statusNewId: "✚ 새 섭외자! 추천 번호: ",
+            alertIncomplete: "모든 항목을 입력해주세요.",
+            alertUpdate: "업데이트 완료: ", alertCreate: "새 파일 생성 완료: ",
+            errIdConflict: "오류: 이 번호는 이미 다른 사람에게 할당되어 있습니다.",
+            errNameConflict: "오류: 이 이름은 이미 다른 번호를 사용 중입니다.",
+            msgCloudError: "Firebase 설정이 필요합니다.",
+            headerProfile: "개인정보 등록", lblProfileId: "번호", lblProfileName: "이름",
+            lblProfileLocation: "거주지", lblProfilePhone: "휴대폰", lblProfileContact: "연락 방법",
+            lblProfileContactId: "연락처 ID", lblProfileBirthday: "생일 / 나이", ageUnit: "세",
+            lblProfileMbti: "MBTI", lblProfileJob: "직업",
+            btnProfileSave: "저장하기", alertProfileSaved: "개인정보가 저장되었습니다.",
+            alertProfileIdRequired: "번호를 먼저 입력해주세요.",
+            optContactNone: "선택하세요",
+            msgPointsEmpty: "클릭하여 추가", confirmPointsEmpty: "클릭하여 추가",
+            messagePointsTitle: "📌 메시지 포인트", confirmPointsTitle: "❓ 확인 필요 메시지"
+        },
+        zh: {
+            lockTitle: "請輸入密碼", lockBtn: "確認", lockError: "密碼錯誤",
+            tabEntry: "登錄", tabProfile: "個人資料",
+            headerEntry: "登錄系統", lblId: "編號", lblName: "姓名", lblDate: "日期",
+            lblType: "回覆類型", lblContent: "回覆內容", optMe: "我回覆", optOther: "對方回覆",
+            btnSubmit: "登錄資料", statusNewId: "✚ 新朋友！系統建議編號：",
+            alertIncomplete: "請填寫所有欄位",
+            alertUpdate: "已更新資料：", alertCreate: "已建立新檔案：",
+            errIdConflict: "錯誤：此編號已經被其他人使用。",
+            errNameConflict: "錯誤：此姓名已經擁有另一個編號。",
+            msgCloudError: "尚未設定 Firebase。",
+            headerProfile: "個人資料登錄", lblProfileId: "編號", lblProfileName: "姓名",
+            lblProfileLocation: "居住地", lblProfilePhone: "手機", lblProfileContact: "聯絡方法",
+            lblProfileContactId: "聯絡方式ID", lblProfileBirthday: "生日 / 年紀", ageUnit: "歲",
+            lblProfileMbti: "MBTI", lblProfileJob: "職業",
+            btnProfileSave: "儲存", alertProfileSaved: "個人資料已儲存。",
+            alertProfileIdRequired: "請先輸入編號。",
+            optContactNone: "請選擇",
+            msgPointsEmpty: "點擊 + 新增", confirmPointsEmpty: "點擊 + 新增",
+            messagePointsTitle: "📌 訊息重點", confirmPointsTitle: "❓ 需確認的訊息"
+        }
+    };
+
+    // 密碼驗證
+    async function hashPassword(pw) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(pw);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.unlock = async () => {
+        const input = document.getElementById('lockInput').value;
+        const hash = await hashPassword(input);
+        if (hash === PASSWORD_HASH) {
+            document.getElementById('lockScreen').classList.add('hidden');
+            document.getElementById('mainApp').style.display = 'block';
+            localStorage.setItem('entry_unlocked', Date.now().toString());
+        } else {
+            document.getElementById('lockError').textContent = i18n[currentLang].lockError;
+        }
+    };
+
+    // 自動解鎖（1小時內）
+    const unlockTime = parseInt(localStorage.getItem('entry_unlocked') || '0');
+    if (Date.now() - unlockTime < 3600000) {
+        document.getElementById('lockScreen').classList.add('hidden');
+        document.getElementById('mainApp').style.display = 'block';
+    }
+
+    // 頁面切換
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        if (tab === 'entry') {
+            document.getElementById('entryPage').classList.add('active');
+            document.getElementById('tabEntry').classList.add('active');
+        } else {
+            document.getElementById('profilePage').classList.add('active');
+            document.getElementById('tabProfile').classList.add('active');
+        }
+    };
+
+    // 語言
+    window.setLang = (lang) => {
+        currentLang = lang;
+        localStorage.setItem('app_lang', lang);
+        applyLang();
+    };
+
+    function applyLang() {
+        const t = i18n[currentLang];
+        document.querySelector('.lang-select').value = currentLang;
+        const map = {
+            'lockTitle': t.lockTitle, 'lockBtn': t.lockBtn,
+            'tabEntry': t.tabEntry, 'tabProfile': t.tabProfile,
+            'txt-entry-header': t.headerEntry, 'lbl-id': t.lblId, 'lbl-name': t.lblName,
+            'lbl-date': t.lblDate, 'lbl-type': t.lblType, 'lbl-content': t.lblContent,
+            'opt-me': t.optMe, 'opt-other': t.optOther, 'btn-submit': t.btnSubmit,
+            'txt-profile-header': t.headerProfile, 'lbl-profile-id': t.lblProfileId,
+            'lbl-profile-name': t.lblProfileName, 'lbl-profile-location': t.lblProfileLocation,
+            'lbl-profile-phone': t.lblProfilePhone, 'lbl-profile-contact': t.lblProfileContact,
+            'lbl-profile-contact-id': t.lblProfileContactId, 'lbl-profile-birthday': t.lblProfileBirthday,
+            'lbl-profile-mbti': t.lblProfileMbti, 'lbl-profile-job': t.lblProfileJob,
+            'btn-profile-save': t.btnProfileSave, 'age-unit': t.ageUnit,
+            'opt-contact-none': t.optContactNone,
+            'messagePointsTitle': t.messagePointsTitle, 'confirmPointsTitle': t.confirmPointsTitle,
+            'messagePointsEmpty': t.msgPointsEmpty, 'confirmPointsEmpty': t.confirmPointsEmpty
+        };
+        for (const [id, text] of Object.entries(map)) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+    }
+
+    // 日期初始化
+    function updateDateInput() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const dateInput = document.getElementById('recordDate');
+        if (dateInput && !dateInput.value) dateInput.value = `${y}-${m}-${d}`;
+    }
+
+    // 登錄相關函數
+    window.handleIdInput = () => {
+        const id = document.getElementById('idInput').value.trim();
+        const user = localDb.find(u => u.id === id);
+        const statusMsg = document.getElementById('statusMsg');
+        if (user) {
+            statusMsg.textContent = `${user.name} (ID: ${user.id})`;
+            statusMsg.style.color = 'var(--primary-green)';
+            document.getElementById('nameInput').value = user.name;
+            updateReplyOption(user.name);
+        } else if (id.length === 4) {
+            statusMsg.textContent = i18n[currentLang].statusNewId + id;
+            statusMsg.style.color = '#e65100';
+            updateReplyOption(null);
+        } else {
+            statusMsg.textContent = '';
+            updateReplyOption(null);
+        }
+    };
+
+    window.handleNameInput = () => {
+        const name = document.getElementById('nameInput').value.trim();
+        const user = localDb.find(u => u.name === name);
+        if (user) {
+            document.getElementById('idInput').value = user.id;
+            window.handleIdInput();
+        }
+    };
+
+    function updateReplyOption(name) {
+        const meOpt = document.getElementById('opt-me');
+        const otherOpt = document.getElementById('opt-other');
+        const t = i18n[currentLang];
+        if (name) {
+            meOpt.textContent = t.optMe;
+            otherOpt.textContent = `${name} ${t.optOther}`;
+        } else {
+            meOpt.textContent = t.optMe;
+            otherOpt.textContent = t.optOther;
+        }
+    }
+
+    // 訊息重點
+    let msgPointCounter = 0, confirmPointCounter = 0;
+    window.addMessagePoint = () => {
+        const id = 'mp_' + (++msgPointCounter);
+        document.getElementById('messagePointsEmpty').style.display = 'none';
+        const item = document.createElement('div');
+        item.className = 'message-point-item'; item.id = id;
+        item.innerHTML = `<input type="text" class="message-point-input" placeholder="重點..."><button class="message-point-remove" onclick="removeMessagePoint('${id}')">✕</button>`;
+        document.getElementById('messagePointsList').appendChild(item);
+        item.querySelector('input').focus();
+    };
+    window.removeMessagePoint = (id) => { document.getElementById(id)?.remove(); };
+    window.addConfirmPoint = () => {
+        const id = 'cp_' + (++confirmPointCounter);
+        document.getElementById('confirmPointsEmpty').style.display = 'none';
+        const item = document.createElement('div');
+        item.className = 'message-point-item'; item.id = id;
+        item.innerHTML = `<input type="text" class="message-point-input" placeholder="確認事項..."><button class="message-point-remove" onclick="removeConfirmPoint('${id}')">✕</button>`;
+        document.getElementById('confirmPointsList').appendChild(item);
+        item.querySelector('input').focus();
+    };
+    window.removeConfirmPoint = (id) => { document.getElementById(id)?.remove(); };
+
+    function getMessagePoints() {
+        return Array.from(document.querySelectorAll('#messagePointsList .message-point-input')).map(i => i.value.trim()).filter(v => v);
+    }
+    function getConfirmPoints() {
+        return Array.from(document.querySelectorAll('#confirmPointsList .message-point-input')).map(i => i.value.trim()).filter(v => v);
+    }
+
+    // 提交資料
+    window.submitData = async () => {
+        if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
+        const t = i18n[currentLang];
+        const id = document.getElementById('idInput').value.trim();
+        const name = document.getElementById('nameInput').value.trim();
+        const date = document.getElementById('recordDate').value;
+        const typeSelect = document.getElementById('replyType').value;
+        const content = document.getElementById('content').value.trim();
+        if (!id || !name || !date || !content) { alert(t.alertIncomplete); return; }
+
+        const existById = localDb.find(u => u.id === id);
+        if (existById && existById.name !== name) { alert(t.errIdConflict); return; }
+        const existByName = localDb.find(u => u.name === name);
+        if (existByName && existByName.id !== id) { alert(t.errNameConflict); return; }
+
+        const messagePoints = getMessagePoints();
+        const confirmPoints = getConfirmPoints();
+        const newLog = { date, type: typeSelect === 'me' ? 'me' : 'other', content, createdAt: Date.now(), messagePoints: messagePoints.length > 0 ? messagePoints : null, confirmPoints: confirmPoints.length > 0 ? confirmPoints : null };
+
+        const userRef = doc(dbInstance, "missionary_data", id);
+        let updatedLogs = [];
+        if (existById) {
+            updatedLogs = [...(existById.logs || []), newLog];
+            await updateDoc(userRef, { logs: updatedLogs });
+            alert(t.alertUpdate + name);
+        } else {
+            updatedLogs = [newLog];
+            await setDoc(userRef, { id, name, logs: updatedLogs });
+            alert(t.alertCreate + name);
+        }
+        document.getElementById('content').value = '';
+        document.querySelectorAll('.message-point-item').forEach(i => i.remove());
+    };
+
+    // 個人資料
+    window.handleProfileIdInput = () => {
+        const id = document.getElementById('profileIdInput').value.trim();
+        const user = localDb.find(u => u.id === id);
+        const statusMsg = document.getElementById('profileStatusMsg');
+        if (user) {
+            statusMsg.textContent = `${user.name} (ID: ${user.id})`;
+            document.getElementById('profileNameInput').value = user.name;
+            if (user.profile) {
+                const p = user.profile;
+                document.getElementById('profileLocation').value = p.location || '';
+                document.getElementById('profilePhone').value = p.phone || '';
+                document.getElementById('profileContact').value = p.contact || '';
+                document.getElementById('profileContactId').value = p.contactId || '';
+                document.getElementById('profileBirthYear').value = p.birthYear || '';
+                document.getElementById('profileBirthMonth').value = p.birthMonth || '';
+                document.getElementById('profileBirthDay').value = p.birthDay || '';
+                document.getElementById('profileAge').value = p.age || '';
+                document.getElementById('profileMbti').value = p.mbti || '';
+                document.getElementById('profileJob').value = p.job || '';
+            }
+        } else { statusMsg.textContent = ''; }
+    };
+    window.handleProfileNameInput = () => {
+        const name = document.getElementById('profileNameInput').value.trim();
+        const user = localDb.find(u => u.name === name);
+        if (user) { document.getElementById('profileIdInput').value = user.id; window.handleProfileIdInput(); }
+    };
+    window.saveProfile = async () => {
+        if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
+        const t = i18n[currentLang];
+        const id = document.getElementById('profileIdInput').value.trim();
+        const name = document.getElementById('profileNameInput').value.trim();
+        if (!id) { alert(t.alertProfileIdRequired); return; }
+        const profileData = {
+            location: document.getElementById('profileLocation').value.trim(),
+            phone: document.getElementById('profilePhone').value.trim(),
+            contact: document.getElementById('profileContact').value,
+            contactId: document.getElementById('profileContactId').value.trim(),
+            birthYear: document.getElementById('profileBirthYear').value.trim(),
+            birthMonth: document.getElementById('profileBirthMonth').value.trim(),
+            birthDay: document.getElementById('profileBirthDay').value.trim(),
+            age: document.getElementById('profileAge').value.trim(),
+            mbti: document.getElementById('profileMbti').value.trim().toUpperCase(),
+            job: document.getElementById('profileJob').value.trim()
+        };
+        const userRef = doc(dbInstance, "missionary_data", id);
+        const existing = localDb.find(u => u.id === id);
+        if (existing) { await updateDoc(userRef, { profile: profileData }); }
+        else if (name) { await setDoc(userRef, { id, name, logs: [], profile: profileData }); }
+        else { alert(t.alertIncomplete); return; }
+        alert(t.alertProfileSaved);
+    };
+
+    window.handleBirthYearInput = (input) => { input.value = input.value.replace(/[^0-9]/g, ''); if (input.value.length === 4) document.getElementById('profileBirthMonth').focus(); };
+    window.handleBirthMonthInput = (input) => { input.value = input.value.replace(/[^0-9]/g, ''); if (input.value.length === 2) document.getElementById('profileBirthDay').focus(); };
+    window.handleBirthDayInput = (input) => { input.value = input.value.replace(/[^0-9]/g, ''); };
+
+    window.onload = () => { applyLang(); updateDateInput(); };
+</script>
+</body>
+</html>
