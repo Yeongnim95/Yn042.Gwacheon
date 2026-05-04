@@ -3524,9 +3524,7 @@
                     <span class="submenu-arrow">▶</span>
                 </div>
                 <div class="menu-submenu" id="submenu-fruit">
-                    <button class="menu-btn" onclick="window.switchPage('entry')" id="btn-entry">등록 시스템</button>
-                    <button class="menu-btn" onclick="window.switchPage('backend')" id="btn-backend">백엔드 관리</button>
-                    <button class="menu-btn" onclick="window.switchPage('profile')" id="btn-profile">개인정보</button>
+                    <button class="menu-btn" onclick="window.switchPage('backend')" id="btn-backend">교류 관리</button>
                 </div>
             </div>
         </div>
@@ -4054,24 +4052,14 @@
     </div>
 
     <div id="backendSection" class="page-section">
-        <h2 id="txt-backend-header">온라인 데이터 관리</h2>
+        <h2 id="txt-backend-header">교류 관리</h2>
         
         <div class="backend-toolbar">
             <div class="toolbar-left">
                 <span class="stat-item" id="txt-total-count">섭외자: 0명</span>
                 <span class="stat-divider">|</span>
-                <span class="stat-item highlight-stat" id="txt-interaction-count">실제 교류 (대화): 0명</span>
-
-                <div class="edit-controls" id="editControls">
-                    <span class="stat-divider">|</span>
-                    <label style="display:flex; align-items:center; cursor:pointer;">
-                        <input type="checkbox" id="selectAll" onclick="window.toggleSelectAll()" style="width:18px; height:18px; margin-right:5px;">
-                        <span id="txt-select-all">전체 선택</span>
-                    </label>
-                    <button class="delete-btn" onclick="window.deleteSelected()" id="btn-delete">선택 삭제</button>
-                </div>
+                <span class="stat-item highlight-stat" id="txt-interaction-count">주간 교류: 0명</span>
             </div>
-            <button class="toggle-edit-btn" onclick="window.toggleEditMode()" id="btn-toggle-edit">편집</button>
         </div>
 
         <div class="list-container" id="dataListContainer">
@@ -4303,7 +4291,7 @@
             // 首頁第二頁
             homeFeatBibleTitle: "성경", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
             homeFeatAutoTitle: "신앙 자동화 관리", homeFeatAutoDesc: "신앙 생활을 체계적으로\n관리하고 성장하는 도구",
-            homeFeatDataTitle: "데이터 관리", homeFeatDataDesc: "기록된 데이터를 확인하고\n열매를 관리하세요",
+            homeFeatDataTitle: "교류 관리", homeFeatDataDesc: "기록된 데이터를 확인하고\n열매를 관리하세요",
             // 今日默想
             dailyVerseLabel: "오늘의 묵상", scrollHint: "아래로 스크롤",
             // 我的信仰
@@ -4318,12 +4306,12 @@
             // 果子資訊
             btnEntry: "등록 시스템", btnOfflineEntry: "오프라인 등록", 
             btnProfile: "개인정보", 
-            btnBackend: "백엔드 관리", btnOfflineBackend: "오프라인 데이터",
+            btnBackend: "교류 관리", btnOfflineBackend: "오프라인 데이터",
             headerEntry: "등록 시스템", lblId: "번호", lblName: "이름",
             lblDate: "날짜", lblType: "회신 유형", lblContent: "내용",
             optMe: "내가 회신", optOther: "상대방 회신",
             phId: "0000-4999 사이의 4자리 번호 입력", phName: "예: 김철수", phContent: "대화 내용이나 기도 제목 입력...",
-            btnSubmit: "등록하기", headerBackend: "백엔드 관리",
+            btnSubmit: "등록하기", headerBackend: "교류 관리",
             txtSelectAll: "전체 선택", txtTotal: "섭외자: ", txtPerson: "명",
             txtWeeklyInteraction: "주간 교류: ",
             btnDelete: "선택 삭제", btnEdit: "편집", btnDone: "완료",
@@ -4381,7 +4369,7 @@
             // 首頁第二頁
             homeFeatBibleTitle: "聖經", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
             homeFeatAutoTitle: "信仰自動化管理", homeFeatAutoDesc: "系統化管理信仰生活，\n持續成長的工具",
-            homeFeatDataTitle: "資料管理", homeFeatDataDesc: "確認記錄的數據，\n管理結出的果子",
+            homeFeatDataTitle: "交流管理", homeFeatDataDesc: "確認記錄的數據，\n管理結出的果子",
             // 今日默想
             dailyVerseLabel: "今日默想", scrollHint: "向下滾動",
             // 我的信仰
@@ -4396,12 +4384,12 @@
             // 果子資訊
             btnEntry: "登錄系統", btnOfflineEntry: "線下登錄", 
             btnProfile: "個人資料", 
-            btnBackend: "後台管理", btnOfflineBackend: "線下後台",
+            btnBackend: "交流管理", btnOfflineBackend: "線下後台",
             headerEntry: "登錄系統", lblId: "編號", lblName: "姓名",
             lblDate: "日期", lblType: "回覆類型", lblContent: "回覆內容",
             optMe: "我回覆", optOther: "對方回覆",
             phId: "請輸入0000-4999間的4位編號", phName: "例: 金大中", phContent: "請輸入對話重點或備忘...",
-            btnSubmit: "登錄資料", headerBackend: "線上後台資料",
+            btnSubmit: "登錄資料", headerBackend: "交流管理",
             txtSelectAll: "全選", txtTotal: "涉外者人數: ", txtPerson: " 人",
             txtWeeklyInteraction: "週間交流: ",
             btnDelete: "刪除選取", btnEdit: "編輯", btnDone: "完成",
