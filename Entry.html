@@ -67,22 +67,23 @@
         nav {
             background: var(--bg-secondary); padding: 0 15px;
             display: flex; align-items: center; justify-content: space-between;
-            height: 55px; position: sticky; top: 0; z-index: 100;
+            height: 60px; position: sticky; top: 0; z-index: 100;
             box-shadow: 0 2px 10px var(--shadow-color);
         }
-        .nav-title { font-weight: 700; color: var(--primary-green); font-size: 1rem; }
-        .nav-tabs { display: flex; gap: 4px; }
+        .nav-tabs { display: flex; gap: 0; margin-left: 8px; }
         .nav-tab {
-            padding: 6px 16px; border: 1px solid var(--border-light);
-            border-radius: 20px; background: transparent; cursor: pointer;
-            font-size: 0.85rem; color: var(--text-secondary); font-family: inherit;
-            transition: all 0.3s;
+            padding: 8px 18px; border: 1px solid var(--border-light);
+            background: transparent; cursor: pointer;
+            font-size: 0.88rem; color: var(--text-secondary); font-family: inherit;
+            transition: all 0.3s; font-weight: 500;
         }
+        .nav-tab:first-child { border-radius: 20px 0 0 20px; border-right: none; }
+        .nav-tab:last-child { border-radius: 0 20px 20px 0; }
         .nav-tab.active { background: var(--primary-green); color: white; border-color: var(--primary-green); }
         .lang-select {
-            padding: 4px 8px; border: 1px solid var(--border-light);
+            padding: 5px 10px; border: 1px solid var(--border-light);
             border-radius: 5px; background: var(--input-bg);
-            font-size: 0.85rem; color: var(--text-secondary); outline: none;
+            font-size: 0.88rem; color: var(--text-secondary); outline: none; font-family: inherit;
         }
 
         /* 容器 */
@@ -159,10 +160,12 @@
 <!-- 主介面 -->
 <div id="mainApp" style="display:none;">
 <nav>
-    <span class="nav-title">🌱 Entry</span>
-    <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchTab('entry')" id="tabEntry">등록</button>
-        <button class="nav-tab" onclick="switchTab('profile')" id="tabProfile">개인정보</button>
+    <div style="display:flex; align-items:center;">
+        <span style="font-size:1.5rem; margin-right:10px;">🌱</span>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('entry')" id="tabEntry">등록</button>
+            <button class="nav-tab" onclick="switchTab('profile')" id="tabProfile">개인정보</button>
+        </div>
     </div>
     <select class="lang-select" onchange="setLang(this.value)">
         <option value="ko">한국어</option>
