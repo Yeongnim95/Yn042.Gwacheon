@@ -30,9 +30,11 @@
         .lock-btn { padding: 10px 40px; border: none; border-radius: 10px; background: var(--primary-green); color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
         .lock-error { color: var(--danger-red); font-size: 0.85rem; min-height: 20px; }
 
-        nav { background: var(--bg-secondary); padding: 0 15px; display: flex; align-items: center; justify-content: space-between; height: 55px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px var(--shadow-color); }
-        .nav-title { font-weight: 700; color: var(--primary-green); font-size: 1rem; }
-        .lang-select { padding: 4px 8px; border: 1px solid var(--border-light); border-radius: 5px; background: var(--input-bg); font-size: 0.85rem; color: var(--text-secondary); outline: none; }
+        nav { background: var(--bg-secondary); padding: 0 15px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px var(--shadow-color); }
+        .nav-left { display: flex; align-items: center; }
+        .nav-title-icon { font-size: 1.5rem; margin-right: 10px; }
+        .nav-title-text { font-weight: 700; color: var(--primary-green); font-size: 1rem; }
+        .lang-select { padding: 5px 10px; border: 1px solid var(--border-light); border-radius: 5px; background: var(--input-bg); font-size: 0.88rem; color: var(--text-secondary); outline: none; font-family: inherit; }
 
         .container { max-width: 1400px; margin: 15px auto; padding: 25px; background: var(--bg-color); border-radius: 16px; box-shadow: 0 10px 30px var(--shadow-color); }
         h2 { color: var(--primary-green); margin-bottom: 8px; font-size: 1.3rem; border-bottom: 3px solid var(--primary-green); padding-bottom: 10px; }
@@ -49,9 +51,9 @@
         .delete-btn { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
 
         .list-container { overflow-x: auto; }
-        .grid-row { display: grid; grid-template-columns: 30px 40px 55px 50px 1fr auto 30px; gap: 8px; align-items: center; padding: 8px 5px; }
-        .list-header-row { background: var(--primary-green); color: white; border-radius: 8px; font-weight: 600; font-size: 0.85rem; position: sticky; top: 55px; z-index: 10; }
-        .sortable { cursor: pointer; }
+        .grid-row { display: grid; grid-template-columns: 30px 40px 55px 55px 1fr 100px 30px; gap: 8px; align-items: center; padding: 10px 8px; }
+        .list-header-row { background: var(--primary-green); color: white; border-radius: 8px; font-weight: 600; font-size: 0.85rem; position: sticky; top: 60px; z-index: 10; }
+        .sortable { cursor: pointer; user-select: none; }
         .check-cell { text-align: center; }
         .action-cell { text-align: center; }
 
@@ -95,7 +97,10 @@
 
 <div id="mainApp" style="display:none;">
 <nav>
-    <span class="nav-title">🌱 Admin</span>
+    <div class="nav-left">
+        <span class="nav-title-icon">🌱</span>
+        <span class="nav-title-text" id="navTitleText">후방 관리</span>
+    </div>
     <select class="lang-select" onchange="setLang(this.value)">
         <option value="ko">한국어</option>
         <option value="zh">中文</option>
@@ -215,6 +220,7 @@
         document.querySelector('.lang-select').value = currentLang;
         document.getElementById('lockTitle').textContent = t.lockTitle;
         document.getElementById('lockBtn').textContent = t.lockBtn;
+        document.getElementById('navTitleText').textContent = t.headerBackend;
         document.getElementById('txt-backend-header').textContent = t.headerBackend;
         document.getElementById('col-id').textContent = t.colId;
         document.getElementById('col-name').textContent = t.colName;
