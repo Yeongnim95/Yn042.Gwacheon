@@ -108,6 +108,7 @@
             cursor: pointer;
             margin-left: 15px;
             transition: all 0.3s;
+            line-height: 1;
         }
         .menu-toggle:hover {
             background: var(--bg-secondary);
@@ -115,16 +116,23 @@
         .hamburger-icon {
             font-size: 1.2rem;
             color: var(--primary-green);
+            line-height: 1;
+            display: flex;
+            align-items: center;
         }
         #current-page-title {
             font-size: 0.95rem;
             font-weight: 500;
             color: #333;
+            line-height: 1;
         }
         .dropdown-arrow {
             font-size: 0.7rem;
             color: #666;
             transition: transform 0.3s;
+            line-height: 1;
+            display: flex;
+            align-items: center;
         }
         .menu-toggle.open .dropdown-arrow {
             transform: rotate(180deg);
@@ -257,7 +265,7 @@
         .nav-ai-btn {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             padding: 5px 10px;
             border: 1px solid var(--border-light);
             border-radius: 5px;
@@ -265,14 +273,16 @@
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
+            line-height: 1;
         }
         .nav-ai-btn:hover { background: var(--bg-secondary); }
         .nav-ai-text {
             font-size: 0.75rem;
             font-weight: 700;
             color: var(--primary-green);
+            line-height: 1;
         }
-        .nav-ai-btn svg { color: var(--text-secondary); }
+        .nav-ai-btn svg { color: var(--text-secondary); display: block; }
         
         /* 首頁時AI按鈕白色 */
         body.home-active .nav-ai-btn {
@@ -5957,417 +5967,87 @@
         
         document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
     }
-    
-    // ===== 天氣功能 =====
-    const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000; // 30分鐘更新一次
-    let weatherUpdateTimer = null;
-    let lastWeatherData = null;
-    
-    const weatherIcons = {
-        // 白天圖示
-        clearDay: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="22" fill="#FFB300"/>
-            <g stroke="#FFB300" stroke-width="4" stroke-linecap="round">
-                <line x1="50" y1="10" x2="50" y2="22"/>
-                <line x1="50" y1="78" x2="50" y2="90"/>
-                <line x1="10" y1="50" x2="22" y2="50"/>
-                <line x1="78" y1="50" x2="90" y2="50"/>
-                <line x1="21.7" y1="21.7" x2="30.2" y2="30.2"/>
-                <line x1="69.8" y1="69.8" x2="78.3" y2="78.3"/>
-                <line x1="21.7" y1="78.3" x2="30.2" y2="69.8"/>
-                <line x1="69.8" y1="30.2" x2="78.3" y2="21.7"/>
-            </g>
-        </svg>`,
-        // 夜間月亮圖示
-        clearNight: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M55 15C35 15 20 32 20 52s15 37 35 37c8 0 15-2.5 21-7-5 2-10 3-16 3-20 0-36-16-36-36 0-15 9-28 22-34-3 0-6 0-9 0z" fill="#FFD54F"/>
-            <circle cx="70" cy="25" r="2" fill="#FFD54F"/>
-            <circle cx="80" cy="40" r="1.5" fill="#FFD54F"/>
-            <circle cx="85" cy="55" r="2" fill="#FFD54F"/>
-            <circle cx="78" cy="70" r="1.5" fill="#FFD54F"/>
-        </svg>`,
-        cloudy: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="55" cy="55" rx="30" ry="20" fill="#90A4AE"/>
-            <ellipse cx="35" cy="60" rx="22" ry="15" fill="#B0BEC5"/>
-            <ellipse cx="65" cy="58" rx="18" ry="14" fill="#B0BEC5"/>
-        </svg>`,
-        partlyCloudyDay: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="35" cy="35" r="16" fill="#FFB300"/>
-            <g stroke="#FFB300" stroke-width="3" stroke-linecap="round">
-                <line x1="35" y1="8" x2="35" y2="15"/>
-                <line x1="35" y1="55" x2="35" y2="48"/>
-                <line x1="8" y1="35" x2="15" y2="35"/>
-                <line x1="55" y1="35" x2="62" y2="35"/>
-            </g>
-            <ellipse cx="58" cy="62" rx="26" ry="17" fill="#90A4AE"/>
-            <ellipse cx="40" cy="66" rx="20" ry="13" fill="#B0BEC5"/>
-            <ellipse cx="68" cy="64" rx="16" ry="12" fill="#B0BEC5"/>
-        </svg>`,
-        partlyCloudyNight: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M38 18C28 18 20 27 20 38c0 5 2 9 5 12-1 0-2 0-3 0 0 0 0 0 0 0" fill="none"/>
-            <path d="M35 15c-8 0-15 5-18 12 2-1 5-1 7-1 10 0 18 8 18 18 0 3-1 6-2 8h2c0 0 0 0 0 0" fill="#FFD54F"/>
-            <ellipse cx="58" cy="62" rx="26" ry="17" fill="#90A4AE"/>
-            <ellipse cx="40" cy="66" rx="20" ry="13" fill="#B0BEC5"/>
-            <ellipse cx="68" cy="64" rx="16" ry="12" fill="#B0BEC5"/>
-        </svg>`,
-        rain: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="50" cy="40" rx="28" ry="18" fill="#78909C"/>
-            <ellipse cx="32" cy="44" rx="20" ry="14" fill="#90A4AE"/>
-            <ellipse cx="65" cy="42" rx="18" ry="13" fill="#90A4AE"/>
-            <g stroke="#42A5F5" stroke-width="3" stroke-linecap="round">
-                <line x1="30" y1="60" x2="26" y2="75"/>
-                <line x1="45" y1="62" x2="41" y2="80"/>
-                <line x1="60" y1="60" x2="56" y2="78"/>
-                <line x1="75" y1="58" x2="71" y2="73"/>
-            </g>
-        </svg>`,
-        snow: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="50" cy="35" rx="28" ry="18" fill="#78909C"/>
-            <ellipse cx="32" cy="39" rx="20" ry="14" fill="#90A4AE"/>
-            <ellipse cx="65" cy="37" rx="18" ry="13" fill="#90A4AE"/>
-            <circle cx="30" cy="65" r="4" fill="#B3E5FC"/>
-            <circle cx="50" cy="70" r="4" fill="#B3E5FC"/>
-            <circle cx="70" cy="63" r="4" fill="#B3E5FC"/>
-            <circle cx="40" cy="82" r="3" fill="#B3E5FC"/>
-            <circle cx="60" cy="85" r="3" fill="#B3E5FC"/>
-        </svg>`,
-        thunder: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="50" cy="35" rx="28" ry="18" fill="#546E7A"/>
-            <ellipse cx="32" cy="39" rx="20" ry="14" fill="#607D8B"/>
-            <ellipse cx="65" cy="37" rx="18" ry="13" fill="#607D8B"/>
-            <polygon points="55,50 45,68 52,68 47,88 62,62 54,62" fill="#FFC107"/>
-        </svg>`,
-        fog: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g stroke="#90A4AE" stroke-width="5" stroke-linecap="round">
-                <line x1="20" y1="35" x2="80" y2="35"/>
-                <line x1="25" y1="50" x2="75" y2="50"/>
-                <line x1="20" y1="65" x2="80" y2="65"/>
-                <line x1="30" y1="80" x2="70" y2="80"/>
-            </g>
-        </svg>`
-    };
-    
-    function isNightTime() {
-        const hour = new Date().getHours();
-        return hour < 6 || hour >= 18; // 18:00-06:00 視為夜間
-    }
-    
-    function getWeatherIcon(code, isNight = false) {
-        // WMO Weather interpretation codes
-        if (code >= 95 && code <= 99) return weatherIcons.thunder;
-        if (code >= 80 && code <= 82) return weatherIcons.rain;
-        if (code >= 85 && code <= 86) return weatherIcons.snow;
-        if (code >= 71 && code <= 77) return weatherIcons.snow;
-        if (code >= 66 && code <= 67) return weatherIcons.rain;
-        if (code >= 61 && code <= 65) return weatherIcons.rain;
-        if (code >= 56 && code <= 57) return weatherIcons.rain;
-        if (code >= 51 && code <= 55) return weatherIcons.rain;
-        if (code >= 45 && code <= 48) return weatherIcons.fog;
-        if (code === 3) return weatherIcons.cloudy;
-        if (code === 2) return isNight ? weatherIcons.partlyCloudyNight : weatherIcons.partlyCloudyDay;
-        if (code === 1) return isNight ? weatherIcons.partlyCloudyNight : weatherIcons.partlyCloudyDay;
-        if (code === 0) return isNight ? weatherIcons.clearNight : weatherIcons.clearDay;
-        return isNight ? weatherIcons.clearNight : weatherIcons.clearDay;
-    }
-    
-    async function loadWeather(forceRefresh = false) {
-        const loading = document.getElementById('weatherLoading');
-        const content = document.getElementById('weatherContent');
-        const error = document.getElementById('weatherError');
-        
-        // 檢查是否有快取且未過期
-        const cached = localStorage.getItem('weather_cache');
-        if (cached && !forceRefresh) {
-            try {
-                const cacheData = JSON.parse(cached);
-                if (Date.now() - cacheData.timestamp < WEATHER_UPDATE_INTERVAL) {
-                    displayWeatherData(cacheData);
-                    scheduleWeatherUpdate();
-                    return;
-                }
-            } catch (e) {}
-        }
-        
-        // 更新載入文字
-        document.getElementById('weatherLoadingText').textContent = 
-            currentLang === 'ko' ? '날씨 정보 로딩 중...' : '正在載入天氣資訊...';
-        document.getElementById('weatherErrorText').textContent = 
-            currentLang === 'ko' ? '날씨 정보를 불러올 수 없습니다' : '無法載入天氣資訊';
-        
-        loading.style.display = 'flex';
-        content.style.display = 'none';
-        error.style.display = 'none';
-        
-        try {
-            let latitude, longitude;
-            
-            // 檢查是否有已儲存的永久位置
-            const savedLocation = localStorage.getItem('weather_location_permanent');
-            
-            if (savedLocation && !forceRefresh) {
-                // 使用已儲存的位置
-                const loc = JSON.parse(savedLocation);
-                latitude = loc.latitude;
-                longitude = loc.longitude;
-            } else {
-                // 嘗試取得位置
-                const coords = await getLocationCoords();
-                latitude = coords.latitude;
-                longitude = coords.longitude;
-                
-                // 如果是GPS定位成功，永久儲存
-                if (coords.source === 'gps') {
-                    localStorage.setItem('weather_location_permanent', JSON.stringify({
-                        latitude,
-                        longitude,
-                        source: 'gps',
-                        savedAt: Date.now()
-                    }));
-                }
-            }
-            
-            // 呼叫 Open-Meteo API
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,is_day&timezone=auto`;
-            const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=${currentLang === 'ko' ? 'ko' : 'zh-TW'}`;
-            
-            const [weatherRes, geoRes] = await Promise.all([
-                fetch(weatherUrl),
-                fetch(geoUrl, { headers: { 'User-Agent': 'PreachingTracker/1.0' } })
-            ]);
-            
-            const weatherData = await weatherRes.json();
-            const geoData = await geoRes.json();
-            
-            // 解析位置名稱
-            let locationName = '';
-            if (geoData.address) {
-                const addr = geoData.address;
-                locationName = addr.city || addr.town || addr.village || addr.county || addr.state || '';
-            }
-            
-            // 建立快取資料
-            const cacheData = {
-                timestamp: Date.now(),
-                temperature: weatherData.current.temperature_2m,
-                weatherCode: weatherData.current.weather_code,
-                isDay: weatherData.current.is_day === 1,
-                locationName: locationName,
-                latitude,
-                longitude,
-                lang: currentLang
-            };
-            
-            // 儲存快取
-            localStorage.setItem('weather_cache', JSON.stringify(cacheData));
-            
-            // 顯示天氣
-            displayWeatherData(cacheData);
-            scheduleWeatherUpdate();
-            
-        } catch (err) {
-            console.error('Weather error:', err);
-            loading.style.display = 'none';
-            content.style.display = 'none';
-            error.style.display = 'block';
-        }
-    }
-    
-    // 取得位置座標（優先GPS，失敗則用IP定位）
-    async function getLocationCoords() {
-        // 先嘗試GPS定位
-        try {
-            const position = await new Promise((resolve, reject) => {
-                if (!navigator.geolocation) {
-                    reject(new Error('Geolocation not supported'));
-                    return;
-                }
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 8000,
-                    maximumAge: 0
-                });
-            });
-            
-            return {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                source: 'gps'
-            };
-        } catch (gpsError) {
-            console.log('GPS定位失敗，嘗試IP定位:', gpsError.message);
-            
-            // GPS失敗，改用IP定位
-            try {
-                // 使用免費的IP定位API
-                const ipRes = await fetch('https://ipapi.co/json/');
-                if (ipRes.ok) {
-                    const ipData = await ipRes.json();
-                    if (ipData.latitude && ipData.longitude) {
-                        return {
-                            latitude: ipData.latitude,
-                            longitude: ipData.longitude,
-                            source: 'ip'
-                        };
-                    }
-                }
-            } catch (ipError) {
-                console.log('IP定位也失敗:', ipError.message);
-            }
-            
-            // 備用：嘗試另一個IP定位服務
-            try {
-                const ip2Res = await fetch('https://ip-api.com/json/?fields=lat,lon');
-                if (ip2Res.ok) {
-                    const ip2Data = await ip2Res.json();
-                    if (ip2Data.lat && ip2Data.lon) {
-                        return {
-                            latitude: ip2Data.lat,
-                            longitude: ip2Data.lon,
-                            source: 'ip'
-                        };
-                    }
-                }
-            } catch (ip2Error) {
-                console.log('備用IP定位失敗:', ip2Error.message);
-            }
-            
-            throw new Error('無法取得位置');
-        }
-    }
-    
-    function displayWeatherData(data) {
-        // 選單內天氣顯示
-        const menuLoading = document.getElementById('menuWeatherLoading');
-        const menuContent = document.getElementById('menuWeatherContent');
-        const menuError = document.getElementById('menuWeatherError');
-        
-        const isNight = !data.isDay || isNightTime();
-        
-        if (menuLoading && menuContent) {
-            document.getElementById('menuWeatherLocation').textContent = data.locationName || (currentLang === 'ko' ? '현재 위치' : '目前位置');
-            document.getElementById('menuWeatherTemp').textContent = `${Math.round(data.temperature)}°`;
-            document.getElementById('menuWeatherIcon').innerHTML = getWeatherIcon(data.weatherCode, isNight);
-            document.getElementById('menuWeatherDesc').textContent = getWeatherDescription(data.weatherCode);
-            
-            menuLoading.style.display = 'none';
-            menuContent.style.display = 'flex';
-            if (menuError) menuError.style.display = 'none';
-        }
-    }
-    
-    function showWeatherError() {
-        const menuLoading = document.getElementById('menuWeatherLoading');
-        const menuContent = document.getElementById('menuWeatherContent');
-        const menuError = document.getElementById('menuWeatherError');
-        
-        if (menuLoading) menuLoading.style.display = 'none';
-        if (menuContent) menuContent.style.display = 'none';
-        if (menuError) menuError.style.display = 'block';
-    }
-    
-    // ===== 今日默想功能 =====
+
+    // ===== 每日經文系統（首爾時間 UTC+9） =====
     const DAILY_VERSE_KEY = 'daily_verse_cache';
-    const DAILY_VERSE_HISTORY_KEY = 'daily_verse_history'; // 60天歷史記錄
+    const DAILY_VERSE_HISTORY_KEY = 'daily_verse_history';
     
-    // 一次性清除舊版快取（版本升級時觸發）
-    const VERSE_CACHE_VERSION = '2026.05.04';
+    // 一次性清除舊版快取
+    const VERSE_CACHE_VERSION = '2026.05.04.v2';
     if (localStorage.getItem('verse_cache_version') !== VERSE_CACHE_VERSION) {
         localStorage.removeItem(DAILY_VERSE_KEY);
         localStorage.setItem('verse_cache_version', VERSE_CACHE_VERSION);
     }
     
-    // 取得今日種子（基於日期）
+    // 取得今日種子（首爾時間 UTC+9，所有裝置統一）
     function getDailySeed() {
-        const today = new Date();
-        return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        const now = new Date();
+        const seoulTime = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
+        return seoulTime.getFullYear() * 10000 + (seoulTime.getMonth() + 1) * 100 + seoulTime.getDate();
     }
     
-    // 基於種子的偽隨機數生成器
     function seededRandom(seed) {
         const x = Math.sin(seed) * 10000;
         return x - Math.floor(x);
     }
     
-    // 取得60天內已用過的經文key
     function getVerseHistory() {
         try {
             const data = JSON.parse(localStorage.getItem(DAILY_VERSE_HISTORY_KEY) || '[]');
             const now = Date.now();
             const sixtyDays = 60 * 24 * 60 * 60 * 1000;
-            // 過濾掉超過60天的記錄
             return data.filter(item => (now - item.timestamp) < sixtyDays);
-        } catch (e) {
-            return [];
-        }
+        } catch (e) { return []; }
     }
     
-    // 記錄已使用的經文
     function recordVerseUsed(verseKey) {
         const history = getVerseHistory();
         history.push({ key: verseKey, timestamp: Date.now() });
         localStorage.setItem(DAILY_VERSE_HISTORY_KEY, JSON.stringify(history));
     }
     
-    // 從聖經資料庫取得今日章節（60天不重複）
     function getDailyVerse() {
         const todaySeed = getDailySeed();
         
-        // 檢查快取是否為今天的
         const cached = localStorage.getItem(DAILY_VERSE_KEY);
         if (cached) {
             try {
                 const cacheData = JSON.parse(cached);
-                if (cacheData.seed === todaySeed) {
-                    return cacheData;
-                }
+                if (cacheData.seed === todaySeed) return cacheData;
             } catch(e) {}
         }
         
-        // 收集所有可用的經文（bookId + chapter + verse）
         const allBooks = [...(bibleBooks?.oldTestament || []), ...(bibleBooks?.newTestament || [])];
         const allVerses = [];
         
         for (const book of allBooks) {
             const bookData = bibleContent[book.id];
             if (!bookData) continue;
-            
             for (const chapter of Object.keys(bookData)) {
                 const verses = bookData[chapter].filter(v => v.verse);
                 if (verses.length === 0) continue;
-                
-                // 每章取第一節作為候選（以章為單位）
                 allVerses.push({
-                    bookId: book.id,
-                    bookKo: book.ko,
-                    bookZh: book.zh,
-                    chapter: parseInt(chapter),
-                    verses: verses
+                    bookId: book.id, bookKo: book.ko, bookZh: book.zh,
+                    chapter: parseInt(chapter), verses: verses
                 });
             }
         }
         
-        if (allVerses.length === 0) {
-            return getDailyVerseDefault(todaySeed);
-        }
+        if (allVerses.length === 0) return getDailyVerseDefault(todaySeed);
         
-        // 取得60天歷史，排除已用過的
         const history = getVerseHistory();
         const usedKeys = new Set(history.map(h => h.key));
-        
-        // 過濾掉已用過的章節
         let candidates = allVerses.filter(v => !usedKeys.has(`${v.bookId}_${v.chapter}`));
         
-        // 如果全部都用過了，重置歷史
         if (candidates.length === 0) {
             localStorage.removeItem(DAILY_VERSE_HISTORY_KEY);
             candidates = allVerses;
         }
         
-        // 用種子選擇（確保同一天結果一致）
         const selectedIndex = Math.floor(seededRandom(todaySeed * 7 + 13) * candidates.length);
         const selected = candidates[selectedIndex];
         
-        // 選擇1節經文
+        // 只選一節
         const startIdx = Math.floor(seededRandom(todaySeed * 3 + 7) * selected.verses.length);
         const pickedVerse = selected.verses[startIdx];
         
@@ -6377,18 +6057,11 @@
                 ko: `${selected.bookKo} ${selected.chapter}:${pickedVerse.verse}`,
                 zh: `${selected.bookZh} ${selected.chapter}:${pickedVerse.verse}`
             },
-            text: {
-                ko: pickedVerse.ko,
-                zh: pickedVerse.zh
-            }
+            text: { ko: pickedVerse.ko, zh: pickedVerse.zh }
         };
         
-        // 快取今日經文
         localStorage.setItem(DAILY_VERSE_KEY, JSON.stringify(result));
-        
-        // 記錄到歷史（60天不重複）
         recordVerseUsed(`${selected.bookId}_${selected.chapter}`);
-        
         return result;
     }
     
@@ -6404,7 +6077,6 @@
     let homeScrollHandler = null;
     let homeScrollContainer = null;
     
-    // 初始化今日默想區塊
     function initDailyVerse() {
         const slide1 = document.getElementById('dailyVerseSection');
         const labelEl = document.getElementById('dailyVerseLabel');
@@ -6414,100 +6086,57 @@
         
         if (!slide1) return;
         
-        // 添加首頁class
         document.body.classList.add('home-active');
-        
-        // 設定html背景色和主題色
         document.documentElement.style.backgroundColor = '#f5f0e8';
-        if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', '#f5f0e8');
-        }
+        if (themeColorMeta) themeColorMeta.setAttribute('content', '#f5f0e8');
         
-        // 取得今日經文
         const verse = getDailyVerse();
         
-        // 標題（隨語言變動）
-        if (labelEl) {
-            labelEl.textContent = currentLang === 'ko' ? '매일묵상' : '每日默想';
-        }
+        if (labelEl) labelEl.textContent = currentLang === 'ko' ? '매일묵상' : '每日默想';
+        if (refEl) refEl.textContent = currentLang === 'ko' ? verse.reference.ko : verse.reference.zh;
+        if (textEl) textEl.textContent = currentLang === 'ko' ? verse.text.ko : verse.text.zh;
         
-        // 經文章節引用（只顯示當前語言）
-        if (refEl) {
-            refEl.textContent = currentLang === 'ko' ? verse.reference.ko : verse.reference.zh;
-        }
-        
-        // 經文內容（只顯示當前語言）
-        if (textEl) {
-            textEl.textContent = currentLang === 'ko' ? verse.text.ko : verse.text.zh;
-        }
-        
-        // 滾動到頂部
         const homeContainer = document.querySelector('#homeSection .home-container');
         if (homeContainer) homeContainer.scrollTo(0, 0);
         
-        // 動畫：先淡入圖片+標題
-        setTimeout(() => {
-            slide1.classList.add('loaded');
-        }, 100);
+        setTimeout(() => { slide1.classList.add('loaded'); }, 100);
+        setTimeout(() => { slide1.classList.add('verse-show'); }, 1200);
         
-        // 動畫：經文由左而右淡入
-        setTimeout(() => {
-            slide1.classList.add('verse-show');
-        }, 1200);
-        
-        // 初始化第二頁選項淡入動畫
         initHomeFeatureAnimations();
     }
     
     function setupHomeScrollListener(container) {}
     
-    // 首頁選項滾動淡入動畫
+    function cleanupDailyVerse() {
+        document.body.classList.remove('home-active');
+        document.documentElement.style.backgroundColor = '#f5f0e8';
+        const themeColorMeta = document.getElementById('themeColorMeta');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', '#f5f0e8');
+        const slide1 = document.getElementById('dailyVerseSection');
+        if (slide1) { slide1.classList.remove('loaded'); slide1.classList.remove('verse-show'); }
+    }
+    
     function initHomeFeatureAnimations() {
         const features = document.querySelectorAll('.home-feature');
         if (!features.length) return;
-        
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, i) => {
+            entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    // 依序延遲淡入
                     const delay = Array.from(features).indexOf(entry.target) * 200;
-                    setTimeout(() => {
-                        entry.target.classList.add('visible');
-                    }, delay);
+                    setTimeout(() => { entry.target.classList.add('visible'); }, delay);
                     observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.15 });
-        
         features.forEach(f => observer.observe(f));
     }
     
-    // 離開首頁時清理
-    function cleanupDailyVerse() {
-        document.body.classList.remove('home-active');
-        
-        document.documentElement.style.backgroundColor = '#f5f0e8';
-        
-        const themeColorMeta = document.getElementById('themeColorMeta');
-        if (themeColorMeta) {
-            themeColorMeta.setAttribute('content', '#f5f0e8');
-        }
-        
-        const slide1 = document.getElementById('dailyVerseSection');
-        if (slide1) {
-            slide1.classList.remove('loaded');
-            slide1.classList.remove('verse-show');
-        }
-    }
-    
-    // 檢查並更新今日經文（每日0時）
-    // 版本檢查函數 - 每5分鐘檢查一次是否有新版本
+    // 版本檢查
     async function checkForUpdates() {
         try {
             const res = await fetch(window.location.href, { cache: 'no-store', method: 'HEAD' });
             const etag = res.headers.get('etag') || res.headers.get('last-modified') || '';
             const savedEtag = localStorage.getItem('app_etag');
-            
             if (savedEtag && etag && savedEtag !== etag) {
                 const toast = document.getElementById('versionUpdateToast');
                 const text = document.getElementById('versionUpdateText');
@@ -6516,53 +6145,28 @@
                 if (btn) btn.textContent = currentLang === 'ko' ? '업데이트' : '更新';
                 if (toast) toast.classList.add('show');
             }
-            
             if (etag) localStorage.setItem('app_etag', etag);
         } catch (e) {}
     }
     
     function scheduleDailyVerseUpdate() {
         const now = new Date();
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
-        const msUntilMidnight = tomorrow - now;
+        const seoulNow = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
+        const tomorrow = new Date(seoulNow);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 5, 0); // 00:00:05 首爾時間
+        const msUntilMidnight = tomorrow.getTime() - seoulNow.getTime();
         
         setTimeout(() => {
-            initDailyVerse();
-            scheduleDailyVerseUpdate(); // 遞迴設定下一次
+            localStorage.removeItem(DAILY_VERSE_KEY);
+            if (document.getElementById('homeSection')?.classList.contains('active-section')) {
+                initDailyVerse();
+            }
+            scheduleDailyVerseUpdate();
         }, msUntilMidnight);
     }
-    
-    function scheduleWeatherUpdate() {
-        if (weatherUpdateTimer) {
-            clearTimeout(weatherUpdateTimer);
-        }
-        weatherUpdateTimer = setTimeout(() => {
-            if (document.getElementById('homeSection').classList.contains('active-section')) {
-                loadWeather(true);
-            }
-        }, WEATHER_UPDATE_INTERVAL);
-    }
-    
-    function getWeatherDescription(code) {
-        const isKo = currentLang === 'ko';
-        // WMO Weather interpretation codes
-        if (code === 0) return isKo ? '맑음' : '晴朗';
-        if (code === 1) return isKo ? '대체로 맑음' : '大致晴朗';
-        if (code === 2) return isKo ? '구름 조금' : '局部多雲';
-        if (code === 3) return isKo ? '흐림' : '多雲';
-        if (code >= 45 && code <= 48) return isKo ? '안개' : '霧';
-        if (code >= 51 && code <= 55) return isKo ? '이슬비' : '毛毛雨';
-        if (code >= 56 && code <= 57) return isKo ? '결빙 이슬비' : '凍毛雨';
-        if (code >= 61 && code <= 65) return isKo ? '비' : '雨';
-        if (code >= 66 && code <= 67) return isKo ? '결빙 비' : '凍雨';
-        if (code >= 71 && code <= 75) return isKo ? '눈' : '雪';
-        if (code === 77) return isKo ? '눈 알갱이' : '雪粒';
-        if (code >= 80 && code <= 82) return isKo ? '소나기' : '陣雨';
-        if (code >= 85 && code <= 86) return isKo ? '눈 소나기' : '陣雪';
-        if (code >= 95 && code <= 99) return isKo ? '뇌우' : '雷雨';
-        return isKo ? '알 수 없음' : '未知';
-    }
-    
+    scheduleDailyVerseUpdate();
+
     function updateOfflineCounter() {
         const t = i18n[currentLang];
         const offlineTotalEl = document.getElementById('txt-offline-total-count');
