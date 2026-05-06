@@ -1201,7 +1201,8 @@
     });
 
     // --- 版本檢查 ---
-    // 版本檢查（用 APP_VERSION 比對）
+    // 版本檢查（只通知「已開著舊版」的使用者）
+    const PAGE_LOAD_VERSION = APP_VERSION;
     async function checkForUpdates() {
         try {
             const res = await fetch(window.location.origin + window.location.pathname + '?_v=' + Date.now(), { cache: 'no-store' });
@@ -1209,7 +1210,7 @@
             const match = html.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
             if (match) {
                 const remoteVersion = match[1];
-                if (remoteVersion !== APP_VERSION) {
+                if (remoteVersion !== PAGE_LOAD_VERSION) {
                     const toast = document.getElementById('versionUpdateToast');
                     const text = document.getElementById('versionUpdateText');
                     const btn = document.getElementById('versionUpdateBtn');
