@@ -570,7 +570,7 @@
 
 <script type="module">
     // --- APP VERSION ---
-    const APP_VERSION = '2026.05.04.01';
+    const APP_VERSION = '2026.05.06.01';
     
     // --- FIREBASE SETUP ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1201,20 +1201,23 @@
     });
 
     // --- 版本檢查 ---
+    // 版本檢查（用 APP_VERSION 比對）
     async function checkForUpdates() {
         try {
-            const res = await fetch(window.location.href, { cache: 'no-store', method: 'HEAD' });
-            const etag = res.headers.get('etag') || res.headers.get('last-modified') || '';
-            const savedEtag = localStorage.getItem('admin_etag');
-            if (savedEtag && etag && savedEtag !== etag) {
-                const toast = document.getElementById('versionUpdateToast');
-                const text = document.getElementById('versionUpdateText');
-                const btn = document.getElementById('versionUpdateBtn');
-                if (text) text.textContent = currentLang === 'ko' ? '새 버전이 있습니다. 업데이트해 주세요' : '有新版本可用，請更新網頁';
-                if (btn) btn.textContent = currentLang === 'ko' ? '업데이트' : '更新';
-                if (toast) toast.classList.add('show');
+            const res = await fetch(window.location.origin + window.location.pathname + '?_v=' + Date.now(), { cache: 'no-store' });
+            const html = await res.text();
+            const match = html.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+            if (match) {
+                const remoteVersion = match[1];
+                if (remoteVersion !== APP_VERSION) {
+                    const toast = document.getElementById('versionUpdateToast');
+                    const text = document.getElementById('versionUpdateText');
+                    const btn = document.getElementById('versionUpdateBtn');
+                    if (text) text.textContent = currentLang === 'ko' ? '새 버전이 있습니다. 업데이트해 주세요' : '有新版本可用，請更新網頁';
+                    if (btn) btn.textContent = currentLang === 'ko' ? '업데이트' : '更新';
+                    if (toast) toast.classList.add('show');
+                }
             }
-            if (etag) localStorage.setItem('admin_etag', etag);
         } catch (e) {}
     }
 
@@ -1228,4 +1231,4 @@
 
 </script>
 </body>
-</html>26
+</html>
