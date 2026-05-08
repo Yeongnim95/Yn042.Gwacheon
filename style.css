@@ -3612,16 +3612,16 @@ body.home-active .ai-panel {
     .ai-compose-input-row input { width: 80px !important; }
 }
 
-/* AI Panel compose link button */
+/* AI Panel compose link button (紫色保留) */
 .ai-panel-compose-link {
     display: block;
     width: 100%;
     margin-top: 8px;
     padding: 8px;
-    background: rgba(67, 160, 71, 0.1);
-    border: 1px solid rgba(67, 160, 71, 0.3);
+    background: linear-gradient(135deg, #7c4dff22, #448aff22);
+    border: 1px solid #7c4dff44;
     border-radius: 8px;
-    color: var(--dark-green);
+    color: #7c4dff;
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
@@ -3629,5 +3629,35 @@ body.home-active .ai-panel {
     transition: all 0.2s;
 }
 .ai-panel-compose-link:hover {
-    background: rgba(67, 160, 71, 0.2);
+    background: linear-gradient(135deg, #7c4dff33, #448aff33);
+}
+
+/* ===== 載入中三個點動畫 ===== */
+.loading-dots-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+.loading-dots {
+    display: flex;
+    gap: 8px;
+}
+.loading-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary-green);
+    opacity: 0.3;
+    animation: loadingDotPulse 1.4s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+@keyframes loadingDotPulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(1); }
+    40% { opacity: 1; transform: scale(1.3); }
 }
