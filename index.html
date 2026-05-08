@@ -13,18 +13,18 @@
     <meta name="theme-color" content="#f5f0e8" id="themeColorMeta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <!-- Favicon (帶版本號避免快取) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=2026.05.08.01">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v=2026.05.08.01">
+    <link rel="icon" type="image/x-icon" href="favicon.ico?v=2026.05.08.01">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2026.05.08.01">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <!-- Self-hosted Noto Sans KR + TC (Variable Font, unicode-range split) -->
     <link rel="stylesheet" href="fonts.css">
     
     <title>비공개 내 관리 센터</title>
-    <link rel="stylesheet" href="style.css?v=2026.05.07.09">
+    <link rel="stylesheet" href="style.css?v=2026.05.08.01">
 </head>
 <body>
 
@@ -682,7 +682,7 @@
                 <div class="action-cell"></div>
             </div>
             <div id="dataList">
-                <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
+                <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
             </div>
         </div>
     </div>
@@ -723,7 +723,7 @@
                 <div class="action-cell"></div>
             </div>
             <div id="offlineDataList">
-                <div style="padding:20px; text-align:center; color:#888;">Loading Cloud Data...</div>
+                <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
             </div>
         </div>
     </div>
@@ -782,7 +782,7 @@
     </div>
 </div>
 
-<script type="module" src="app.js?v=2026.05.07.09"></script>
+<script type="module" src="app.js?v=2026.05.08.01"></script>
 
 </body>
 </html>
