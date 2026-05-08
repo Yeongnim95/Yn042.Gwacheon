@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.07.09';
+const APP_VERSION = '2026.05.08.01';
 
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -3673,14 +3673,17 @@ function renderAiPanelResults(results) {
         container.innerHTML = '';
         return;
     }
+    const checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14" style="vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>';
+    const searchSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:4px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+    const editSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
     container.innerHTML = results.map(r => {
         const composeLink = r.composeUserId 
-            ? `<button class="ai-panel-compose-link" onclick="window.openFullCompose('${r.composeUserId}')">${currentLang === 'ko' ? 'AI 통합 작문 열기' : '開啟 AI 整合作文'}</button>` 
+            ? `<button class="ai-panel-compose-link" onclick="window.openFullCompose('${r.composeUserId}')">${editSvg}${currentLang === 'ko' ? 'AI 통합 작문 열기' : '開啟 AI 整合作文'}</button>` 
             : '';
-        const copiedLabel = r.success && !r.isPreview ? `<div class="result-copied">✅ ${currentLang === 'ko' ? '복사됨' : '已複製'}</div>` : '';
+        const copiedLabel = r.success && !r.isPreview ? `<div class="result-copied">${checkSvg} ${currentLang === 'ko' ? '복사됨' : '已複製'}</div>` : '';
         return `
         <div class="ai-panel-result-item ${r.success ? 'success' : 'error'}">
-            <div class="result-query">🔍 ${r.query}</div>
+            <div class="result-query">${searchSvg}${r.query}</div>
             <div class="result-text">${r.text}</div>
             ${copiedLabel}
             ${composeLink}
@@ -3770,7 +3773,6 @@ function parseBibleQuery(input) {
             break;
         }
     }
-    // 如果沒匹配到語言關鍵字，根據書名語言推斷
     if (language === 'both') {
         const hasKorean = /[\uAC00-\uD7AF]/.test(cleanInput);
         const hasChinese = /[\u4E00-\u9FFF]/.test(cleanInput);
@@ -3784,8 +3786,53 @@ function parseBibleQuery(input) {
     let lastBookId = null;
     
     for (const seg of segments) {
-        // 匹配格式：書卷名 章:節範圍
-        // 支援：創1:1-4 / 창1:1、3-6 / Gen 1:1,3-6 / 1:5（繼承上一個書卷）
+        // 章對章格式：啟5章到7章 / 계 1장 가 7장 / 創1-3章 / 啟5~7
+        // 支援關鍵字：到、去、가、세요、까지、~、-
+        const chapterRangeMatch = seg.match(/^([^\d]*?)(\d+)\s*(?:章|장)?\s*(?:到|去|가|세요|요|까지|가지|~|-|至)\s*(\d+)\s*(?:章|장)?$/);
+        if (chapterRangeMatch) {
+            let bookName = chapterRangeMatch[1].trim();
+            const startCh = parseInt(chapterRangeMatch[2]);
+            const endCh = parseInt(chapterRangeMatch[3]);
+            let bookId = bookName ? (bookLookup[bookName] || bookLookup[bookName.toLowerCase()]) : lastBookId;
+            if (!bookId && bookName) {
+                const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
+                for (const key of sortedKeys) {
+                    if (bookName.endsWith(key) || bookName.startsWith(key)) {
+                        bookId = bookLookup[key];
+                        break;
+                    }
+                }
+            }
+            if (!bookId) continue;
+            lastBookId = bookId;
+            for (let ch = startCh; ch <= endCh; ch++) {
+                queries.push({ bookId, chapter: ch, verses: 'all' });
+            }
+            continue;
+        }
+        
+        // 純章節格式：啟5章 / 啟5 / 계 1장
+        const chapterOnlyMatch = seg.match(/^([^\d]*?)(\d+)\s*(?:章|장)$/);
+        if (chapterOnlyMatch) {
+            let bookName = chapterOnlyMatch[1].trim();
+            const chapter = parseInt(chapterOnlyMatch[2]);
+            let bookId = bookName ? (bookLookup[bookName] || bookLookup[bookName.toLowerCase()]) : lastBookId;
+            if (!bookId && bookName) {
+                const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
+                for (const key of sortedKeys) {
+                    if (bookName.endsWith(key) || bookName.startsWith(key)) {
+                        bookId = bookLookup[key];
+                        break;
+                    }
+                }
+            }
+            if (!bookId) continue;
+            lastBookId = bookId;
+            queries.push({ bookId, chapter, verses: 'all' });
+            continue;
+        }
+        
+        // 標準格式：書卷名 章:節範圍
         const match = seg.match(/^([^\d]*?)(\d+)\s*[:：]\s*(.+)$/);
         if (!match) continue;
         
@@ -3793,12 +3840,9 @@ function parseBibleQuery(input) {
         const chapter = parseInt(match[2]);
         const verseStr = match[3].trim();
         
-        // 解析書卷
         let bookId = null;
         if (bookName) {
-            // 嘗試直接匹配
             bookId = bookLookup[bookName] || bookLookup[bookName.toLowerCase()];
-            // 嘗試匹配更長的鍵
             if (!bookId) {
                 const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
                 for (const key of sortedKeys) {
@@ -3813,9 +3857,7 @@ function parseBibleQuery(input) {
         if (!bookId) continue;
         lastBookId = bookId;
         
-        // 解析節數：支援 1-4, 1、3-6, 1,3,5-7 等
         const verses = [];
-        // 全部
         if (/^(all|전부|전체|全部|全)$/i.test(verseStr)) {
             queries.push({ bookId, chapter, verses: 'all' });
             continue;
@@ -3888,27 +3930,97 @@ window.aiPanelSearch = async () => {
         return;
     }
     
-    // --- 聖經查詢模式（本地解析，即時回應） ---
+    // --- 聖經查詢模式（先本地解析，失敗時用 AI 輔助） ---
+    sendBtn.disabled = true;
+    let loadingEl = null;
     try {
-        const parsed = parseBibleQuery(query);
-        if (!parsed.queries.length) {
-            throw new Error(currentLang === 'ko' ? '경문 형식을 인식할 수 없습니다.\n예: 창1:1-3 한 / 사1:1;계3:5 중' : '無法辨識經文格式\n例：創1:1-3 中 / 賽1:1；啟3:5 韓');
+        // 1. 本地 regex 解析
+        let parsed = parseBibleQuery(query);
+        let formatted = parsed.queries.length > 0 ? formatBibleResult(parsed) : { text: '', foundCount: 0 };
+        
+        // 2. 如果本地解析失敗或沒找到任何節，試 AI 輔助
+        if (!parsed.queries.length || formatted.foundCount === 0) {
+            loadingEl = document.createElement('div');
+            loadingEl.className = 'ai-panel-loading';
+            loadingEl.textContent = currentLang === 'ko' ? 'AI 분석 중...' : 'AI 分析中...';
+            resultContainer.prepend(loadingEl);
+            
+            try {
+                const aiResult = await parseBibleWithAI(query);
+                if (aiResult && aiResult.queries && aiResult.queries.length > 0) {
+                    parsed = aiResult;
+                    formatted = formatBibleResult(parsed);
+                }
+            } catch (e) {
+                console.warn('AI 解析失敗:', e);
+            }
         }
         
-        const { text, foundCount } = formatBibleResult(parsed);
-        if (foundCount === 0) {
-            throw new Error(currentLang === 'ko' ? '해당 경문을 찾을 수 없습니다' : '找不到對應的經文');
+        if (formatted.foundCount === 0) {
+            throw new Error(currentLang === 'ko' 
+                ? '경문 형식을 인식할 수 없습니다.\n예: 창1:1-3 한 / 사1:1;계3:5 중 / 계5장 / 계1장-3장' 
+                : '無法辨識經文格式\n例：創1:1-3 中 / 賽1:1；啟3:5 韓 / 啟5章 / 啟1章到3章');
         }
         
-        await navigator.clipboard.writeText(text);
-        const cacheItem = { query, text, success: true, timestamp: Date.now() };
+        await navigator.clipboard.writeText(formatted.text);
+        const cacheItem = { query, text: formatted.text, success: true, timestamp: Date.now() };
         saveAiPanelResult(cacheItem);
         input.value = '';
     } catch (err) {
         const cacheItem = { query, text: err.message, success: false, timestamp: Date.now() };
         saveAiPanelResult(cacheItem);
+    } finally {
+        if (loadingEl) loadingEl.remove();
+        sendBtn.disabled = false;
     }
 };
+
+// AI 輔助解析（當本地解析失敗時呼叫）
+async function parseBibleWithAI(query) {
+    const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+    const bookRef = allBooks.map(b => {
+        const abbr = bookAbbreviations[b.id] || {};
+        return `${b.id}:${abbr.ko||b.ko}/${abbr.zh||b.zh}`;
+    }).join(',');
+    
+    const prompt = `解析聖經經文引用，返回純JSON（無markdown）。
+
+書卷ID: ${bookRef}
+
+格式：{"queries":[{"bookId":"gen","chapter":1,"verses":[1,2,3]}],"language":"both"}
+或章節: {"bookId":"gen","chapter":1,"verses":"all"}
+
+規則：
+- bookId必須用上方ID
+- verses是數字陣列；連續範圍展開如1-5→[1,2,3,4,5]
+- 整章用"all"
+- 章對章範圍展開為多個queries
+- language: "ko"=韓文,"zh"=中文,"both"=兩者
+- 語言觸發詞：中/中文/중/중국어→zh; 韓/韓文/한/한국어→ko; 全/全部/都/다/all→both
+- 沒指定語言時，根據輸入語言判斷
+- 支援關鍵字：到/去/까지/가/세요/요/가지/~/-（章對章）
+
+範例：
+"創1:1-3 中"→{"queries":[{"bookId":"gen","chapter":1,"verses":[1,2,3]}],"language":"zh"}
+"啟5章 韓"→{"queries":[{"bookId":"rev","chapter":5,"verses":"all"}],"language":"ko"}
+"啟1章到3章 全"→{"queries":[{"bookId":"rev","chapter":1,"verses":"all"},{"bookId":"rev","chapter":2,"verses":"all"},{"bookId":"rev","chapter":3,"verses":"all"}],"language":"both"}
+"창1:1;계3:5 다"→{"queries":[{"bookId":"gen","chapter":1,"verses":[1]},{"bookId":"rev","chapter":3,"verses":[5]}],"language":"both"}
+
+無法解析→{"queries":[]}
+
+輸入：${query}`;
+
+    const response = await fetch(AI_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+    });
+    if (!response.ok) throw new Error('API Error');
+    const data = await response.json();
+    const aiText = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    return JSON.parse(cleaned);
+}
 
 // --- AI 面板：回覆生成模式 ---
 async function aiPanelCompose(userId, instruction, input, sendBtn, resultContainer) {
@@ -3941,10 +4053,10 @@ async function aiPanelCompose(userId, instruction, input, sendBtn, resultContain
             return;
         }
         const typeLabel = lastLog.type === 'me' ? (currentLang === 'ko' ? '본인' : '我') : (currentLang === 'ko' ? '상대방' : '對方');
-        const preview = `👤 ${user.name} (${userId})\n📅 ${lastLog.date} [${typeLabel}]\n\n${lastLog.content.substring(0, 150)}${lastLog.content.length > 150 ? '...' : ''}`;
+        const preview = `${user.name} (${userId})\n${lastLog.date} [${typeLabel}]\n\n${lastLog.content.substring(0, 150)}${lastLog.content.length > 150 ? '...' : ''}`;
         const hint = currentLang === 'ko' 
-            ? `\n\n💡 빠른 생성: @${userId} [지시]\n예: @${userId} 관심사 물어보기\n\n📝 상세 작문 → AI 통합 작문 페이지`
-            : `\n\n💡 快速生成：@${userId} [指示]\n例：@${userId} 詢問興趣\n\n📝 詳細作文 → AI 整合作文頁面`;
+            ? `\n\n빠른 생성: @${userId} [지시]\n예: @${userId} 관심사 물어보기\n\n상세 작문 → AI 통합 작문 페이지`
+            : `\n\n快速生成：@${userId} [指示]\n例：@${userId} 詢問興趣\n\n詳細作文 → AI 整合作文頁面`;
         
         const previewItem = { query: `@${userId}`, text: preview + hint, success: true, timestamp: Date.now(), isPreview: true, composeUserId: userId };
         saveAiPanelResult(previewItem);
@@ -4013,7 +4125,7 @@ ${styleSection}
         
         await navigator.clipboard.writeText(result);
         const label = currentLang === 'ko' ? ' (복사됨!)' : ' (已複製！)';
-        const cacheItem = { query: `@${userId} ${instruction}`, text: `✦ → ${user.name}\n\n${result}\n\n📋${label}`, success: true, timestamp: Date.now() };
+        const cacheItem = { query: `@${userId} ${instruction}`, text: `→ ${user.name}\n\n${result}\n\n${label}`, success: true, timestamp: Date.now() };
         saveAiPanelResult(cacheItem);
         input.value = '';
     } catch (err) {
