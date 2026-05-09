@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.08.01';
+const APP_VERSION = '2026.05.08.02';
 
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -278,6 +278,7 @@ if (cloudEnabled) {
         snapshot.forEach((doc) => {
             localDb.push(doc.data());
         });
+        window.firebaseLoaded = true;
         renderBackend();
         const activeId = document.getElementById('idInput').value;
         if(activeId) window.handleIdInput();
@@ -290,6 +291,7 @@ if (cloudEnabled) {
         snapshot.forEach((doc) => {
             offlineDb.push(doc.data());
         });
+        window.offlineFirebaseLoaded = true;
         renderOfflineBackend();
         const offlineActiveId = document.getElementById('offlineIdInput');
         if(offlineActiveId && offlineActiveId.value) window.handleOfflineIdInput();
@@ -1324,6 +1326,14 @@ function renderBackend() {
     if (!cloudEnabled) return;
     const t = i18n[currentLang];
     const listContainer = document.getElementById('dataList');
+    
+    // 如果 Firebase 還沒回傳資料，顯示載入動畫
+    if (!window.firebaseLoaded) {
+        listContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+        if (typeof updateCounter === 'function') updateCounter();
+        return;
+    }
+    
     listContainer.innerHTML = '';
 
     // 排序輔助函數：主要以選擇的日期排序，同一天則以 createdAt (秒級) 排序
@@ -2444,6 +2454,12 @@ function renderOfflineBackend() {
     const t = i18n[currentLang];
     const listContainer = document.getElementById('offlineDataList');
     if (!listContainer) return;
+    
+    if (!window.offlineFirebaseLoaded) {
+        listContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+        return;
+    }
+    
     listContainer.innerHTML = '';
 
     // 排序輔助函數：主要以選擇的日期排序，同一天則以 createdAt (秒級) 排序
@@ -4053,10 +4069,10 @@ async function aiPanelCompose(userId, instruction, input, sendBtn, resultContain
             return;
         }
         const typeLabel = lastLog.type === 'me' ? (currentLang === 'ko' ? '본인' : '我') : (currentLang === 'ko' ? '상대방' : '對方');
-        const preview = `${user.name} (${userId})\n${lastLog.date} [${typeLabel}]\n\n${lastLog.content.substring(0, 150)}${lastLog.content.length > 150 ? '...' : ''}`;
+        const preview = `👤 ${user.name} (${userId})\n📅 ${lastLog.date} [${typeLabel}]\n\n${lastLog.content.substring(0, 150)}${lastLog.content.length > 150 ? '...' : ''}`;
         const hint = currentLang === 'ko' 
-            ? `\n\n빠른 생성: @${userId} [지시]\n예: @${userId} 관심사 물어보기\n\n상세 작문 → AI 통합 작문 페이지`
-            : `\n\n快速生成：@${userId} [指示]\n例：@${userId} 詢問興趣\n\n詳細作文 → AI 整合作文頁面`;
+            ? `\n\n💡 빠른 생성: @${userId} [지시]\n예: @${userId} 관심사 물어보기\n\n📝 상세 작문 → AI 통합 작문 페이지`
+            : `\n\n💡 快速生成：@${userId} [指示]\n例：@${userId} 詢問興趣\n\n📝 詳細作文 → AI 整合作文頁面`;
         
         const previewItem = { query: `@${userId}`, text: preview + hint, success: true, timestamp: Date.now(), isPreview: true, composeUserId: userId };
         saveAiPanelResult(previewItem);
