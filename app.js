@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.08.03';
+const APP_VERSION = '2026.05.08.04';
 
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -562,9 +562,9 @@ function applyLanguage() {
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
     if (aiNote) aiNote.innerHTML = currentLang === 'ko' 
-        ? '경문: <b>창1:1-3 한</b> &nbsp;|&nbsp; 작문: <b>@번호 지시</b>' 
-        : '經文: <b>創1:1-3 中</b> &nbsp;|&nbsp; 作文: <b>@編號 指示</b>';
-    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / @0012 관심사 물어보기' : '創1:1 中 / @0012 詢問興趣';
+        ? '경문: <b>창1:1-3 한</b> | 이동: <b>계1장 가</b> | 작문: <b>@번호 지시</b>' 
+        : '經文: <b>創1:1-3 中</b> | 跳轉: <b>到 啟1章</b> | 作文: <b>@編號 指示</b>';
+    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / 계1장 가 / @0012 지시' : '創1:1 中 / 到 啟1章 / @0012 指示';
     
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
@@ -3758,8 +3758,30 @@ function parseBibleQuery(input) {
         else if (hasChinese && !hasKorean) language = 'zh';
     }
     
-    // 用分號或；拆分多段引用
-    const segments = cleanInput.split(/[;；]/).map(s => s.trim()).filter(Boolean);
+    // 拆分多段引用：分號、；、以及空格+書名開頭
+    // 例：啟1:1-2 創1:2-7、9 → ['啟1:1-2', '創1:2-7、9']
+    // 例：啟1:1;創1:2 → ['啟1:1', '創1:2']
+    const rawSegments = cleanInput.split(/[;；]/);
+    const segments = [];
+    for (const raw of rawSegments) {
+        const trimmed = raw.trim();
+        if (!trimmed) continue;
+        // 進一步用空格拆分，但只在空格後跟書名（非數字開頭）時才拆
+        const spaceSegs = trimmed.split(/\s+/);
+        let current = spaceSegs[0];
+        for (let i = 1; i < spaceSegs.length; i++) {
+            const s = spaceSegs[i];
+            // 如果這個片段以非數字開頭（新書名），就是新的引用
+            if (/^[^\d]/.test(s)) {
+                segments.push(current);
+                current = s;
+            } else {
+                // 否則合併（可能是 "1:2-7" 這種）
+                current += ' ' + s;
+            }
+        }
+        segments.push(current);
+    }
     const queries = [];
     let lastBookId = null;
     
@@ -3901,7 +3923,43 @@ window.aiPanelSearch = async () => {
     const query = input.value.trim();
     if (!query) return;
     
-    // 判斷模式：@0012 開頭 = 回覆生成模式
+    // 模式 1：跳轉到聖經章節
+    // 「到 啟5章」「去 創1章」「계 1장 가」「계 1장 세요」「계 1장 가지」
+    const navMatch = query.match(/^(?:到|去|가|가자|가세요|가요|가지)\s*([^\d]*?)(\d+)\s*(?:章|장)\s*$/);
+    const navMatch2 = query.match(/^([^\d]*?)(\d+)\s*(?:章|장)\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
+    const nav = navMatch || navMatch2;
+    if (nav) {
+        const bookLookup = buildBookLookup();
+        const bookName = nav[1].trim();
+        const chapter = parseInt(nav[2]);
+        let bookId = bookLookup[bookName] || bookLookup[bookName.toLowerCase()];
+        if (!bookId) {
+            const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
+            for (const key of sortedKeys) {
+                if (bookName.endsWith(key) || bookName.startsWith(key)) {
+                    bookId = bookLookup[key];
+                    break;
+                }
+            }
+        }
+        if (bookId) {
+            const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+            const book = allBooks.find(b => b.id === bookId);
+            if (book && chapter >= 1 && chapter <= book.chapters) {
+                // 關閉 AI 面板，切到聖經頁面，打開該章節
+                window.toggleAiPanel();
+                window.switchPage('bible');
+                setTimeout(() => {
+                    selectBibleBook(book);
+                    setTimeout(() => openBibleChapter(book, chapter), 300);
+                }, 300);
+                input.value = '';
+                return;
+            }
+        }
+    }
+    
+    // 模式 2：@編號 = 回覆生成模式
     const composeMatch = query.match(/^@(\d{1,4})\s*(.*)/);
     if (composeMatch) {
         await aiPanelCompose(composeMatch[1].padStart(4, '0'), composeMatch[2].trim(), input, sendBtn, resultContainer);
