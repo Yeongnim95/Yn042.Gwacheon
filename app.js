@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.08.02';
+const APP_VERSION = '2026.05.08.03';
 
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -302,7 +302,7 @@ if (cloudEnabled) {
 }
 
 // 頁面記憶超時設定（12小時 = 12 * 60 * 60 * 1000 毫秒）
-const PAGE_MEMORY_TIMEOUT = 12 * 60 * 60 * 1000;
+// (頁面記憶已停用)
 
 // ===== 滑動與點擊區分（後台用） =====
 let backendTouchStartX = 0;
@@ -327,37 +327,7 @@ document.addEventListener('touchmove', (e) => {
 
 window.isSwipeAction = () => isBackendSwiping;
 
-// 儲存頁面和時間戳
-function saveCurrentPage(page) {
-    const data = {
-        page: page,
-        timestamp: Date.now()
-    };
-    localStorage.setItem('app_current_page', JSON.stringify(data));
-}
-
-// 載入儲存的頁面（檢查是否超時）
-function loadSavedPage() {
-    const saved = localStorage.getItem('app_current_page');
-    if (!saved) return null;
-    
-    try {
-        const data = JSON.parse(saved);
-        const elapsed = Date.now() - data.timestamp;
-        
-        // 檢查是否超過12小時
-        if (elapsed > PAGE_MEMORY_TIMEOUT) {
-            localStorage.removeItem('app_current_page');
-            return null; // 超時，返回首頁
-        }
-        
-        return data.page;
-    } catch (e) {
-        // 如果解析失敗（舊格式），清除並返回null
-        localStorage.removeItem('app_current_page');
-        return null;
-    }
-}
+// 頁面記憶已停用 — 每次開啟都回首頁
 
 // Path → Page 映射（支援 clean URL 和舊版 hash 相容）
 function getPageFromPath() {
@@ -440,12 +410,7 @@ window.onload = function() {
     if (currentPage && currentPage !== 'home') {
         switchPage(currentPage);
     } else {
-        const savedPage = loadSavedPage();
-        if (savedPage) {
-            switchPage(savedPage);
-        } else {
-            switchPage('home');
-        }
+        switchPage('home');
     }
     
     applyLanguage();
@@ -1751,9 +1716,6 @@ window.switchPage = (page) => {
     if (window.location.pathname !== newPath) {
         history.pushState(null, '', newPath);
     }
-    
-    // 儲存當前頁面到 localStorage（帶時間戳，12小時後過期）
-    saveCurrentPage(page);
     
     // 更新當前頁面標題
     const pageTitleEl = document.getElementById('current-page-title');
