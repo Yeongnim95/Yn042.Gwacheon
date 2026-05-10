@@ -13,7 +13,7 @@ const firebaseConfig = {
     projectId: "discourse-dissemination",
     storageBucket: "discourse-dissemination.firebasestorage.app",
     messagingSenderId: "686407798490",
-    appId: "1:686407798490:web:e41a5f2d007615fb6e5fe3",
+    appId: "1:686407798490:web:e41a5f2$ $d007615fb6e5fe3",
     measurementId: "G-M0JHY4QED9"
 };
 // ------------------------------------------------------------------
@@ -5025,4 +5025,4 @@ window.copyComposeResult = async () => {
         btn.textContent = currentLang === 'ko' ? '✅ 복사됨!' : '✅ 已複製！';
         setTimeout(() => { btn.textContent = orig; }, 1500);
     } catch (e) {}
-};
+}; 
