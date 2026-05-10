@@ -1,5 +1,6 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.10.05';
+const APP_VERSION = '2026.05.10.06';
+window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -415,9 +416,37 @@ window.onload = function() {
     
     applyLanguage();
     updateDateInput();
-    
-    // 版本檢查已移除（Cloudflare 快取環境下不穩定，單人使用直接重新整理即可）
+    bindScrollTopTargets();
+    updateScrollTopButton();
+    checkForAppUpdates();
+    setInterval(checkForAppUpdates, 2 * 60 * 1000);
 };
+
+const PAGE_LOAD_VERSION = APP_VERSION;
+const UPDATE_RELOAD_KEY = 'app_update_reload_version';
+
+async function checkForAppUpdates() {
+    try {
+        const res = await fetch(`/app.js?_v=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const source = await res.text();
+        const match = source.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+        if (!match) return;
+
+        const remoteVersion = match[1];
+        if (remoteVersion && remoteVersion !== PAGE_LOAD_VERSION) {
+            if (sessionStorage.getItem(UPDATE_RELOAD_KEY) === remoteVersion) return;
+            sessionStorage.setItem(UPDATE_RELOAD_KEY, remoteVersion);
+            window.location.reload();
+        }
+    } catch (err) {
+        console.warn('App update check failed:', err);
+    }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) checkForAppUpdates();
+});
 
 window.setLanguage = (lang) => {
     currentLang = lang;
@@ -2971,36 +3000,77 @@ window.closeBibleContent = () => {
 };
 
 // 返回頂部
+const SCROLL_TOP_THRESHOLD = 120;
+const scrollTopBoundTargets = new WeakSet();
+
+function getWindowScrollTop() {
+    return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+}
+
+function getActiveScrollElements() {
+    const activeSection = document.querySelector('.page-section.active-section');
+    const candidates = [
+        document.scrollingElement,
+        document.documentElement,
+        document.body,
+        document.querySelector('.container')
+    ];
+
+    if (activeSection) {
+        candidates.push(activeSection);
+        candidates.push(...activeSection.querySelectorAll(
+            '.home-container, .bible-container, .bible-content-view, .bible-verses, .list-container'
+        ));
+    }
+
+    return [...new Set(candidates)].filter(Boolean);
+}
+
+function getCurrentScrollTop() {
+    const elementScrollTop = getActiveScrollElements()
+        .reduce((max, el) => Math.max(max, el.scrollTop || 0), 0);
+    return Math.max(getWindowScrollTop(), elementScrollTop);
+}
+
+function bindScrollTopTargets() {
+    getActiveScrollElements().forEach((el) => {
+        if (scrollTopBoundTargets.has(el)) return;
+        el.addEventListener('scroll', updateScrollTopButton, { passive: true });
+        scrollTopBoundTargets.add(el);
+    });
+}
+
 function updateScrollTopButton() {
     const btn = document.getElementById('scrollTopBtn');
     if (!btn) return;
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-    if (scrollY > 100) {
-        btn.classList.add('show');
-    } else {
-        btn.classList.remove('show');
-    }
+    bindScrollTopTargets();
+    btn.classList.toggle('show', getCurrentScrollTop() > SCROLL_TOP_THRESHOLD);
 }
 
-// 首頁 home-container 的 scroll 監聽（動態綁定，保留以防萬一）
-let _homeContainerScrollBound = false;
+// 首頁 home-container 的 scroll 監聽（舊呼叫保留，實際交給統一綁定）
 function bindHomeContainerScroll() {
-    if (_homeContainerScrollBound) return;
-    const homeContainer = document.querySelector('#homeSection .home-container');
-    if (homeContainer && getComputedStyle(homeContainer).overflowY !== 'visible') {
-        homeContainer.addEventListener('scroll', updateScrollTopButton, { passive: true });
-        _homeContainerScrollBound = true;
-    }
+    bindScrollTopTargets();
 }
 
 window.scrollToTop = () => {
+    getActiveScrollElements().forEach((el) => {
+        if (el.scrollTop > 0) {
+            el.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 // 監聽滾動事件，顯示/隱藏返回頂部按鈕
 window.addEventListener('scroll', updateScrollTopButton, { passive: true });
-window.addEventListener('resize', updateScrollTopButton);
-document.addEventListener('DOMContentLoaded', updateScrollTopButton);
+window.addEventListener('resize', () => {
+    bindScrollTopTargets();
+    updateScrollTopButton();
+});
+document.addEventListener('DOMContentLoaded', () => {
+    bindScrollTopTargets();
+    updateScrollTopButton();
+});
 
 // ===== 新複製模式系統 =====
 const LONG_PRESS_DURATION = 300; // 長按時間 300ms（快速觸發）
