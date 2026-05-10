@@ -1725,6 +1725,9 @@ window.switchPage = (page) => {
     
     // 隱藏功能按鈕群組（預設）
     document.getElementById('bibleFabContainer').classList.remove('show');
+    if (page !== 'bible') {
+        closeBibleChaptersPopover();
+    }
     // 重置搜尋按鈕
     document.getElementById('bibleFabMain').classList.remove('active');
     document.getElementById('bibleFabIcon').textContent = '🔍';
@@ -1804,6 +1807,8 @@ window.switchPage = (page) => {
         pageTitleEl.textContent = t.btnOfflineBackend;
         renderOfflineBackend(); 
     }
+
+    setTimeout(updateScrollTopButton, 0);
 };
 
 // 切換子選單
@@ -2773,6 +2778,7 @@ const bookAbbreviations = {
 let currentBibleBook = null;
 let currentBibleChapter = null;
 let selectedVerseData = null;
+let activeBibleBookButton = null;
 
 // 初始化聖經頁面
 function initBiblePage() {
@@ -2791,19 +2797,23 @@ function renderBibleBooks(testament, containerId) {
         btn.className = 'bible-book-btn';
         btn.id = `bible-book-${book.id}`;
         btn.innerHTML = `<span class="ko">${book.ko}</span><span class="zh">${book.zh}</span>`;
-        btn.onclick = () => selectBibleBook(book);
+        btn.onclick = (event) => {
+            event.stopPropagation();
+            selectBibleBook(book, event.currentTarget);
+        };
         container.appendChild(btn);
     });
 }
 
 // 選擇書卷
-function selectBibleBook(book) {
+function selectBibleBook(book, anchorEl = null) {
     // 移除其他書卷的選中狀態
     document.querySelectorAll('.bible-book-btn').forEach(btn => btn.classList.remove('active'));
     
     // 選中當前書卷
-    const currentBtn = document.getElementById(`bible-book-${book.id}`);
+    const currentBtn = anchorEl || document.getElementById(`bible-book-${book.id}`);
     if (currentBtn) currentBtn.classList.add('active');
+    activeBibleBookButton = currentBtn;
     
     currentBibleBook = book;
     
@@ -2819,15 +2829,71 @@ function selectBibleBook(book) {
         const btn = document.createElement('div');
         btn.className = 'bible-chapter-btn';
         btn.textContent = i;
-        btn.onclick = () => openBibleChapter(book, i);
+        btn.onclick = (event) => {
+            event.stopPropagation();
+            openBibleChapter(book, i);
+        };
         chaptersGrid.appendChild(btn);
     }
     
     chaptersContainer.classList.add('show');
-    
-    // 滾動到章節選擇區
-    chaptersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    positionBibleChaptersPopover(currentBtn);
 }
+
+function positionBibleChaptersPopover(anchorEl = activeBibleBookButton) {
+    const chaptersContainer = document.getElementById('bibleChaptersContainer');
+    if (!chaptersContainer || !chaptersContainer.classList.contains('show') || !anchorEl) return;
+
+    const rect = anchorEl.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const panelWidth = Math.min(380, Math.max(260, viewportWidth - 24));
+    let left = rect.left + (rect.width / 2) - (panelWidth / 2);
+    left = Math.max(12, Math.min(left, viewportWidth - panelWidth - 12));
+
+    chaptersContainer.style.width = `${panelWidth}px`;
+    chaptersContainer.style.left = `${left}px`;
+    chaptersContainer.style.top = `${rect.bottom + 10}px`;
+
+    requestAnimationFrame(() => {
+        const panelHeight = chaptersContainer.offsetHeight;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        let top = rect.bottom + 10;
+
+        if (spaceBelow < panelHeight + 22 && spaceAbove > spaceBelow) {
+            top = Math.max(12, rect.top - panelHeight - 10);
+            chaptersContainer.classList.add('above-anchor');
+        } else {
+            top = Math.min(top, viewportHeight - panelHeight - 12);
+            chaptersContainer.classList.remove('above-anchor');
+        }
+
+        chaptersContainer.style.top = `${Math.max(12, top)}px`;
+    });
+}
+
+function closeBibleChaptersPopover({ keepActiveBook = false } = {}) {
+    const chaptersContainer = document.getElementById('bibleChaptersContainer');
+    if (chaptersContainer) {
+        chaptersContainer.classList.remove('show', 'above-anchor');
+        chaptersContainer.removeAttribute('style');
+    }
+    if (!keepActiveBook) {
+        document.querySelectorAll('.bible-book-btn').forEach(btn => btn.classList.remove('active'));
+        activeBibleBookButton = null;
+    }
+}
+
+document.addEventListener('click', (event) => {
+    const chaptersContainer = document.getElementById('bibleChaptersContainer');
+    if (!chaptersContainer || !chaptersContainer.classList.contains('show')) return;
+    if (chaptersContainer.contains(event.target) || event.target.closest('.bible-book-btn')) return;
+    closeBibleChaptersPopover();
+});
+
+window.addEventListener('resize', () => positionBibleChaptersPopover());
+window.addEventListener('scroll', () => positionBibleChaptersPopover(), { passive: true });
 
 // 開啟聖經章節
 async function openBibleChapter(book, chapter) {
@@ -2844,6 +2910,7 @@ async function openBibleChapter(book, chapter) {
     contentTitle.querySelector('.zh').textContent = `${book.zh} 第${chapter}章`;
     
     // 先切換視圖 + 顯示載入動畫
+    closeBibleChaptersPopover({ keepActiveBook: true });
     booksList.style.display = 'none';
     contentView.classList.add('show');
     versesContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
@@ -2893,11 +2960,10 @@ window.closeBibleContent = () => {
     contentView.classList.remove('show');
     booksList.style.display = 'block';
     
-    // 滾動到章節選擇區
-    const chaptersContainer = document.getElementById('bibleChaptersContainer');
-    if (chaptersContainer && chaptersContainer.classList.contains('show')) {
+    // 回到剛才選擇的書卷附近
+    if (activeBibleBookButton) {
         setTimeout(() => {
-            chaptersContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            activeBibleBookButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
     }
 };
@@ -2907,15 +2973,20 @@ window.scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// 監聽滾動事件，顯示/隱藏返回頂部按鈕
-window.addEventListener('scroll', () => {
+function updateScrollTopButton() {
     const scrollTopBtn = document.getElementById('scrollTopBtn');
-    if (window.scrollY > 300) {
+    if (!scrollTopBtn) return;
+
+    const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (scrollY > 260) {
         scrollTopBtn.classList.add('show');
     } else {
         scrollTopBtn.classList.remove('show');
     }
-});
+}
+
+// 監聽滾動事件，顯示/隱藏返回頂部按鈕
+window.addEventListener('scroll', updateScrollTopButton, { passive: true });
 
 // ===== 新複製模式系統 =====
 const LONG_PRESS_DURATION = 300; // 長按時間 300ms（快速觸發）
