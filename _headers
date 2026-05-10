@@ -1,0 +1,89 @@
+/
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/index.html
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/bible
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/entry
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/backend
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/profile
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/faith-auto
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/faith-chart
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/daily-faith
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/ai-compose
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/offline-entry
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/offline-backend
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/404.html
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/architecture-v2.html
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/Admin/*
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/Entry/*
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/app.js
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/style.css
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/fonts.css
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon.ico
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon-2.ico
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon-16x16.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon-16x16-2.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon-32x32.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/favicon-32x32-2.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/apple-touch-icon.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/apple-touch-icon-2.png
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+
+/logo-20260509.avif
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts-selfhost/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.avif
+  Cache-Control: public, max-age=31536000, immutable
