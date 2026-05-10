@@ -686,8 +686,9 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
 .home-hero-title {
     position: absolute;
     top: 38%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
     z-index: 5;
     font-size: clamp(2.2rem, 9vw, 6rem);
     font-weight: 900;
@@ -696,6 +697,10 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
     text-shadow: none;
     text-align: center;
     white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: clamp(6px, 2vw, 20px);
     opacity: 1;
     transition: opacity 1.2s ease 0.3s;
 }
