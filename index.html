@@ -25,6 +25,28 @@
     
     <title>비공개의 새싹</title>
     <link rel="stylesheet" href="/style.css">
+    <style>
+        #homeSection .home-slide-1,
+        #homeSection .home-hero-title,
+        #homeSection .home-verse-area {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+
+        .scroll-top-btn {
+            display: flex !important;
+            position: fixed !important;
+            right: calc(18px + env(safe-area-inset-right)) !important;
+            bottom: calc(22px + env(safe-area-inset-bottom)) !important;
+            z-index: 1200 !important;
+        }
+
+        .scroll-top-btn:not(.show) {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+    </style>
 </head>
 <body>
 
