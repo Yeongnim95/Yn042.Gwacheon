@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.10.07';
+const APP_VERSION = '2026.05.10.08';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -2818,6 +2818,7 @@ let currentBibleBook = null;
 let currentBibleChapter = null;
 let selectedVerseData = null;
 let activeBibleBookButton = null;
+let bibleChaptersScrollCloseRaf = 0;
 
 // 初始化聖經頁面
 function initBiblePage() {
@@ -2931,8 +2932,21 @@ document.addEventListener('click', (event) => {
     closeBibleChaptersPopover();
 });
 
+function closeBibleChaptersOnPageScroll(event) {
+    const chaptersContainer = document.getElementById('bibleChaptersContainer');
+    if (!chaptersContainer || !chaptersContainer.classList.contains('show')) return;
+    if (event?.target && chaptersContainer.contains(event.target)) return;
+    if (bibleChaptersScrollCloseRaf) return;
+
+    bibleChaptersScrollCloseRaf = requestAnimationFrame(() => {
+        bibleChaptersScrollCloseRaf = 0;
+        closeBibleChaptersPopover();
+    });
+}
+
 window.addEventListener('resize', () => positionBibleChaptersPopover());
-window.addEventListener('scroll', () => positionBibleChaptersPopover(), { passive: true });
+document.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: true, capture: true });
+window.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: true });
 
 // 開啟聖經章節
 async function openBibleChapter(book, chapter) {
@@ -3109,6 +3123,14 @@ function injectBackToTopStyle() {
         #${BACK_TO_TOP_ID}:hover {
             background: rgba(27, 94, 32, 0.95);
             transform: translate3d(0, 0, 0) scale(1.06);
+        }
+        body.home-active #${BACK_TO_TOP_ID} {
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(46, 125, 50, 0.56);
+            box-shadow: 0 8px 22px rgba(30, 50, 30, 0.18);
+        }
+        body.home-active #${BACK_TO_TOP_ID}:hover {
+            background: rgba(46, 125, 50, 0.72);
         }
         #${BACK_TO_TOP_ID} svg {
             width: 23px;
@@ -3674,6 +3696,77 @@ function buildBookLookup() {
     return lookup;
 }
 
+function resolveBibleBookId(bookName, bookLookup) {
+    if (!bookName) return null;
+
+    const normalized = bookName.trim();
+    const direct = bookLookup[normalized] || bookLookup[normalized.toLowerCase()];
+    if (direct) return direct;
+
+    const compact = normalized.replace(/\s+/g, '');
+    const compactDirect = bookLookup[compact] || bookLookup[compact.toLowerCase()];
+    if (compactDirect) return compactDirect;
+
+    const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
+    for (const key of sortedKeys) {
+        if (!key) continue;
+        const lowerKey = key.toLowerCase();
+        const lowerName = normalized.toLowerCase();
+        if (normalized.endsWith(key) || normalized.startsWith(key) || lowerName.endsWith(lowerKey) || lowerName.startsWith(lowerKey)) {
+            return bookLookup[key];
+        }
+    }
+    return null;
+}
+
+function startsBibleReferenceSegment(fragment, bookLookup) {
+    const trimmed = fragment.trim();
+    if (!trimmed || /^\d/.test(trimmed)) return false;
+
+    const bookName = trimmed.match(/^([^\d:：,、，;；]+)/)?.[1]?.trim() || '';
+    return Boolean(resolveBibleBookId(bookName, bookLookup));
+}
+
+function markImplicitBibleReferenceBreaks(input, bookLookup) {
+    const sortedKeys = [...new Set(Object.keys(bookLookup))]
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length);
+
+    return sortedKeys.reduce((text, key) => {
+        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`([0-9０-９,、，])(${escapedKey})(?=\\d)`, 'gi');
+        return text.replace(pattern, '$1;$2');
+    }, input);
+}
+
+function splitBibleReferenceSegments(input, bookLookup) {
+    const normalized = markImplicitBibleReferenceBreaks(input, bookLookup)
+        .replace(/[；]/g, ';')
+        .replace(/\s+/g, ' ')
+        .trim();
+    const segments = [];
+
+    for (const raw of normalized.split(';')) {
+        const trimmed = raw.trim();
+        if (!trimmed) continue;
+
+        const pieces = trimmed.split(' ');
+        let current = pieces[0] || '';
+        for (let i = 1; i < pieces.length; i++) {
+            const piece = pieces[i];
+            if (startsBibleReferenceSegment(piece, bookLookup)) {
+                if (current.trim()) segments.push(current.trim());
+                current = piece;
+            } else {
+                current += ` ${piece}`;
+            }
+        }
+        if (current.trim()) segments.push(current.trim());
+    }
+
+    return segments;
+}
+
 function parseBibleQuery(input) {
     const bookLookup = buildBookLookup();
     
@@ -3681,8 +3774,11 @@ function parseBibleQuery(input) {
     let language = 'both';
     const langPatterns = [
         { regex: /(?:중국어|중|中文|中)\s*$/i, lang: 'zh' },
+        { regex: /^(?:중국어|중|中文|中)\s*/i, lang: 'zh' },
         { regex: /(?:한국어|한|韓文|韓)\s*$/i, lang: 'ko' },
+        { regex: /^(?:한국어|한|韓文|韓)\s*/i, lang: 'ko' },
         { regex: /(?:전부|전체|全部|全|都|다|all|양쪽|兩個)\s*$/i, lang: 'both' },
+        { regex: /^(?:전부|전체|全部|全|都|다|all|양쪽|兩個)\s*/i, lang: 'both' },
     ];
     let cleanInput = input.trim();
     for (const p of langPatterns) {
@@ -3702,27 +3798,7 @@ function parseBibleQuery(input) {
     // 拆分多段引用：分號、；、以及空格+書名開頭
     // 例：啟1:1-2 創1:2-7、9 → ['啟1:1-2', '創1:2-7、9']
     // 例：啟1:1;創1:2 → ['啟1:1', '創1:2']
-    const rawSegments = cleanInput.split(/[;；]/);
-    const segments = [];
-    for (const raw of rawSegments) {
-        const trimmed = raw.trim();
-        if (!trimmed) continue;
-        // 進一步用空格拆分，但只在空格後跟書名（非數字開頭）時才拆
-        const spaceSegs = trimmed.split(/\s+/);
-        let current = spaceSegs[0];
-        for (let i = 1; i < spaceSegs.length; i++) {
-            const s = spaceSegs[i];
-            // 如果這個片段以非數字開頭（新書名），就是新的引用
-            if (/^[^\d]/.test(s)) {
-                segments.push(current);
-                current = s;
-            } else {
-                // 否則合併（可能是 "1:2-7" 這種）
-                current += ' ' + s;
-            }
-        }
-        segments.push(current);
-    }
+    const segments = splitBibleReferenceSegments(cleanInput, bookLookup);
     const queries = [];
     let lastBookId = null;
     
@@ -3734,16 +3810,7 @@ function parseBibleQuery(input) {
             let bookName = chapterRangeMatch[1].trim();
             const startCh = parseInt(chapterRangeMatch[2]);
             const endCh = parseInt(chapterRangeMatch[3]);
-            let bookId = bookName ? (bookLookup[bookName] || bookLookup[bookName.toLowerCase()]) : lastBookId;
-            if (!bookId && bookName) {
-                const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
-                for (const key of sortedKeys) {
-                    if (bookName.endsWith(key) || bookName.startsWith(key)) {
-                        bookId = bookLookup[key];
-                        break;
-                    }
-                }
-            }
+            let bookId = bookName ? resolveBibleBookId(bookName, bookLookup) : lastBookId;
             if (!bookId) continue;
             lastBookId = bookId;
             for (let ch = startCh; ch <= endCh; ch++) {
@@ -3757,16 +3824,7 @@ function parseBibleQuery(input) {
         if (chapterOnlyMatch) {
             let bookName = chapterOnlyMatch[1].trim();
             const chapter = parseInt(chapterOnlyMatch[2]);
-            let bookId = bookName ? (bookLookup[bookName] || bookLookup[bookName.toLowerCase()]) : lastBookId;
-            if (!bookId && bookName) {
-                const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
-                for (const key of sortedKeys) {
-                    if (bookName.endsWith(key) || bookName.startsWith(key)) {
-                        bookId = bookLookup[key];
-                        break;
-                    }
-                }
-            }
+            let bookId = bookName ? resolveBibleBookId(bookName, bookLookup) : lastBookId;
             if (!bookId) continue;
             lastBookId = bookId;
             queries.push({ bookId, chapter, verses: 'all' });
@@ -3783,16 +3841,7 @@ function parseBibleQuery(input) {
         
         let bookId = null;
         if (bookName) {
-            bookId = bookLookup[bookName] || bookLookup[bookName.toLowerCase()];
-            if (!bookId) {
-                const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
-                for (const key of sortedKeys) {
-                    if (bookName.endsWith(key) || bookName.startsWith(key)) {
-                        bookId = bookLookup[key];
-                        break;
-                    }
-                }
-            }
+            bookId = resolveBibleBookId(bookName, bookLookup);
         }
         if (!bookId) bookId = lastBookId;
         if (!bookId) continue;
@@ -3803,7 +3852,7 @@ function parseBibleQuery(input) {
             queries.push({ bookId, chapter, verses: 'all' });
             continue;
         }
-        const parts = verseStr.split(/[,、，]+/);
+        const parts = verseStr.replace(/\s*([-~])\s*/g, '$1').split(/[,、，\s]+/);
         for (const part of parts) {
             const rangeMatch = part.trim().match(/^(\d+)\s*[-~]\s*(\d+)$/);
             if (rangeMatch) {
@@ -3873,16 +3922,7 @@ window.aiPanelSearch = async () => {
         const bookLookup = buildBookLookup();
         const bookName = nav[1].trim();
         const chapter = parseInt(nav[2]);
-        let bookId = bookLookup[bookName] || bookLookup[bookName.toLowerCase()];
-        if (!bookId) {
-            const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
-            for (const key of sortedKeys) {
-                if (bookName.endsWith(key) || bookName.startsWith(key)) {
-                    bookId = bookLookup[key];
-                    break;
-                }
-            }
-        }
+        let bookId = resolveBibleBookId(bookName, bookLookup);
         if (bookId) {
             const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
             const book = allBooks.find(b => b.id === bookId);
@@ -3972,6 +4012,7 @@ async function parseBibleWithAI(query) {
 - verses是數字陣列；連續範圍展開如1-5→[1,2,3,4,5]
 - 整章用"all"
 - 章對章範圍展開為多個queries
+- 多個引用可用空格、分號、頓號分隔；如果空格後又出現新書卷，要拆成新的query
 - language: "ko"=韓文,"zh"=中文,"both"=兩者
 - 語言觸發詞：中/中文/중/중국어→zh; 韓/韓文/한/한국어→ko; 全/全部/都/다/all→both
 - 沒指定語言時，根據輸入語言判斷
@@ -3982,6 +4023,7 @@ async function parseBibleWithAI(query) {
 "啟5章 韓"→{"queries":[{"bookId":"rev","chapter":5,"verses":"all"}],"language":"ko"}
 "啟1章到3章 全"→{"queries":[{"bookId":"rev","chapter":1,"verses":"all"},{"bookId":"rev","chapter":2,"verses":"all"},{"bookId":"rev","chapter":3,"verses":"all"}],"language":"both"}
 "창1:1;계3:5 다"→{"queries":[{"bookId":"gen","chapter":1,"verses":[1]},{"bookId":"rev","chapter":3,"verses":[5]}],"language":"both"}
+"創1:2-3、6 出2:1 中"→{"queries":[{"bookId":"gen","chapter":1,"verses":[2,3,6]},{"bookId":"exo","chapter":2,"verses":[1]}],"language":"zh"}
 
 無法解析→{"queries":[]}
 
@@ -4168,6 +4210,7 @@ ${bookRef}
 - verses 是數字陣列，如 [1,2,3] 或連續範圍展開如 1-5 → [1,2,3,4,5]
 - 用戶可能用縮寫（創、창、Gen）、全名（創世記、창세기）或混合語言
 - 如果用戶寫"全部"/"전체"/"all"/"全"/"都"/"다"，verses設為"all"
+- 多個引用可能用空格分隔，例如「創1:2-3、6 出2:1」要解析成兩筆 queries
 
 語言判斷規則（language 欄位）：
 - "zh" = 只要中文。觸發詞：中文、中、중국어、중
@@ -4185,6 +4228,7 @@ ${bookRef}
 - "Gen 1:1-4 all" → gen 1章 1-4節 language=both
 - "賽2:4 韓" → isa 2章 4節 language=ko
 - "사2:4 중국어" → isa 2章 4節 language=zh
+- "創1:2-3、6 出2:1 中" → gen 1章 2,3,6節 + exo 2章 1節 language=zh
 
 - 如果無法解析，返回 { "error": "無法識別的經文格式" }
 
@@ -4196,6 +4240,25 @@ ${bookRef}
     resultDiv.classList.remove('show');
     
     try {
+        const localParsed = parseBibleQuery(query);
+        const localFormatted = localParsed.queries.length > 0
+            ? await formatBibleResult(localParsed)
+            : { text: '', foundCount: 0 };
+
+        if (localFormatted.foundCount > 0) {
+            resultDiv.className = 'smart-copy-result show success';
+            resultText.textContent = currentLang === 'ko'
+                ? `✅ ${localFormatted.foundCount}절 찾았습니다`
+                : `✅ 找到 ${localFormatted.foundCount} 節經文`;
+            previewDiv.textContent = localFormatted.text.length > 300
+                ? localFormatted.text.substring(0, 300) + '...'
+                : localFormatted.text;
+            await navigator.clipboard.writeText(localFormatted.text);
+            resultText.textContent += currentLang === 'ko' ? ' (복사됨!)' : ' (已複製！)';
+            input.value = '';
+            return;
+        }
+
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
