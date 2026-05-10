@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.10.08';
+const APP_VERSION = '2026.05.11.01';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -590,9 +590,9 @@ function applyLanguage() {
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
     if (aiNote) aiNote.innerHTML = currentLang === 'ko' 
-        ? '경문: <b>창1:1-3 한</b> | 이동: <b>계1장 가</b> | 작문: <b>@번호 지시</b>' 
-        : '經文: <b>創1:1-3 中</b> | 跳轉: <b>到 啟1章</b> | 作文: <b>@編號 指示</b>';
-    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / 계1장 가 / @0012 지시' : '創1:1 中 / 到 啟1章 / @0012 指示';
+        ? '경문: <b>창1:1-3 한</b> | 이동: <b>계1장 가</b> | 글꼴: <b>성경 글꼴</b> | 작문: <b>@번호 지시</b>' 
+        : '經文: <b>創1:1-3 中</b> | 跳轉: <b>到 啟1章</b> | 字體: <b>聖經字體</b> | 作文: <b>@編號 指示</b>';
+    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / 계1장 가 / 성경 글꼴 / @0012 지시' : '創1:1 中 / 到 啟1章 / 聖經字體 / @0012 指示';
     
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
@@ -3577,6 +3577,78 @@ function copyToClipboard(text) {
 // ===== AI 助手面板 =====
 const AI_PANEL_CACHE_KEY = 'ai_panel_results';
 const AI_PANEL_CACHE_DURATION = 60 * 60 * 1000; // 1小時
+const BIBLE_FONT_KEY = 'bible_font_mode';
+
+function getBibleFontMode() {
+    return localStorage.getItem(BIBLE_FONT_KEY) === 'sans' ? 'sans' : 'serif';
+}
+
+function getBibleFontLabel(mode = getBibleFontMode()) {
+    if (currentLang === 'ko') return mode === 'sans' ? '고딕체' : '명조체';
+    return mode === 'sans' ? '黑體' : '宋體';
+}
+
+function applyBibleFontPreference(mode = getBibleFontMode()) {
+    const normalizedMode = mode === 'sans' ? 'sans' : 'serif';
+    localStorage.setItem(BIBLE_FONT_KEY, normalizedMode);
+    if (document.body) document.body.dataset.bibleFont = normalizedMode;
+    return normalizedMode;
+}
+
+function isBibleFontCommand(query) {
+    const normalized = query.trim();
+    if (!normalized || normalized.startsWith('@')) return false;
+    return /聖經字體|圣经字体|經文字體|经文字体|字體|字体|font|폰트|글꼴|서체|黑體|黑体|宋體|宋体|고딕체|명조체|sans|serif/i.test(normalized);
+}
+
+function renderBibleFontOptions() {
+    const mode = getBibleFontMode();
+    const serifSelected = mode === 'serif' ? ' selected' : '';
+    const sansSelected = mode === 'sans' ? ' selected' : '';
+    const title = currentLang === 'ko' ? '성경 글꼴 선택' : '選擇聖經字體';
+    const hint = currentLang === 'ko'
+        ? `현재 성경 본문은 ${getBibleFontLabel(mode)}로 표시됩니다.`
+        : `目前聖經正文使用${getBibleFontLabel(mode)}顯示。`;
+    const serifTitle = currentLang === 'ko' ? '명조체' : '宋體';
+    const sansTitle = currentLang === 'ko' ? '고딕체' : '黑體';
+    const serifPreview = currentLang === 'ko' ? '태초에 하나님이 천지를 창조하시니라' : '起初，神創造天地';
+    const sansPreview = currentLang === 'ko' ? '말씀을 또렷하게 읽기' : '清楚俐落地閱讀經文';
+
+    return `
+        <div class="ai-panel-result-item success ai-panel-font-picker">
+            <div class="result-query">${title}</div>
+            <div class="result-text">${hint}</div>
+            <div class="ai-panel-font-options">
+                <button type="button" class="ai-panel-font-choice${serifSelected}" data-font-mode="serif" onclick="window.setBibleFontMode('serif')">
+                    <span class="ai-panel-font-choice-title">${serifTitle}</span>
+                    <span class="ai-panel-font-choice-preview">${serifPreview}</span>
+                </button>
+                <button type="button" class="ai-panel-font-choice${sansSelected}" data-font-mode="sans" onclick="window.setBibleFontMode('sans')">
+                    <span class="ai-panel-font-choice-title">${sansTitle}</span>
+                    <span class="ai-panel-font-choice-preview">${sansPreview}</span>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function showBibleFontOptions(resultContainer) {
+    resultContainer.querySelector('.ai-panel-font-picker')?.remove();
+    resultContainer.insertAdjacentHTML('afterbegin', renderBibleFontOptions());
+}
+
+window.setBibleFontMode = (mode) => {
+    const appliedMode = applyBibleFontPreference(mode);
+    const resultContainer = document.getElementById('aiPanelResult');
+    if (resultContainer) showBibleFontOptions(resultContainer);
+    const message = currentLang === 'ko'
+        ? `성경 글꼴을 ${getBibleFontLabel(appliedMode)}로 변경했습니다.`
+        : `已將聖經字體切換為${getBibleFontLabel(appliedMode)}。`;
+    const picker = document.querySelector('.ai-panel-font-picker .result-text');
+    if (picker) picker.textContent = message;
+};
+
+applyBibleFontPreference();
 
 window.toggleAiPanel = () => {
     const panel = document.getElementById('aiPanel');
@@ -3912,6 +3984,12 @@ window.aiPanelSearch = async () => {
     
     const query = input.value.trim();
     if (!query) return;
+
+    if (isBibleFontCommand(query)) {
+        showBibleFontOptions(resultContainer);
+        input.value = '';
+        return;
+    }
     
     // 模式 1：跳轉到聖經章節
     // 「到 啟5章」「去 創1章」「계 1장 가」「계 1장 세요」「계 1장 가지」
@@ -4893,10 +4971,10 @@ window.openSearchPreview = (index) => {
             <div class="verse-num" style="color: var(--primary-green); font-weight: bold; margin-bottom: 10px; font-size: 1.15rem;">
                 ${result.verse}
             </div>
-            <div class="verse-text-ko" style="color: #555; font-size: 1.15rem; margin-bottom: 10px; line-height: 1.8; font-family: 'Noto Serif KR', 'Noto Serif TC', serif;">
+            <div class="verse-text-ko" style="color: #555; font-size: 1.15rem; margin-bottom: 10px; line-height: 1.8; font-family: var(--font-bible-current);">
                 ${result.ko}
             </div>
-            <div class="verse-text-zh" style="font-size: 1.2rem; line-height: 1.9; font-family: 'Noto Serif TC', 'Noto Serif KR', serif;">
+            <div class="verse-text-zh" style="font-size: 1.2rem; line-height: 1.9; font-family: var(--font-bible-current);">
                 ${result.zh}
             </div>
         </div>

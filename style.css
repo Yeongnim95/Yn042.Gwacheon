@@ -18,6 +18,16 @@
     --shadow-color: rgba(80, 60, 40, 0.08);
     --input-bg: #faf8f4;
     --nav-bg: #ece7df;
+    --font-ui: "Noto Sans KR", "Noto Sans TC", "Source Han Sans KR", "Source Han Sans TC",
+               "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei",
+               "Segoe UI", -apple-system, BlinkMacSystemFont,
+               "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji",
+               sans-serif;
+    --font-bible-sans: "Noto Sans KR", "Noto Sans TC", "Source Han Sans KR", "Source Han Sans TC",
+                       "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", sans-serif;
+    --font-bible-serif: "Noto Serif KR", "Noto Serif TC", "Source Han Serif KR", "Source Han Serif TC",
+                        "Songti TC", "PMingLiU", "MingLiU", serif;
+    --font-bible-current: var(--font-bible-serif);
 }
 
 * { box-sizing: border-box; }
@@ -31,11 +41,7 @@ html {
 }
 
 body {
-    font-family: "Noto Sans KR", "Noto Sans TC",
-                 "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei",
-                 "Segoe UI", -apple-system, BlinkMacSystemFont,
-                 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 
-                 sans-serif;
+    font-family: var(--font-ui);
     background: transparent;
     min-height: 100%;
     min-height: 100vh;
@@ -45,6 +51,14 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
     color: var(--text-primary);
     transition: color 0.3s;
+}
+
+body[data-bible-font="serif"] {
+    --font-bible-current: var(--font-bible-serif);
+}
+
+body[data-bible-font="sans"] {
+    --font-bible-current: var(--font-bible-sans);
 }
 
 /* --- 導航列 --- */
@@ -417,6 +431,49 @@ body.home-active .nav-ai-btn svg { color: white !important; }
     color: var(--text-muted);
     margin-top: 4px;
 }
+.ai-panel-font-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+}
+.ai-panel-font-choice {
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    font-family: inherit;
+}
+.ai-panel-font-choice:hover {
+    border-color: var(--primary-green);
+    transform: translateY(-1px);
+}
+.ai-panel-font-choice.selected {
+    background: rgba(67, 160, 71, 0.12);
+    border-color: var(--primary-green);
+}
+.ai-panel-font-choice-title {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark-green);
+}
+.ai-panel-font-choice-preview {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.ai-panel-font-choice[data-font-mode="serif"] .ai-panel-font-choice-preview {
+    font-family: var(--font-bible-serif);
+}
+.ai-panel-font-choice[data-font-mode="sans"] .ai-panel-font-choice-preview {
+    font-family: var(--font-bible-sans);
+}
 .ai-panel-loading {
     text-align: center;
     padding: 20px;
@@ -630,9 +687,7 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
 .home-hero-title,
 .home-verse-area, .home-verse-area *,
 .home-pinch-transition {
-    font-family: "Noto Sans KR", "Noto Sans TC",
-        "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei",
-        -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: var(--font-ui) !important;
 }
 
 /* ===== 首頁第一張投影片 ===== */
@@ -966,8 +1021,7 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
 }
 
 .home-feature-title {
-    font-family: "Noto Sans KR", "Noto Sans TC",
-        "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+    font-family: var(--font-ui);
     font-size: clamp(1.6rem, 4.5vw, 2.5rem);
     font-weight: 900;
     color: #3a3530;
@@ -976,8 +1030,7 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
 }
 
 .home-feature-desc {
-    font-family: "Noto Sans KR", "Noto Sans TC",
-        "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", -apple-system, sans-serif;
+    font-family: var(--font-ui);
     font-size: clamp(0.85rem, 2vw, 1.05rem);
     line-height: 1.8;
     color: #8a8070;
@@ -1995,16 +2048,16 @@ button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
     text-align: center;
     font-size: 1.35rem;
     font-weight: 600;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
-.bible-content-title .ko { display: block; font-family: "Noto Serif KR", "Noto Serif TC", serif; }
-.bible-content-title .zh { display: block; font-size: 1.15rem; color: #666; margin-top: 2px; font-family: "Noto Serif TC", "Noto Serif KR", serif; }
+.bible-content-title .ko { display: block; font-family: var(--font-bible-current); }
+.bible-content-title .zh { display: block; font-size: 1.15rem; color: #666; margin-top: 2px; font-family: var(--font-bible-current); }
 
 .bible-verses {
     line-height: 2.1;
     font-size: 1.15rem;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 .bible-verse {
@@ -2016,7 +2069,7 @@ button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
     font-weight: bold;
     font-size: 1.1rem;
     margin-right: 8px;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 .bible-verse .verse-text-ko {
@@ -2026,14 +2079,14 @@ button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
     margin-left: 24px;
     margin-bottom: 8px;
     line-height: 1.8;
-    font-family: "Noto Serif KR", "Noto Serif TC", serif;
+    font-family: var(--font-bible-current);
 }
 
 .bible-verse .verse-text-zh {
     display: block;
     font-size: 1.2rem;
     line-height: 1.9;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 /* 段落標題 - 只顯示中文 */
@@ -2056,7 +2109,7 @@ button.submit-btn:disabled { background: #ccc; cursor: not-allowed; }
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--dark-green);
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 /* 首頁時AI面板按鈕也半透明 */
@@ -2186,7 +2239,7 @@ body.home-active .ai-panel {
     padding: 15px;
     background: var(--card-bg);
     border-radius: 10px;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
     font-size: 1.1rem;
     line-height: 1.9;
     -webkit-user-select: text;
@@ -2205,12 +2258,12 @@ body.home-active .ai-panel {
     color: #555;
     display: block;
     margin-bottom: 10px;
-    font-family: "Noto Serif KR", "Noto Serif TC", serif;
+    font-family: var(--font-bible-current);
 }
 
 .bible-partial-copy-content .verse-zh {
     display: block;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 .bible-partial-copy-hint {
@@ -3013,7 +3066,7 @@ body.home-active .ai-panel {
     transition: background 0.2s;
     -webkit-user-select: none;
     user-select: none;
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
     -webkit-touch-callout: none;
 }
 
@@ -3029,9 +3082,9 @@ body.home-active .ai-panel {
     background: var(--border-color);
 }
 
-/* 搜尋結果列表也使用思源宋體 */
+/* 搜尋結果列表也跟隨聖經字體設定 */
 .bible-search-result-text {
-    font-family: "Noto Serif TC", "Noto Serif KR", serif;
+    font-family: var(--font-bible-current);
 }
 
 /* ===== AI 智能複製 ===== */
