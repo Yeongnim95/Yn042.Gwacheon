@@ -381,11 +381,20 @@ function getPageFromPath() {
 
 // 監聽瀏覽器上一頁/下一頁
 window.addEventListener('popstate', () => {
+    closeTransientBiblePanels();
     const page = getPageFromPath();
     if (page) {
         switchPage(page);
     }
 });
+
+function closeTransientBiblePanels() {
+    document.getElementById('bibleSearchPreview')?.classList.remove('show');
+    document.getElementById('bibleSearchPanel')?.classList.remove('show');
+    document.getElementById('bibleSearchOverlay')?.classList.remove('show');
+    document.getElementById('biblePartialCopyModal')?.classList.remove('show');
+    closeBibleChaptersPopover?.();
+}
 
 window.onload = function() {
     document.querySelector('.lang-select').value = currentLang;
@@ -3839,33 +3848,57 @@ function splitBibleReferenceSegments(input, bookLookup) {
     return segments;
 }
 
-function parseBibleQuery(input) {
-    const bookLookup = buildBookLookup();
-    
-    // 判斷語言
-    let language = 'both';
-    const langPatterns = [
-        { regex: /(?:중국어|중|中文|中)\s*$/i, lang: 'zh' },
-        { regex: /^(?:중국어|중|中文|中)\s*/i, lang: 'zh' },
-        { regex: /(?:한국어|한|韓文|韓)\s*$/i, lang: 'ko' },
-        { regex: /^(?:한국어|한|韓文|韓)\s*/i, lang: 'ko' },
-        { regex: /(?:전부|전체|全部|全|都|다|all|양쪽|兩個)\s*$/i, lang: 'both' },
-        { regex: /^(?:전부|전체|全部|全|都|다|all|양쪽|兩個)\s*/i, lang: 'both' },
-    ];
+function detectBibleCopyLanguage(input) {
     let cleanInput = input.trim();
-    for (const p of langPatterns) {
-        if (p.regex.test(cleanInput)) {
-            language = p.lang;
-            cleanInput = cleanInput.replace(p.regex, '').trim();
-            break;
+    let language = null;
+
+    const stripPatterns = (patterns) => {
+        let matched = false;
+        for (const pattern of patterns) {
+            if (pattern.test(cleanInput)) {
+                cleanInput = cleanInput.replace(pattern, ' ').replace(/\s+/g, ' ').trim();
+                matched = true;
+            }
         }
+        return matched;
+    };
+
+    const bothPatterns = [
+        /(?:中韓|韓中|中韩|韩中|中文韓文|韓文中文|中文韩文|韩文中文|雙語|双语|兩語|两语|중한|한중|중\s*한|한\s*중|중국어\s*한국어|한국어\s*중국어|전부|전체|全部|全|都|다|all|both|양쪽|兩個|两个)\s*$/i,
+        /^(?:中韓|韓中|中韩|韩中|中文韓文|韓文中文|中文韩文|韩文中文|雙語|双语|兩語|两语|중한|한중|중\s*한|한\s*중|중국어\s*한국어|한국어\s*중국어|전부|전체|全部|全|都|다|all|both|양쪽|兩個|两个)\s*/i,
+    ];
+    const zhPatterns = [
+        /(?:中文|中|중국어|중)\s*$/i,
+        /^(?:中文|中|중국어|중)\s*/i,
+    ];
+    const koPatterns = [
+        /(?:韓文|韩文|韓|韩|한국어|한)\s*$/i,
+        /^(?:韓文|韩文|韓|韩|한국어|한)\s*/i,
+    ];
+
+    if (stripPatterns(bothPatterns)) {
+        language = 'both';
+    } else if (stripPatterns(zhPatterns)) {
+        language = 'zh';
+    } else if (stripPatterns(koPatterns)) {
+        language = 'ko';
     }
-    if (language === 'both') {
+
+    if (!language) {
         const hasKorean = /[\uAC00-\uD7AF]/.test(cleanInput);
         const hasChinese = /[\u4E00-\u9FFF]/.test(cleanInput);
         if (hasKorean && !hasChinese) language = 'ko';
         else if (hasChinese && !hasKorean) language = 'zh';
+        else language = currentLang === 'ko' ? 'ko' : 'zh';
     }
+
+    return { language, cleanInput };
+}
+
+function parseBibleQuery(input) {
+    const bookLookup = buildBookLookup();
+    
+    const { language, cleanInput } = detectBibleCopyLanguage(input);
     
     // 拆分多段引用：分號、；、以及空格+書名開頭
     // 例：啟1:1-2 創1:2-7、9 → ['啟1:1-2', '創1:2-7、9']
@@ -3920,7 +3953,7 @@ function parseBibleQuery(input) {
         lastBookId = bookId;
         
         const verses = [];
-        if (/^(all|전부|전체|全部|全)$/i.test(verseStr)) {
+        if (/^(all|both|다|전부|전체|全部|全|都)$/i.test(verseStr)) {
             queries.push({ bookId, chapter, verses: 'all' });
             continue;
         }
@@ -4293,7 +4326,7 @@ ${bookRef}
 語言判斷規則（language 欄位）：
 - "zh" = 只要中文。觸發詞：中文、中、중국어、중
 - "ko" = 只要韓文。觸發詞：韓文、韓、한국어、한
-- "both" = 兩種都要。觸發詞：全部、全、都、다、all、兩個、양쪽
+- "both" = 兩種都要。觸發詞：中韓、韓中、雙語、한중、중한、한 중、중 한、全部、全、都、다、all、兩個、양쪽
 - 如果沒有任何語言關鍵字，根據用戶主要輸入語言推斷：中文書名輸入→"zh"，韓文書名輸入→"ko"
 - 語言關鍵字可能出現在經文引用的前面或後面，甚至用空格或不用空格分隔
 
@@ -4301,6 +4334,8 @@ ${bookRef}
 - "創1:1-4 中" → gen 1章 1-4節 language=zh
 - "창1:1-4 한국어" → gen 1章 1-4節 language=ko
 - "創1:1-4 全部" → gen 1章 1-4節 language=both
+- "啟1:5中韓" → rev 1章 5節 language=both
+- "啟1:5 한 중" → rev 1章 5節 language=both
 - "창1:1-4 중" → gen 1章 1-4節 language=zh
 - "창1:1-4 다" → gen 1章 1-4節 language=both
 - "Gen 1:1-4 all" → gen 1章 1-4節 language=both
@@ -4684,6 +4719,7 @@ window.openBibleSearch = () => {
 
 // 關閉搜尋面板
 window.closeBibleSearch = () => {
+    document.getElementById('bibleSearchPreview')?.classList.remove('show');
     document.getElementById('bibleSearchPanel').classList.remove('show');
     document.getElementById('bibleSearchOverlay').classList.remove('show');
     clearSearchInput();
@@ -4943,6 +4979,7 @@ function renderSearchResults(results, keyword, aiActive = false) {
 window.openSearchPreview = (index) => {
     const result = window.currentSearchResults[index];
     if (!result) return;
+    window.currentSearchPreviewResult = result;
     
     const preview = document.getElementById('bibleSearchPreview');
     const title = document.getElementById('bibleSearchPreviewTitle');
@@ -4984,8 +5021,23 @@ window.openSearchPreview = (index) => {
 };
 
 // 關閉搜尋預覽
-window.closeSearchPreview = () => {
+window.closeSearchPreview = (openChapter = true) => {
     document.getElementById('bibleSearchPreview').classList.remove('show');
+    if (!openChapter) return;
+
+    const result = window.currentSearchPreviewResult;
+    if (!result) return;
+
+    const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+    const book = allBooks.find(b => b.id === result.bookId);
+    if (!book) return;
+
+    window.closeBibleSearch();
+    window.switchPage('bible');
+    setTimeout(() => {
+        selectBibleBook(book);
+        setTimeout(() => openBibleChapter(book, result.chapter), 120);
+    }, 80);
 };
 
 // 預覽頁長按相關變數
