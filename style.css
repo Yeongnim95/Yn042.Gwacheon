@@ -2790,39 +2790,49 @@ body.home-active .ai-panel {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(34, 42, 30, 0.12);
     z-index: 199;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 .bible-search-overlay.show { display: block; }
 
 .bible-search-panel {
     position: fixed;
-    top: -100%;
-    left: 0;
-    right: 0;
+    top: 14px;
+    left: 50%;
     z-index: 200;
-    background: rgba(245, 240, 232, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    transition: top 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 80vh;
+    width: min(720px, calc(100vw - 28px));
+    max-height: min(78vh, 680px);
     display: flex;
     flex-direction: column;
-    border-radius: 0 0 18px 18px;
+    background: rgba(250, 247, 240, 0.76);
+    border: 1px solid rgba(255,255,255,0.56);
+    border-radius: 22px;
+    box-shadow: 0 20px 55px rgba(34, 42, 30, 0.18);
+    transform: translate3d(-50%, -18px, 0) scale(0.98);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.24s ease, transform 0.24s ease, visibility 0.24s ease;
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    overflow: hidden;
 }
-.bible-search-panel.show { top: 0; }
+.bible-search-panel.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate3d(-50%, 0, 0) scale(1);
+}
 
 /* 輸入列 */
 .bible-search-header {
     display: flex;
     align-items: center;
-    padding: 12px 14px 10px;
+    padding: 12px 14px;
     gap: 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(67,160,71,0.1);
 }
 
 .bible-search-input-wrap {
@@ -2830,7 +2840,7 @@ body.home-active .ai-panel {
     position: relative;
     display: flex;
     align-items: center;
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.62);
     border: 1.5px solid rgba(67,160,71,0.25);
     border-radius: 12px;
     padding: 0 10px;
@@ -2889,7 +2899,7 @@ body.home-active .ai-panel {
 /* 結果區 — 只有有內容才展開 */
 .bible-search-body {
     overflow-y: auto;
-    max-height: calc(80vh - 60px);
+    max-height: calc(min(78vh, 680px) - 60px);
     padding: 0;
     transition: max-height 0.3s ease;
 }

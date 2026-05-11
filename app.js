@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.11.01';
+const APP_VERSION = '2026.05.11.02';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -381,6 +381,12 @@ function getPageFromPath() {
 
 // 監聽瀏覽器上一頁/下一頁
 window.addEventListener('popstate', () => {
+    const bibleSection = document.getElementById('bibleSection');
+    const bibleContentView = document.getElementById('bibleContentView');
+    if (bibleSection?.classList.contains('active-section') && bibleContentView?.classList.contains('show')) {
+        window.closeBibleContent({ fromHistory: true });
+        return;
+    }
     closeTransientBiblePanels();
     const page = getPageFromPath();
     if (page) {
@@ -2828,6 +2834,7 @@ let currentBibleChapter = null;
 let selectedVerseData = null;
 let activeBibleBookButton = null;
 let bibleChaptersScrollCloseRaf = 0;
+let bibleChapterHistoryActive = false;
 
 // 初始化聖經頁面
 function initBiblePage() {
@@ -2966,6 +2973,11 @@ async function openBibleChapter(book, chapter) {
     
     // 記錄當前章節
     currentBibleChapter = chapter;
+    currentBibleBook = book;
+    if (!bibleChapterHistoryActive && document.getElementById('bibleSection')?.classList.contains('active-section')) {
+        history.pushState({ bibleChapter: true, bookId: book.id, chapter }, '', '/bible');
+        bibleChapterHistoryActive = true;
+    }
     
     // 設定標題
     contentTitle.querySelector('.ko').textContent = `${book.ko} ${chapter}장`;
@@ -3017,18 +3029,24 @@ async function openBibleChapter(book, chapter) {
 }
 
 // 關閉聖經內容，返回書卷列表
-window.closeBibleContent = () => {
+window.closeBibleContent = (options = {}) => {
+    const { fromHistory = false } = options;
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
     
     contentView.classList.remove('show');
     booksList.style.display = 'block';
+    bibleChapterHistoryActive = false;
     
-    // 回到剛才選擇的書卷附近
     if (activeBibleBookButton) {
         setTimeout(() => {
-            activeBibleBookButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            activeBibleBookButton.scrollIntoView({ behavior: 'auto', block: 'center' });
+            selectBibleBook(currentBibleBook, activeBibleBookButton);
         }, 100);
+    }
+
+    if (!fromHistory && history.state?.bibleChapter) {
+        history.replaceState(null, '', '/bible');
     }
 };
 
@@ -4780,8 +4798,10 @@ window.handleSearchInput = (value) => {
 // 按 Enter 才執行搜尋
 window.handleSearchKeydown = (e) => {
     if (e.key !== 'Enter') return;
+    e.preventDefault();
     const value = e.target.value.trim();
     if (!value || value.length < 1) return;
+    e.target.blur();
     
     const results = document.getElementById('bibleSearchResults');
     const aiLoading = document.getElementById('bibleSearchAiLoading');
@@ -4943,13 +4963,11 @@ function renderSearchResults(results, keyword, aiActive = false) {
             koText = koText.replace(new RegExp(safeKeyword, 'g'), `<mark>${keyword}</mark>`);
         } catch(e) {}
         const aiBadge = r.type === 'ai' ? `<span class="bible-search-ai-badge">AI</span>` : '';
-        const reasonLine = r.reason ? `<div style="font-size:0.8rem;color:#7c4dff;margin-top:3px;opacity:0.85;">${r.reason}</div>` : '';
         return `
             <div class="bible-search-result-item" onclick="window.openSearchPreview(${index})">
                 <div class="bible-search-result-ref">${refKo} / ${refZh}${aiBadge}</div>
                 ${koText ? `<div class="bible-search-result-text" style="color:#777;font-size:0.88rem;margin-bottom:3px;">${koText}</div>` : ''}
                 <div class="bible-search-result-text">${zhText}</div>
-                ${reasonLine}
             </div>`;
     };
     
