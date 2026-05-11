@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.11.05';
+const APP_VERSION = '2026.05.12.01';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -2773,7 +2773,7 @@ async function fetchBibleChapter(bookId, chapter) {
     const key = `${bookId}_${chapter}`;
     if (bibleCache[key]) return bibleCache[key];
     try {
-        const res = await fetch(`/bible/${bookId}/${chapter}.json`);
+        const res = await fetch(`/bible/${bookId}/${chapter}.json?v=${encodeURIComponent(APP_VERSION)}`);
         if (!res.ok) { bibleCache[key] = null; return null; }
         const data = await res.json();
         bibleCache[key] = data;
