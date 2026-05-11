@@ -8,7 +8,7 @@
         var pathSegmentsToKeep = 0; // 根目錄部署，設為 0
         var l = window.location;
         // 已知的 SPA 路由頁面
-        var validPages = ['bible','entry','backend','profile','faith-auto','faith-chart','daily-faith','offline-entry','offline-backend','home'];
+        var validPages = ['bible','lords-prayer','entry','backend','profile','faith-auto','faith-chart','daily-faith','offline-entry','offline-backend','home'];
         var path = l.pathname.replace(/^\//, '').replace(/\/$/, '');
         if (validPages.indexOf(path) !== -1 || /^bible\/[a-z0-9]+\d+$/i.test(path)) {
             // 是 SPA 頁面，轉回首頁讓 JS 處理

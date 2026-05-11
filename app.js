@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.12.01';
+const APP_VERSION = '2026.05.12.02';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -106,7 +106,7 @@ const i18n = {
         homeStatTotal: "총 섭외자", homeStatWeek: "주간 교류",
         copyrightMain: "Yeongnim 개인 소유",
         // 首頁第二頁
-        homeFeatBibleTitle: "성경", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
+        homeFeatBibleTitle: "읽기", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
         homeFeatAutoTitle: "신앙 자동화 관리", homeFeatAutoDesc: "신앙 생활을 체계적으로\n관리하고 성장하는 도구",
         homeFeatDataTitle: "교류 관리", homeFeatDataDesc: "기록된 데이터를 확인하고\n열매를 관리하세요",
         // 今日默想
@@ -128,7 +128,7 @@ const i18n = {
         aiComposeHint3: "격려 메시지", aiComposeHint4: "성경 말씀 나누기",
         faithCardAiCompose: "AI 통합 작문", faithCardAiComposeDesc: "AI를 활용하여 섭외자에게 보낼 메시지를 자동으로 생성합니다.",
         // 書籍
-        menuBooks: "서적", btnBible: "성경",
+        menuBooks: "서적", btnBible: "성경", btnLordsPrayer: "주기도문",
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "뒤로",
         // 果子資訊
@@ -195,7 +195,7 @@ const i18n = {
         homeStatTotal: "總涉外者", homeStatWeek: "週間交流",
         copyrightMain: "Yeongnim個人所有",
         // 首頁第二頁
-        homeFeatBibleTitle: "聖經", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
+        homeFeatBibleTitle: "閱讀", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
         homeFeatAutoTitle: "信仰自動化管理", homeFeatAutoDesc: "系統化管理信仰生活，\n持續成長的工具",
         homeFeatDataTitle: "交流管理", homeFeatDataDesc: "確認記錄的數據，\n管理結出的果子",
         // 今日默想
@@ -217,7 +217,7 @@ const i18n = {
         aiComposeHint3: "鼓勵訊息", aiComposeHint4: "分享聖經話語",
         faithCardAiCompose: "AI 整合作文", faithCardAiComposeDesc: "利用 AI 自動生成要發送給涉外者的訊息。",
         // 書籍
-        menuBooks: "書籍", btnBible: "聖經",
+        menuBooks: "書籍", btnBible: "聖經", btnLordsPrayer: "主祈禱文",
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "返回",
         // 果子資訊
@@ -371,6 +371,7 @@ function getPageFromPath() {
             'faith-auto': 'faithAuto',
             'faith-chart': 'faith-chart',
             'daily-faith': 'daily-faith',
+            'lords-prayer': 'lords-prayer',
             'ai-compose': 'ai-compose',
             'offline-entry': 'offline-entry',
             'offline-backend': 'offline-backend'
@@ -384,7 +385,7 @@ function getPageFromPath() {
             'home': 'home', 'bible': 'bible', 'entry': 'entry',
             'backend': 'backend', 'profile': 'profile',
             'faith-auto': 'faithAuto', 'faith-chart': 'faith-chart',
-            'daily-faith': 'daily-faith', 'ai-compose': 'ai-compose',
+            'daily-faith': 'daily-faith', 'lords-prayer': 'lords-prayer', 'ai-compose': 'ai-compose',
             'offline-entry': 'offline-entry',
             'offline-backend': 'offline-backend'
         };
@@ -395,7 +396,7 @@ function getPageFromPath() {
                 'home': '/', 'bible': '/bible', 'entry': '/entry',
                 'backend': '/backend', 'profile': '/profile',
                 'faithAuto': '/faith-auto', 'faith-chart': '/faith-chart',
-                'daily-faith': '/daily-faith', 'ai-compose': '/ai-compose',
+                'daily-faith': '/daily-faith', 'lords-prayer': '/lords-prayer', 'ai-compose': '/ai-compose',
                 'offline-entry': '/offline-entry',
                 'offline-backend': '/offline-backend'
             };
@@ -440,7 +441,7 @@ window.onload = function() {
             'bible': '/bible', 'entry': '/entry', 'backend': '/backend',
             'profile': '/profile', 'faith-auto': '/faith-auto',
             'faith-chart': '/faith-chart', 'daily-faith': '/daily-faith',
-            'ai-compose': '/ai-compose',
+            'lords-prayer': '/lords-prayer', 'ai-compose': '/ai-compose',
             'offline-entry': '/offline-entry', 'offline-backend': '/offline-backend',
             'home': '/'
         };
@@ -529,6 +530,7 @@ function applyLanguage() {
         'faith-card-ai-compose': t.faithCardAiCompose, 'faith-card-ai-compose-desc': t.faithCardAiComposeDesc,
         // 書籍
         'btn-bible': t.btnBible,
+        'btn-lords-prayer': t.btnLordsPrayer,
         'txt-old-testament': t.txtOldTestament, 'txt-new-testament': t.txtNewTestament,
         'txt-bible-back': t.txtBibleBack,
         // 果子資訊
@@ -602,6 +604,7 @@ function applyLanguage() {
         else if (sectionId === 'dailyFaithSection') pageTitleEl.textContent = t.btnDailyFaith;
         else if (sectionId === 'faithChartSection') pageTitleEl.textContent = t.btnFaithChart;
         else if (sectionId === 'bibleSection') pageTitleEl.textContent = t.btnBible;
+        else if (sectionId === 'lordsPrayerSection') pageTitleEl.textContent = t.btnLordsPrayer;
         else if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
         else if (sectionId === 'offlineEntrySection') pageTitleEl.textContent = t.btnOfflineEntry;
         else if (sectionId === 'profileSection') pageTitleEl.textContent = t.btnProfile;
@@ -1782,6 +1785,7 @@ window.switchPage = (page) => {
     const pathMap = {
         'home': '/',
         'bible': '/bible',
+        'lords-prayer': '/lords-prayer',
         'entry': '/entry',
         'backend': '/backend',
         'profile': '/profile',
@@ -1869,6 +1873,12 @@ window.switchPage = (page) => {
                 openBibleChapter(bibleRoute.book, bibleRoute.chapter, { fromRoute: true });
             }, 0);
         }
+    } else if (page === 'lords-prayer') {
+        document.getElementById('lordsPrayerSection').classList.add('active-section');
+        document.getElementById('btn-lords-prayer')?.classList.add('active');
+        document.getElementById('menu-category-books').classList.add('open');
+        pageTitleEl.textContent = t.btnLordsPrayer;
+        renderLordsPrayer();
     } else if (page === 'entry') { 
         document.getElementById('entrySection').classList.add('active-section'); 
         document.getElementById('btn-entry')?.classList.add('active');
@@ -2768,6 +2778,7 @@ const bibleBooks = {
 // ===== 聖經經文：從 /bible/ JSON 動態載入 =====
 // 格式：/bible/{bookId}/{chapter}.json → [{verse:1, zh:'...'}, ...]
 const bibleCache = {}; // { 'gen_1': [...], 'rev_3': [...] }
+let lordsPrayerCache = null;
 
 async function fetchBibleChapter(bookId, chapter) {
     const key = `${bookId}_${chapter}`;
@@ -2781,6 +2792,50 @@ async function fetchBibleChapter(bookId, chapter) {
     } catch(e) {
         bibleCache[key] = null;
         return null;
+    }
+}
+
+async function fetchLordsPrayer() {
+    if (lordsPrayerCache) return lordsPrayerCache;
+    const res = await fetch(`/prayers/lords-prayer.json?v=${encodeURIComponent(APP_VERSION)}`);
+    if (!res.ok) throw new Error(`Failed to load lords-prayer.json: ${res.status}`);
+    lordsPrayerCache = await res.json();
+    return lordsPrayerCache;
+}
+
+async function renderLordsPrayer() {
+    const content = document.getElementById('lordsPrayerContent');
+    const title = document.getElementById('lordsPrayerTitle');
+    const kicker = document.getElementById('lordsPrayerKicker');
+    if (!content) return;
+
+    content.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+    try {
+        const data = await fetchLordsPrayer();
+        if (title) title.textContent = `${data.titles?.ko || '주기도문'} / ${data.titles?.zh || '主祈禱文'}`;
+        if (kicker) kicker.textContent = currentLang === 'ko' ? '기도문 / 祈禱文' : '祈禱文 / 기도문';
+
+        const renderLines = (lines = []) => lines
+            .map((line) => `<p>${escapeHtml(line)}</p>`)
+            .join('');
+
+        content.innerHTML = `
+            <section class="prayer-language-card ko">
+                <div class="prayer-language-label">한국어</div>
+                <div class="prayer-lines">${renderLines(data.ko)}</div>
+            </section>
+            <section class="prayer-language-card zh">
+                <div class="prayer-language-label">中文</div>
+                <div class="prayer-lines">${renderLines(data.zh)}</div>
+            </section>
+        `;
+    } catch (error) {
+        content.innerHTML = `
+            <div class="prayer-error">
+                ${currentLang === 'ko' ? '주기도문을 불러오지 못했습니다.' : '無法載入主祈禱文。'}
+                <span>${escapeHtml(error.message || String(error))}</span>
+            </div>
+        `;
     }
 }
 
