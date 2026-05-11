@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <script>
         // GitHub Pages SPA 路由：將 clean URL 導回 index.html
-        // 例如 /bible → 載入 index.html 並由 JS 處理路由
+        // 例如 /bible、/bible/gen1 → 載入 index.html 並由 JS 處理路由
         var pathSegmentsToKeep = 0; // 根目錄部署，設為 0
         var l = window.location;
         // 已知的 SPA 路由頁面
-        var validPages = ['bible','entry','backend','profile','faith-auto','faith-chart','daily-faith','ai-compose','offline-entry','offline-backend','home'];
+        var validPages = ['bible','entry','backend','profile','faith-auto','faith-chart','daily-faith','offline-entry','offline-backend','home'];
         var path = l.pathname.replace(/^\//, '').replace(/\/$/, '');
-        if (validPages.indexOf(path) !== -1) {
+        if (validPages.indexOf(path) !== -1 || /^bible\/[a-z0-9]+\d+$/i.test(path)) {
             // 是 SPA 頁面，轉回首頁讓 JS 處理
             l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/' + '?p=' + encodeURIComponent(path));
         }

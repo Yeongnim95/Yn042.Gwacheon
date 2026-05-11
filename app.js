@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.11.04';
+const APP_VERSION = '2026.05.11.05';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -331,10 +331,37 @@ window.isSwipeAction = () => isBackendSwiping;
 // 頁面記憶已停用 — 每次開啟都回首頁
 
 // Path → Page 映射（支援 clean URL 和舊版 hash 相容）
+function getAllBibleBooks() {
+    return [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+}
+
+function getBibleChapterPath(book, chapter) {
+    return `/bible/${book.id}${chapter}`;
+}
+
+function parseBibleChapterPath(pathname = window.location.pathname) {
+    const path = String(pathname).replace(/^\//, '').replace(/\/$/, '');
+    if (!path.startsWith('bible/')) return null;
+
+    const slug = path.slice('bible/'.length).toLowerCase();
+    const booksByIdLength = getAllBibleBooks().sort((a, b) => b.id.length - a.id.length);
+    for (const book of booksByIdLength) {
+        if (!slug.startsWith(book.id)) continue;
+        const chapterText = slug.slice(book.id.length);
+        if (!/^\d+$/.test(chapterText)) continue;
+        const chapter = Number(chapterText);
+        if (chapter >= 1 && chapter <= book.chapters) {
+            return { book, chapter };
+        }
+    }
+    return null;
+}
+
 function getPageFromPath() {
     // 優先讀取 pathname
     const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
     if (path) {
+        if (parseBibleChapterPath(window.location.pathname)) return 'bible';
         const reverseMap = {
             'home': 'home',
             'bible': 'bible',
@@ -417,7 +444,9 @@ window.onload = function() {
             'offline-entry': '/offline-entry', 'offline-backend': '/offline-backend',
             'home': '/'
         };
-        const cleanPath = pathMap[redirectPage] || '/';
+        const cleanPath = /^bible\/[a-z0-9]+\d+$/i.test(redirectPage)
+            ? `/${redirectPage.toLowerCase()}`
+            : (pathMap[redirectPage] || '/');
         history.replaceState(null, '', cleanPath);
     }
     
@@ -1741,6 +1770,7 @@ document.addEventListener('click', (e) => {
 
 window.switchPage = (page) => {
     const t = i18n[currentLang];
+    const bibleRoute = page === 'bible' ? parseBibleChapterPath() : null;
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     
@@ -1762,7 +1792,7 @@ window.switchPage = (page) => {
         'offline-entry': '/offline-entry',
         'offline-backend': '/offline-backend'
     };
-    const newPath = pathMap[page] || '/';
+    const newPath = bibleRoute ? getBibleChapterPath(bibleRoute.book, bibleRoute.chapter) : (pathMap[page] || '/');
     if (window.location.pathname !== newPath) {
         history.pushState(null, '', newPath);
     }
@@ -1830,8 +1860,15 @@ window.switchPage = (page) => {
         // 重置聖經頁面到書卷列表
         document.getElementById('bibleBooksList').style.display = 'block';
         document.getElementById('bibleContentView').classList.remove('show');
+        bibleChapterHistoryActive = false;
         // 顯示功能按鈕群組
         document.getElementById('bibleFabContainer').classList.add('show');
+        if (bibleRoute) {
+            setTimeout(() => {
+                selectBibleBook(bibleRoute.book);
+                openBibleChapter(bibleRoute.book, bibleRoute.chapter, { fromRoute: true });
+            }, 0);
+        }
     } else if (page === 'entry') { 
         document.getElementById('entrySection').classList.add('active-section'); 
         document.getElementById('btn-entry')?.classList.add('active');
@@ -2834,6 +2871,7 @@ let currentBibleChapter = null;
 let selectedVerseData = null;
 let activeBibleBookButton = null;
 let bibleChaptersScrollCloseRaf = 0;
+let suppressBibleChaptersScrollCloseUntil = 0;
 let bibleChapterHistoryActive = false;
 let activeWordStudyVerseElement = null;
 
@@ -2950,9 +2988,14 @@ document.addEventListener('click', (event) => {
 });
 
 function closeBibleChaptersOnPageScroll(event) {
+    hideWordStudyActionBubble();
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     if (!chaptersContainer || !chaptersContainer.classList.contains('show')) return;
     if (event?.target && chaptersContainer.contains(event.target)) return;
+    if (Date.now() < suppressBibleChaptersScrollCloseUntil) {
+        positionBibleChaptersPopover();
+        return;
+    }
     if (bibleChaptersScrollCloseRaf) return;
 
     bibleChaptersScrollCloseRaf = requestAnimationFrame(() => {
@@ -2975,9 +3018,16 @@ async function openBibleChapter(book, chapter, options = {}) {
     // 記錄當前章節
     currentBibleChapter = chapter;
     currentBibleBook = book;
-    if (!bibleChapterHistoryActive && document.getElementById('bibleSection')?.classList.contains('active-section')) {
-        history.pushState({ bibleChapter: true, bookId: book.id, chapter }, '', '/bible');
+    const chapterPath = getBibleChapterPath(book, chapter);
+    const chapterState = { bibleChapter: true, bookId: book.id, chapter };
+    if (options.fromRoute) {
+        history.replaceState(chapterState, '', chapterPath);
         bibleChapterHistoryActive = true;
+    } else if (!bibleChapterHistoryActive && document.getElementById('bibleSection')?.classList.contains('active-section')) {
+        history.pushState(chapterState, '', chapterPath);
+        bibleChapterHistoryActive = true;
+    } else if (window.location.pathname !== chapterPath) {
+        history.replaceState(chapterState, '', chapterPath);
     }
     
     // 設定標題
@@ -3049,19 +3099,22 @@ window.closeBibleContent = (options = {}) => {
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
     
+    hideWordStudyActionBubble();
     contentView.classList.remove('show');
     booksList.style.display = 'block';
     bibleChapterHistoryActive = false;
+    suppressBibleChaptersScrollCloseUntil = Date.now() + 900;
     
-    if (activeBibleBookButton) {
-        setTimeout(() => {
-            activeBibleBookButton.scrollIntoView({ behavior: 'auto', block: 'center' });
-            selectBibleBook(currentBibleBook, activeBibleBookButton);
-        }, 100);
+    if (!fromHistory && (history.state?.bibleChapter || /^\/bible\/[a-z0-9]+\d+$/i.test(window.location.pathname))) {
+        history.replaceState(null, '', '/bible');
     }
 
-    if (!fromHistory && history.state?.bibleChapter) {
-        history.replaceState(null, '', '/bible');
+    if (currentBibleBook) {
+        setTimeout(() => {
+            suppressBibleChaptersScrollCloseUntil = Date.now() + 700;
+            activeBibleBookButton?.scrollIntoView({ behavior: 'auto', block: 'center' });
+            selectBibleBook(currentBibleBook, activeBibleBookButton);
+        }, 100);
     }
 };
 
@@ -3140,11 +3193,11 @@ function injectBackToTopStyle() {
             height: 46px;
             display: grid;
             place-items: center;
-            border: 1px solid rgba(255,255,255,0.42);
+            border: 1px solid rgba(255,255,255,0.58);
             border-radius: 999px;
-            background: rgba(46, 125, 50, 0.92);
+            background: rgba(67, 160, 71, 0.62);
             color: #fff;
-            box-shadow: 0 8px 22px rgba(30, 50, 30, 0.28);
+            box-shadow: 0 8px 22px rgba(30, 50, 30, 0.18);
             cursor: pointer;
             opacity: 0;
             visibility: hidden;
@@ -3163,7 +3216,7 @@ function injectBackToTopStyle() {
             transform: translate3d(0, 0, 0) scale(1);
         }
         #${BACK_TO_TOP_ID}:hover {
-            background: rgba(27, 94, 32, 0.95);
+            background: rgba(46, 125, 50, 0.78);
             transform: translate3d(0, 0, 0) scale(1.06);
         }
         body.home-active #${BACK_TO_TOP_ID} {
@@ -3503,9 +3556,6 @@ function renderWordStudyResult(data, analysis) {
     const pairs = analysis.pairs || [];
     const koHtml = highlightWordStudyText(data.ko, pairs, 'ko');
     const zhHtml = highlightWordStudyText(data.zh, pairs, 'zh');
-    const summary = analysis.summary
-        ? `<div class="word-study-summary">${escapeHtml(analysis.summary)}</div>`
-        : '';
 
     const rows = pairs.length
         ? pairs.map((pair, index) => `
@@ -3528,7 +3578,6 @@ function renderWordStudyResult(data, analysis) {
             <div class="word-study-verse ko">${koHtml}</div>
             <div class="word-study-verse zh">${zhHtml}</div>
         </div>
-        ${summary}
         <div class="word-study-list">${rows}</div>
     `;
 }
@@ -4836,6 +4885,7 @@ window.handleVerseTouchMove = (event, element) => {
         // 移動超過10px視為滑動
         if (moveX > 10 || moveY > 10) {
             copyModeTouchMoved = true;
+            hideWordStudyActionBubble();
         }
         return;
     }
@@ -4847,6 +4897,7 @@ window.handleVerseTouchMove = (event, element) => {
         
         // 移動超過10px則取消長按
         if (moveX > 10 || moveY > 10) {
+            hideWordStudyActionBubble();
             clearLongPressState();
         }
     }
