@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.12.02';
+const APP_VERSION = '2026.05.12.03';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -636,10 +636,10 @@ function applyLanguage() {
     const aiNote = document.getElementById('aiPanelNote');
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
-    if (aiNote) aiNote.innerHTML = currentLang === 'ko' 
-        ? '경문: <b>창1:1-3 한</b> | 이동: <b>계1장 가</b> | 글꼴: <b>성경 글꼴</b> | 작문: <b>@번호 지시</b>' 
-        : '經文: <b>創1:1-3 中</b> | 跳轉: <b>到 啟1章</b> | 字體: <b>聖經字體</b> | 作文: <b>@編號 指示</b>';
-    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / 계1장 가 / 성경 글꼴 / @0012 지시' : '創1:1 中 / 到 啟1章 / 聖經字體 / @0012 指示';
+    if (aiNote) aiNote.innerHTML = currentLang === 'ko'
+        ? '이동: <b>cd 계1</b> / <b>계1:5 가요</b> | 복사: <b>cp 창1:1</b> / <b>cp 주기도문</b>' 
+        : '跳轉: <b>cd 啟1</b> / <b>到 啟1:5</b> | 複製: <b>cp 創1:1</b> / <b>cp 主祈禱文</b>';
+    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? 'cd 계1 / 계1:5 가요 / cp 창1:1 / cp 주기도문' : 'cd 啟1 / 到 啟1:5 / cp 創1:1 / cp 主祈禱文';
     
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
@@ -4182,7 +4182,7 @@ function resolveBibleBookId(bookName, bookLookup) {
 function parseBibleNavigationQuery(input) {
     const bookLookup = buildBookLookup();
     const cleanInput = input.trim().replace(/\s+/g, ' ');
-    const englishPrefix = /^(?:to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
+    const englishPrefix = /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
     const asianPrefix = /^(?:到|去|가|가자|가세요|가요|가지)\s*/;
 
     let navText = '';
@@ -4191,9 +4191,9 @@ function parseBibleNavigationQuery(input) {
     } else if (asianPrefix.test(cleanInput)) {
         navText = cleanInput.replace(asianPrefix, '').trim();
     } else {
-        const suffixMatch = cleanInput.match(/^(.+?)\s*(\d+)\s*(?:章|장)\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
+        const suffixMatch = cleanInput.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장)?\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
         if (!suffixMatch) return null;
-        navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}`;
+        navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}${suffixMatch[3] ? `:${suffixMatch[3]}` : ''}`;
     }
 
     const match = navText.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장|chapter|chapters|ch)?\s*$/i);
@@ -4212,6 +4212,26 @@ function parseBibleCopyCommand(input) {
     if (!match) return null;
     const parsed = parseBibleQuery(match[1].trim());
     return parsed.queries.length > 0 ? parsed : null;
+}
+
+function parsePrayerCopyCommand(input) {
+    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    if (!match) return null;
+    const target = match[1].trim().replace(/[\s'’/／_-]+/g, '').toLowerCase();
+    const aliases = [
+        '主禱文', '主祷文', '主祈禱文', '主祈祷文', '天主經', '天主经',
+        '주기도문', 'lordsprayer', 'lordprayer', 'thelordsprayer', 'ourfather'
+    ];
+    return aliases.some((alias) => {
+        const normalizedAlias = alias.replace(/[\s'’/／_-]+/g, '').toLowerCase();
+        return target === normalizedAlias || target.includes(normalizedAlias);
+    });
+}
+
+function formatPrayerForCopy(data) {
+    const koTitle = data.titles?.ko || '주기도문';
+    const zhTitle = data.titles?.zh || '主祈禱文';
+    return `${koTitle}\n${(data.ko || []).join('\n')}\n\n${zhTitle}\n${(data.zh || []).join('\n')}`;
 }
 
 function startsBibleReferenceSegment(fragment, bookLookup) {
@@ -4435,6 +4455,41 @@ window.aiPanelSearch = async () => {
     if (isBibleFontCommand(query)) {
         showBibleFontOptions(resultContainer);
         input.value = '';
+        return;
+    }
+
+    // 模式 0-a：Linux 風格移動指令，例如 cd gen1 / cd 계 1 / cd 啟1:5
+    const cdNav = parseBibleNavigationQuery(query);
+    if (cdNav && /^cd\s+/i.test(query)) {
+        const { bookId, chapter, verse } = cdNav;
+        const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+        const book = allBooks.find(b => b.id === bookId);
+        if (book && chapter >= 1 && chapter <= book.chapters) {
+            window.toggleAiPanel();
+            window.switchPage('bible');
+            setTimeout(() => {
+                selectBibleBook(book);
+                setTimeout(() => openBibleChapter(book, chapter, { targetVerse: verse }), 300);
+            }, 300);
+            input.value = '';
+            return;
+        }
+    }
+
+    // 模式 0-b：複製主祈禱文，例如 cp 主禱文 / cp 주기도문 / cp lords prayer
+    if (parsePrayerCopyCommand(query)) {
+        sendBtn.disabled = true;
+        try {
+            const prayer = await fetchLordsPrayer();
+            const text = formatPrayerForCopy(prayer);
+            await navigator.clipboard.writeText(text);
+            saveAiPanelResult({ query, text, success: true, timestamp: Date.now() });
+            input.value = '';
+        } catch (err) {
+            saveAiPanelResult({ query, text: '❌ ' + err.message, success: false, timestamp: Date.now() });
+        } finally {
+            sendBtn.disabled = false;
+        }
         return;
     }
 
