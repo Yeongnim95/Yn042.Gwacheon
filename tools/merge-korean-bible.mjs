@@ -159,7 +159,12 @@ for (const [index, sourceFile] of sourceFiles.entries()) {
   }
 
   const original = JSON.stringify(target);
-  const koreanByVerse = new Map(source.verses.map((verse) => [Number(verse.verse), verse.text]));
+  const koreanByVerse = new Map();
+  for (const verse of source.verses) {
+    const verseNumber = Number(verse.verse);
+    const existing = koreanByVerse.get(verseNumber);
+    koreanByVerse.set(verseNumber, existing ? `${existing}\n${verse.text}` : verse.text);
+  }
   const seen = new Set();
 
   for (const item of target) {
@@ -172,10 +177,11 @@ for (const [index, sourceFile] of sourceFiles.entries()) {
 
   for (const [verseNumber] of koreanByVerse) {
     if (seen.has(verseNumber)) continue;
+    target.push({ verse: verseNumber, ko: koreanByVerse.get(verseNumber) });
     report.verseMismatches.push({
       targetFile,
       verse: verseNumber,
-      issue: 'Source verse not found as an independent verse in the Chinese target; skipped',
+      issue: 'Source verse not found as an independent verse in the Chinese target; appended as Korean-only verse',
     });
   }
 
