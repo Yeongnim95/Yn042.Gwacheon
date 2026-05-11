@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.11.01';
+const APP_VERSION = '2026.05.11.05';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -331,10 +331,37 @@ window.isSwipeAction = () => isBackendSwiping;
 // 頁面記憶已停用 — 每次開啟都回首頁
 
 // Path → Page 映射（支援 clean URL 和舊版 hash 相容）
+function getAllBibleBooks() {
+    return [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+}
+
+function getBibleChapterPath(book, chapter) {
+    return `/bible/${book.id}${chapter}`;
+}
+
+function parseBibleChapterPath(pathname = window.location.pathname) {
+    const path = String(pathname).replace(/^\//, '').replace(/\/$/, '');
+    if (!path.startsWith('bible/')) return null;
+
+    const slug = path.slice('bible/'.length).toLowerCase();
+    const booksByIdLength = getAllBibleBooks().sort((a, b) => b.id.length - a.id.length);
+    for (const book of booksByIdLength) {
+        if (!slug.startsWith(book.id)) continue;
+        const chapterText = slug.slice(book.id.length);
+        if (!/^\d+$/.test(chapterText)) continue;
+        const chapter = Number(chapterText);
+        if (chapter >= 1 && chapter <= book.chapters) {
+            return { book, chapter };
+        }
+    }
+    return null;
+}
+
 function getPageFromPath() {
     // 優先讀取 pathname
     const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
     if (path) {
+        if (parseBibleChapterPath(window.location.pathname)) return 'bible';
         const reverseMap = {
             'home': 'home',
             'bible': 'bible',
@@ -381,6 +408,12 @@ function getPageFromPath() {
 
 // 監聽瀏覽器上一頁/下一頁
 window.addEventListener('popstate', () => {
+    const bibleSection = document.getElementById('bibleSection');
+    const bibleContentView = document.getElementById('bibleContentView');
+    if (bibleSection?.classList.contains('active-section') && bibleContentView?.classList.contains('show')) {
+        window.closeBibleContent({ fromHistory: true });
+        return;
+    }
     closeTransientBiblePanels();
     const page = getPageFromPath();
     if (page) {
@@ -411,7 +444,9 @@ window.onload = function() {
             'offline-entry': '/offline-entry', 'offline-backend': '/offline-backend',
             'home': '/'
         };
-        const cleanPath = pathMap[redirectPage] || '/';
+        const cleanPath = /^bible\/[a-z0-9]+\d+$/i.test(redirectPage)
+            ? `/${redirectPage.toLowerCase()}`
+            : (pathMap[redirectPage] || '/');
         history.replaceState(null, '', cleanPath);
     }
     
@@ -1735,6 +1770,7 @@ document.addEventListener('click', (e) => {
 
 window.switchPage = (page) => {
     const t = i18n[currentLang];
+    const bibleRoute = page === 'bible' ? parseBibleChapterPath() : null;
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
     
@@ -1756,7 +1792,7 @@ window.switchPage = (page) => {
         'offline-entry': '/offline-entry',
         'offline-backend': '/offline-backend'
     };
-    const newPath = pathMap[page] || '/';
+    const newPath = bibleRoute ? getBibleChapterPath(bibleRoute.book, bibleRoute.chapter) : (pathMap[page] || '/');
     if (window.location.pathname !== newPath) {
         history.pushState(null, '', newPath);
     }
@@ -1824,8 +1860,15 @@ window.switchPage = (page) => {
         // 重置聖經頁面到書卷列表
         document.getElementById('bibleBooksList').style.display = 'block';
         document.getElementById('bibleContentView').classList.remove('show');
+        bibleChapterHistoryActive = false;
         // 顯示功能按鈕群組
         document.getElementById('bibleFabContainer').classList.add('show');
+        if (bibleRoute) {
+            setTimeout(() => {
+                selectBibleBook(bibleRoute.book);
+                openBibleChapter(bibleRoute.book, bibleRoute.chapter, { fromRoute: true });
+            }, 0);
+        }
     } else if (page === 'entry') { 
         document.getElementById('entrySection').classList.add('active-section'); 
         document.getElementById('btn-entry')?.classList.add('active');
@@ -2828,6 +2871,9 @@ let currentBibleChapter = null;
 let selectedVerseData = null;
 let activeBibleBookButton = null;
 let bibleChaptersScrollCloseRaf = 0;
+let suppressBibleChaptersScrollCloseUntil = 0;
+let bibleChapterHistoryActive = false;
+let activeWordStudyVerseElement = null;
 
 // 初始化聖經頁面
 function initBiblePage() {
@@ -2942,9 +2988,14 @@ document.addEventListener('click', (event) => {
 });
 
 function closeBibleChaptersOnPageScroll(event) {
+    hideWordStudyActionBubble();
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     if (!chaptersContainer || !chaptersContainer.classList.contains('show')) return;
     if (event?.target && chaptersContainer.contains(event.target)) return;
+    if (Date.now() < suppressBibleChaptersScrollCloseUntil) {
+        positionBibleChaptersPopover();
+        return;
+    }
     if (bibleChaptersScrollCloseRaf) return;
 
     bibleChaptersScrollCloseRaf = requestAnimationFrame(() => {
@@ -2958,7 +3009,7 @@ document.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: t
 window.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: true });
 
 // 開啟聖經章節
-async function openBibleChapter(book, chapter) {
+async function openBibleChapter(book, chapter, options = {}) {
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
     const contentTitle = document.getElementById('bibleContentTitle');
@@ -2966,6 +3017,18 @@ async function openBibleChapter(book, chapter) {
     
     // 記錄當前章節
     currentBibleChapter = chapter;
+    currentBibleBook = book;
+    const chapterPath = getBibleChapterPath(book, chapter);
+    const chapterState = { bibleChapter: true, bookId: book.id, chapter };
+    if (options.fromRoute) {
+        history.replaceState(chapterState, '', chapterPath);
+        bibleChapterHistoryActive = true;
+    } else if (!bibleChapterHistoryActive && document.getElementById('bibleSection')?.classList.contains('active-section')) {
+        history.pushState(chapterState, '', chapterPath);
+        bibleChapterHistoryActive = true;
+    } else if (window.location.pathname !== chapterPath) {
+        history.replaceState(chapterState, '', chapterPath);
+    }
     
     // 設定標題
     contentTitle.querySelector('.ko').textContent = `${book.ko} ${chapter}장`;
@@ -3013,21 +3076,44 @@ async function openBibleChapter(book, chapter) {
             </div>`;
     }
     // 章節載入後更新回頂按鈕狀態
+    if (options.targetVerse != null) {
+        setTimeout(() => scrollToBibleVerse(options.targetVerse), 120);
+    }
     setTimeout(() => window.refreshBackToTop?.(), 100);
 }
 
+function scrollToBibleVerse(verse) {
+    const verseText = String(verse);
+    const target = [...document.querySelectorAll('#bibleVerses .bible-verse')]
+        .find((el) => el.dataset.verse === verseText);
+    if (!target) return;
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.add('verse-jump-highlight');
+    setTimeout(() => target.classList.remove('verse-jump-highlight'), 1800);
+}
+
 // 關閉聖經內容，返回書卷列表
-window.closeBibleContent = () => {
+window.closeBibleContent = (options = {}) => {
+    const { fromHistory = false } = options;
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
     
+    hideWordStudyActionBubble();
     contentView.classList.remove('show');
     booksList.style.display = 'block';
+    bibleChapterHistoryActive = false;
+    suppressBibleChaptersScrollCloseUntil = Date.now() + 900;
     
-    // 回到剛才選擇的書卷附近
-    if (activeBibleBookButton) {
+    if (!fromHistory && (history.state?.bibleChapter || /^\/bible\/[a-z0-9]+\d+$/i.test(window.location.pathname))) {
+        history.replaceState(null, '', '/bible');
+    }
+
+    if (currentBibleBook) {
         setTimeout(() => {
-            activeBibleBookButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            suppressBibleChaptersScrollCloseUntil = Date.now() + 700;
+            activeBibleBookButton?.scrollIntoView({ behavior: 'auto', block: 'center' });
+            selectBibleBook(currentBibleBook, activeBibleBookButton);
         }, 100);
     }
 };
@@ -3107,11 +3193,11 @@ function injectBackToTopStyle() {
             height: 46px;
             display: grid;
             place-items: center;
-            border: 1px solid rgba(255,255,255,0.42);
+            border: 1px solid rgba(255,255,255,0.58);
             border-radius: 999px;
-            background: rgba(46, 125, 50, 0.92);
+            background: rgba(67, 160, 71, 0.62);
             color: #fff;
-            box-shadow: 0 8px 22px rgba(30, 50, 30, 0.28);
+            box-shadow: 0 8px 22px rgba(30, 50, 30, 0.18);
             cursor: pointer;
             opacity: 0;
             visibility: hidden;
@@ -3130,7 +3216,7 @@ function injectBackToTopStyle() {
             transform: translate3d(0, 0, 0) scale(1);
         }
         #${BACK_TO_TOP_ID}:hover {
-            background: rgba(27, 94, 32, 0.95);
+            background: rgba(46, 125, 50, 0.78);
             transform: translate3d(0, 0, 0) scale(1.06);
         }
         body.home-active #${BACK_TO_TOP_ID} {
@@ -3282,6 +3368,8 @@ function clearLongPressState() {
 // 觸發長按成功 - 進入複製模式並顯示小圖示
 function triggerLongPress(event, element) {
     clearLongPressState();
+    longPressTriggered = true;
+    showWordStudyAction(event, element);
 }
 
 // 顯示複製小圖示
@@ -3320,6 +3408,242 @@ window.openCopyModePanel = () => {
 function enterCopyMode(element) {
     clearLongPressState();
 }
+
+function getVersePointerPosition(event) {
+    const touch = event?.touches?.[0] || event?.changedTouches?.[0];
+    if (touch) return { x: touch.clientX, y: touch.clientY };
+    return {
+        x: event?.clientX || window.innerWidth / 2,
+        y: event?.clientY || window.innerHeight / 2
+    };
+}
+
+function createWordStudyActionBubble() {
+    let bubble = document.getElementById('wordStudyActionBubble');
+    if (bubble) return bubble;
+
+    bubble = document.createElement('div');
+    bubble.id = 'wordStudyActionBubble';
+    bubble.className = 'word-study-action-bubble';
+    bubble.innerHTML = `
+        <button type="button" class="word-study-action-btn" onclick="window.openWordStudyPanel()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19.5V5.75A2.75 2.75 0 0 1 6.75 3H20v15H6.75A2.75 2.75 0 0 0 4 20.75"/>
+                <path d="M8 7h8M8 11h6"/>
+            </svg>
+            <span>${currentLang === 'ko' ? '분석' : '解析'}</span>
+        </button>
+    `;
+    document.body.appendChild(bubble);
+    return bubble;
+}
+
+function hideWordStudyActionBubble() {
+    document.getElementById('wordStudyActionBubble')?.classList.remove('show');
+}
+
+function showWordStudyAction(event, element) {
+    activeWordStudyVerseElement = element;
+    const bubble = createWordStudyActionBubble();
+    const point = getVersePointerPosition(event);
+    const width = 112;
+    const height = 44;
+    const left = Math.max(12, Math.min(point.x - width / 2, window.innerWidth - width - 12));
+    const top = Math.max(12, Math.min(point.y - height - 14, window.innerHeight - height - 12));
+    bubble.style.left = `${left}px`;
+    bubble.style.top = `${top}px`;
+    bubble.classList.add('show');
+}
+
+document.addEventListener('click', (event) => {
+    const bubble = document.getElementById('wordStudyActionBubble');
+    if (!bubble?.classList.contains('show')) return;
+    if (bubble.contains(event.target) || event.target.closest('.bible-verse')) return;
+    hideWordStudyActionBubble();
+});
+
+function escapeHtml(value = '') {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function createWordStudyPanel() {
+    let overlay = document.getElementById('wordStudyOverlay');
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'wordStudyOverlay';
+    overlay.className = 'word-study-overlay';
+    overlay.innerHTML = `
+        <div class="word-study-panel" onclick="event.stopPropagation()">
+            <div class="word-study-header">
+                <div>
+                    <div class="word-study-title">${currentLang === 'ko' ? '성경 원문 흐름 분석' : '聖經經文逐詞解析'}</div>
+                    <div class="word-study-ref" id="wordStudyRef"></div>
+                </div>
+                <button type="button" class="word-study-close" onclick="window.closeWordStudyPanel()">✕</button>
+            </div>
+            <div class="word-study-body" id="wordStudyBody"></div>
+        </div>
+    `;
+    overlay.addEventListener('click', () => window.closeWordStudyPanel());
+    document.body.appendChild(overlay);
+    return overlay;
+}
+
+window.closeWordStudyPanel = () => {
+    document.getElementById('wordStudyOverlay')?.classList.remove('show');
+};
+
+function getActiveWordStudyVerseData() {
+    const element = activeWordStudyVerseElement;
+    if (!element) return null;
+    return {
+        element,
+        verse: element.dataset.verse,
+        ko: decodeURIComponent(element.dataset.ko || ''),
+        zh: decodeURIComponent(element.dataset.zh || ''),
+        book: currentBibleBook,
+        chapter: currentBibleChapter
+    };
+}
+
+function highlightWordStudyText(text, pairs, langKey) {
+    let html = escapeHtml(text);
+    const seen = new Set();
+    const terms = pairs
+        .map((pair, index) => ({ term: pair[langKey], index }))
+        .filter(({ term }) => term && String(term).trim())
+        .map(({ term, index }) => ({ term: String(term).trim(), index }))
+        .sort((a, b) => b.term.length - a.term.length);
+
+    for (const { term, index } of terms) {
+        const key = `${langKey}:${term}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const safeTerm = escapeHtml(term);
+        if (!safeTerm || !html.includes(safeTerm)) continue;
+        const cls = `word-study-token tone-${index % 6}`;
+        html = html.split(safeTerm).join(`<span class="${cls}">${safeTerm}</span>`);
+    }
+    return html;
+}
+
+function normalizeWordStudyPairs(aiText) {
+    const jsonText = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const parsed = JSON.parse(jsonText);
+    const rawPairs = Array.isArray(parsed) ? parsed : (parsed.pairs || []);
+    return {
+        summary: parsed.summary || '',
+        pairs: rawPairs
+            .filter((item) => item && (item.ko || item.zh || item.korean || item.chinese))
+            .map((item) => ({
+                ko: item.ko || item.korean || '',
+                zh: item.zh || item.chinese || '',
+                label: item.label || item.pos || item.type || '',
+                explanation: item.explanation || item.note || item.meaning || ''
+            }))
+            .slice(0, 24)
+    };
+}
+
+function renderWordStudyResult(data, analysis) {
+    const body = document.getElementById('wordStudyBody');
+    const pairs = analysis.pairs || [];
+    const koHtml = highlightWordStudyText(data.ko, pairs, 'ko');
+    const zhHtml = highlightWordStudyText(data.zh, pairs, 'zh');
+
+    const rows = pairs.length
+        ? pairs.map((pair, index) => `
+            <div class="word-study-row">
+                <div class="word-study-row-marker tone-${index % 6}"></div>
+                <div class="word-study-row-main">
+                    <div class="word-study-pair">
+                        <span>${escapeHtml(pair.ko || '-')}</span>
+                        <span>${escapeHtml(pair.zh || '-')}</span>
+                    </div>
+                    ${pair.label ? `<div class="word-study-label">${escapeHtml(pair.label)}</div>` : ''}
+                    ${pair.explanation ? `<div class="word-study-explain">${escapeHtml(pair.explanation)}</div>` : ''}
+                </div>
+            </div>
+        `).join('')
+        : `<div class="word-study-empty">${currentLang === 'ko' ? '분석 결과가 비어 있습니다.' : '解析結果為空。'}</div>`;
+
+    body.innerHTML = `
+        <div class="word-study-verses">
+            <div class="word-study-verse ko">${koHtml}</div>
+            <div class="word-study-verse zh">${zhHtml}</div>
+        </div>
+        <div class="word-study-list">${rows}</div>
+    `;
+}
+
+window.openWordStudyPanel = async () => {
+    const data = getActiveWordStudyVerseData();
+    if (!data) return;
+
+    hideWordStudyActionBubble();
+    const overlay = createWordStudyPanel();
+    const body = document.getElementById('wordStudyBody');
+    const ref = document.getElementById('wordStudyRef');
+    const abbr = bookAbbreviations[data.book?.id] || { ko: '', zh: '' };
+    if (ref) ref.textContent = `${abbr.ko} ${data.chapter}:${data.verse} / ${abbr.zh} ${data.chapter}:${data.verse}`;
+    if (body) {
+        body.innerHTML = `
+            <div class="word-study-loading">
+                <div class="word-study-spinner"></div>
+                <div>${currentLang === 'ko' ? 'AI가 구절을 분석하고 있습니다...' : 'AI 正在解析所選經文...'}</div>
+            </div>
+        `;
+    }
+    overlay.classList.add('show');
+
+    const prompt = `你是聖經中韓文逐詞解析助手。請分析以下同一節經文的韓文與中文對應。
+
+請只回傳 JSON，不要 markdown。格式：
+{
+  "summary": "一句話說明句子核心",
+  "pairs": [
+    {"ko":"韓文詞或短語","zh":"對應中文詞或短語","label":"詞性或語法功能","explanation":"簡短解釋"}
+  ]
+}
+
+規則：
+- pairs 依照經文出現順序排列。
+- ko 與 zh 請盡量使用原經文中實際出現的字詞，方便前端標色。
+- 可以用短語，不必逐字硬切，但要有教學價值。
+- explanation 使用繁體中文，若需要可補充韓文敬語、時態、連接語尾、名詞角色。
+- 最多 16 組。
+
+韓文：${data.ko}
+中文：${data.zh}`;
+
+    try {
+        const response = await fetch(AI_WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        if (!response.ok) throw new Error('API Error');
+        const payload = await response.json();
+        const aiText = payload.text || payload.response || payload.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const analysis = normalizeWordStudyPairs(aiText);
+        renderWordStudyResult(data, analysis);
+    } catch (error) {
+        if (body) {
+            body.innerHTML = `
+                <div class="word-study-error">
+                    ${currentLang === 'ko' ? '분석에 실패했습니다.' : '解析失敗。'}<br>
+                    <span>${escapeHtml(error.message || String(error))}</span>
+                </div>
+            `;
+        }
+    }
+};
 
 // 退出複製模式
 window.exitCopyMode = () => {
@@ -3800,6 +4124,41 @@ function resolveBibleBookId(bookName, bookLookup) {
     return null;
 }
 
+function parseBibleNavigationQuery(input) {
+    const bookLookup = buildBookLookup();
+    const cleanInput = input.trim().replace(/\s+/g, ' ');
+    const englishPrefix = /^(?:to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
+    const asianPrefix = /^(?:到|去|가|가자|가세요|가요|가지)\s*/;
+
+    let navText = '';
+    if (englishPrefix.test(cleanInput)) {
+        navText = cleanInput.replace(englishPrefix, '').trim();
+    } else if (asianPrefix.test(cleanInput)) {
+        navText = cleanInput.replace(asianPrefix, '').trim();
+    } else {
+        const suffixMatch = cleanInput.match(/^(.+?)\s*(\d+)\s*(?:章|장)\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
+        if (!suffixMatch) return null;
+        navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}`;
+    }
+
+    const match = navText.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장|chapter|chapters|ch)?\s*$/i);
+    if (!match) return null;
+
+    const bookName = match[1].trim();
+    const chapter = parseInt(match[2], 10);
+    const verse = match[3] ? parseInt(match[3], 10) : null;
+    const bookId = resolveBibleBookId(bookName, bookLookup);
+    if (!bookId || !Number.isFinite(chapter)) return null;
+    return { bookId, chapter, verse };
+}
+
+function parseBibleCopyCommand(input) {
+    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    if (!match) return null;
+    const parsed = parseBibleQuery(match[1].trim());
+    return parsed.queries.length > 0 ? parsed : null;
+}
+
 function startsBibleReferenceSegment(fragment, bookLookup) {
     const trimmed = fragment.trim();
     if (!trimmed || /^\d/.test(trimmed)) return false;
@@ -4023,17 +4382,32 @@ window.aiPanelSearch = async () => {
         input.value = '';
         return;
     }
+
+    // 模式 0：明確複製指令，例如 copy gen1:1 / cp gen1:1
+    const copyCommand = parseBibleCopyCommand(query);
+    if (copyCommand) {
+        sendBtn.disabled = true;
+        try {
+            const formatted = await formatBibleResult(copyCommand);
+            if (formatted.foundCount === 0) {
+                throw new Error(currentLang === 'ko' ? '해당 경문을 찾을 수 없습니다' : '找不到對應的經文');
+            }
+            await navigator.clipboard.writeText(formatted.text);
+            saveAiPanelResult({ query, text: formatted.text, success: true, timestamp: Date.now() });
+            input.value = '';
+        } catch (err) {
+            saveAiPanelResult({ query, text: '❌ ' + err.message, success: false, timestamp: Date.now() });
+        } finally {
+            sendBtn.disabled = false;
+        }
+        return;
+    }
     
     // 模式 1：跳轉到聖經章節
-    // 「到 啟5章」「去 創1章」「계 1장 가」「계 1장 세요」「계 1장 가지」
-    const navMatch = query.match(/^(?:到|去|가|가자|가세요|가요|가지)\s*([^\d]*?)(\d+)\s*(?:章|장)\s*$/);
-    const navMatch2 = query.match(/^([^\d]*?)(\d+)\s*(?:章|장)\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
-    const nav = navMatch || navMatch2;
+    // 「到 啟5章」「去 創1章」「계 1장 가」「to gen 1」「go to rev 3」
+    const nav = parseBibleNavigationQuery(query);
     if (nav) {
-        const bookLookup = buildBookLookup();
-        const bookName = nav[1].trim();
-        const chapter = parseInt(nav[2]);
-        let bookId = resolveBibleBookId(bookName, bookLookup);
+        const { bookId, chapter, verse } = nav;
         if (bookId) {
             const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
             const book = allBooks.find(b => b.id === bookId);
@@ -4043,7 +4417,7 @@ window.aiPanelSearch = async () => {
                 window.switchPage('bible');
                 setTimeout(() => {
                     selectBibleBook(book);
-                    setTimeout(() => openBibleChapter(book, chapter), 300);
+                    setTimeout(() => openBibleChapter(book, chapter, { targetVerse: verse }), 300);
                 }, 300);
                 input.value = '';
                 return;
@@ -4474,6 +4848,14 @@ window.handleVerseTouchStart = (event, element) => {
     }
     
     clearLongPressState();
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    longPressElement = element;
+    element.classList.add('long-press');
+    longPressTimer = setTimeout(() => {
+        triggerLongPress(event, element);
+    }, LONG_PRESS_DURATION);
 };
 
 // 手機觸控結束
@@ -4503,6 +4885,7 @@ window.handleVerseTouchMove = (event, element) => {
         // 移動超過10px視為滑動
         if (moveX > 10 || moveY > 10) {
             copyModeTouchMoved = true;
+            hideWordStudyActionBubble();
         }
         return;
     }
@@ -4514,6 +4897,7 @@ window.handleVerseTouchMove = (event, element) => {
         
         // 移動超過10px則取消長按
         if (moveX > 10 || moveY > 10) {
+            hideWordStudyActionBubble();
             clearLongPressState();
         }
     }
@@ -4530,6 +4914,11 @@ window.handleVerseMouseDown = (event, element) => {
     }
     
     clearLongPressState();
+    longPressElement = element;
+    element.classList.add('long-press');
+    longPressTimer = setTimeout(() => {
+        triggerLongPress(event, element);
+    }, LONG_PRESS_DURATION);
 };
 
 // 電腦滑鼠放開
@@ -4555,8 +4944,10 @@ window.handleVerseMouseLeave = (event, element) => {
 
 // 電腦右鍵選單 - 也進入複製模式
 window.handleVerseContextMenu = (event, element) => {
+    event.preventDefault();
     clearLongPressState();
-    return true;
+    showWordStudyAction(event, element);
+    return false;
 };
 
 // 禁用聖經內容區域的系統右鍵選單
@@ -4780,8 +5171,10 @@ window.handleSearchInput = (value) => {
 // 按 Enter 才執行搜尋
 window.handleSearchKeydown = (e) => {
     if (e.key !== 'Enter') return;
+    e.preventDefault();
     const value = e.target.value.trim();
     if (!value || value.length < 1) return;
+    e.target.blur();
     
     const results = document.getElementById('bibleSearchResults');
     const aiLoading = document.getElementById('bibleSearchAiLoading');
@@ -4943,13 +5336,11 @@ function renderSearchResults(results, keyword, aiActive = false) {
             koText = koText.replace(new RegExp(safeKeyword, 'g'), `<mark>${keyword}</mark>`);
         } catch(e) {}
         const aiBadge = r.type === 'ai' ? `<span class="bible-search-ai-badge">AI</span>` : '';
-        const reasonLine = r.reason ? `<div style="font-size:0.8rem;color:#7c4dff;margin-top:3px;opacity:0.85;">${r.reason}</div>` : '';
         return `
             <div class="bible-search-result-item" onclick="window.openSearchPreview(${index})">
                 <div class="bible-search-result-ref">${refKo} / ${refZh}${aiBadge}</div>
                 ${koText ? `<div class="bible-search-result-text" style="color:#777;font-size:0.88rem;margin-bottom:3px;">${koText}</div>` : ''}
                 <div class="bible-search-result-text">${zhText}</div>
-                ${reasonLine}
             </div>`;
     };
     
