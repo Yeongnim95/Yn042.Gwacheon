@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.12.05';
+const APP_VERSION = '2026.05.12.06';
 window.__APP_VERSION__ = APP_VERSION;
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -1820,8 +1820,8 @@ function initDailyVerse() {
     if (textEl) textEl.textContent = currentLang === 'ko' ? verse.text.ko : verse.text.zh;
     const homeContainer = document.querySelector('#homeSection .home-container');
     if (homeContainer) homeContainer.scrollTo(0, 0);
-    setTimeout(() => { slide1.classList.add('loaded'); }, 100);
-    setTimeout(() => { slide1.classList.add('verse-show'); }, 1200);
+    setTimeout(() => { slide1.classList.add('loaded'); }, 30);
+    setTimeout(() => { slide1.classList.add('verse-show'); }, 360);
     window.refreshBackToTop?.();
     initHomeFeatureAnimations();
 }
