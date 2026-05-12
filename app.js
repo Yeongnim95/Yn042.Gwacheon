@@ -1,11 +1,9 @@
 // --- APP VERSION ---
 const APP_VERSION = '2026.05.12.03';
 window.__APP_VERSION__ = APP_VERSION;
-
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 // 【重要】請確認您的 Firebase Config
 // ------------------------------------------------------------------
 const firebaseConfig = {
@@ -18,10 +16,8 @@ const firebaseConfig = {
     measurementId: "G-M0JHY4QED9"
 };
 // ------------------------------------------------------------------
-
 let dbInstance;
 let cloudEnabled = false;
-
 try {
     if (firebaseConfig.apiKey) {
         const app = initializeApp(firebaseConfig);
@@ -34,17 +30,15 @@ try {
 } catch (e) {
     console.error("Firebase init failed:", e);
 }
-
 // --- 全域變數與邏輯 ---
-let currentLang = localStorage.getItem('app_lang') || 'ko'; 
+let currentLang = localStorage.getItem('app_lang') || 'ko';
 let localDb = [];
 let offlineDb = [];
-let sortDesc = true; 
+let sortDesc = true;
 let sortBy = 'date'; // 'date', 'id', 'name', 'activity'
 let offlineSortDesc = true;
 let isEditMode = false;
 let isOfflineEditMode = false;
-
 // --- 日期自動更新功能 ---
 function getTodayDateString() {
     const now = new Date();
@@ -53,7 +47,6 @@ function getTodayDateString() {
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
-
 function updateDateInput() {
     const dateInput = document.getElementById('recordDate');
     if (dateInput) {
@@ -64,25 +57,20 @@ function updateDateInput() {
         offlineDateInput.value = getTodayDateString();
     }
 }
-
 // --- 每天0點自動重新整理並更新日期功能 ---
 function setupMidnightRefresh() {
     const now = new Date();
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
-    
     const msUntilMidnight = tomorrow.getTime() - now.getTime();
-    
     setTimeout(() => {
         // 0點時自動重新整理頁面
         location.reload();
     }, msUntilMidnight);
-    
     console.log(`Auto-refresh scheduled in ${Math.round(msUntilMidnight / 1000 / 60)} minutes (at midnight).`);
 }
 setupMidnightRefresh();
-
 // 監聽頁面可見性變化，當使用者重新回到頁面時更新日期
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
@@ -90,10 +78,9 @@ document.addEventListener('visibilitychange', () => {
         console.log('Page visible, date updated to:', getTodayDateString());
     }
 });
-
 const i18n = {
     ko: {
-        appTitle: "전도 관리 시스템", 
+        appTitle: "전도 관리 시스템",
         // 主選單
         menuHome: "홈", menuFaith: "나의 신앙", menuFruit: "열매 정보",
         devBadge: "개발 중",
@@ -132,8 +119,8 @@ const i18n = {
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "뒤로",
         // 果子資訊
-        btnEntry: "등록 시스템", btnOfflineEntry: "오프라인 등록", 
-        btnProfile: "개인정보", 
+        btnEntry: "등록 시스템", btnOfflineEntry: "오프라인 등록",
+        btnProfile: "개인정보",
         btnBackend: "교류 관리", btnOfflineBackend: "오프라인 데이터",
         headerEntry: "등록 시스템", lblId: "번호", lblName: "이름",
         lblDate: "날짜", lblType: "회신 유형", lblContent: "내용",
@@ -166,9 +153,9 @@ const i18n = {
         popupBirthday: "생일", popupAge: "나이", popupMbti: "MBTI", popupJob: "직업",
         optContactNone: "선택하세요",
         // 線下登錄
-        headerOfflineEntry: "오프라인 전도 등록", 
+        headerOfflineEntry: "오프라인 전도 등록",
         lblOfflineId: "번호", lblOfflineName: "이름", lblOfflineDate: "날짜",
-        lblOfflinePhone: "휴대폰", lblOfflineContactId: "연락처 ID", 
+        lblOfflinePhone: "휴대폰", lblOfflineContactId: "연락처 ID",
         lblOfflineContactMethod: "연락 방법",
         lblOfflineLocation: "장소", lblOfflineActivity: "활동", lblOfflineContent: "섭외 내용",
         phOfflineId: "5000 이상의 4자리 번호 입력", phOfflineContent: "섭외 내용 입력...",
@@ -182,7 +169,7 @@ const i18n = {
         colOfflineLocation: "장소", colOfflineEvent: "활동", colOfflineActivity: "활동"
     },
     zh: {
-        appTitle: "傳道整理系統", 
+        appTitle: "傳道整理系統",
         // 主選單
         menuHome: "首頁", menuFaith: "我的信仰", menuFruit: "果子資訊",
         devBadge: "開發中",
@@ -221,8 +208,8 @@ const i18n = {
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "返回",
         // 果子資訊
-        btnEntry: "登錄系統", btnOfflineEntry: "線下登錄", 
-        btnProfile: "個人資料", 
+        btnEntry: "登錄系統", btnOfflineEntry: "線下登錄",
+        btnProfile: "個人資料",
         btnBackend: "交流管理", btnOfflineBackend: "線下後台",
         headerEntry: "登錄系統", lblId: "編號", lblName: "姓名",
         lblDate: "日期", lblType: "回覆類型", lblContent: "回覆內容",
@@ -255,9 +242,9 @@ const i18n = {
         popupBirthday: "生日", popupAge: "年紀", popupMbti: "MBTI", popupJob: "職業",
         optContactNone: "請選擇",
         // 線下登錄
-        headerOfflineEntry: "線下傳道登錄", 
+        headerOfflineEntry: "線下傳道登錄",
         lblOfflineId: "編號", lblOfflineName: "姓名", lblOfflineDate: "日期",
-        lblOfflinePhone: "手機", lblOfflineContactId: "聯絡方式ID", 
+        lblOfflinePhone: "手機", lblOfflineContactId: "聯絡方式ID",
         lblOfflineContactMethod: "聯絡方法",
         lblOfflineLocation: "地點", lblOfflineActivity: "活動", lblOfflineContent: "涉外內容",
         phOfflineId: "請輸入5000以上的4位編號", phOfflineContent: "請輸入涉外內容...",
@@ -271,7 +258,6 @@ const i18n = {
         colOfflineLocation: "地點", colOfflineEvent: "活動", colOfflineActivity: "活躍度"
     }
 };
-
 if (cloudEnabled) {
     const q = collection(dbInstance, "missionary_data");
     onSnapshot(q, (snapshot) => {
@@ -284,7 +270,6 @@ if (cloudEnabled) {
         const activeId = document.getElementById('idInput').value;
         if(activeId) window.handleIdInput();
     });
-    
     // 監聽線下資料
     const offlineQ = collection(dbInstance, "offline_missionary_data");
     onSnapshot(offlineQ, (snapshot) => {
@@ -301,22 +286,18 @@ if (cloudEnabled) {
     document.getElementById('dataList').innerHTML = `<div style="padding:20px; text-align:center; color:red;">${i18n[currentLang].msgCloudError}</div>`;
     document.getElementById('offlineDataList').innerHTML = `<div style="padding:20px; text-align:center; color:red;">${i18n[currentLang].msgCloudError}</div>`;
 }
-
 // 頁面記憶超時設定（12小時 = 12 * 60 * 60 * 1000 毫秒）
 // (頁面記憶已停用)
-
 // ===== 滑動與點擊區分（後台用） =====
 let backendTouchStartX = 0;
 let backendTouchStartY = 0;
 let isBackendSwiping = false;
 const BACKEND_SWIPE_THRESHOLD = 10; // 移動超過10px視為滑動
-
 document.addEventListener('touchstart', (e) => {
     backendTouchStartX = e.touches[0].clientX;
     backendTouchStartY = e.touches[0].clientY;
     isBackendSwiping = false;
 }, { passive: true });
-
 document.addEventListener('touchmove', (e) => {
     if (!backendTouchStartX || !backendTouchStartY) return;
     const deltaX = Math.abs(e.touches[0].clientX - backendTouchStartX);
@@ -325,24 +306,18 @@ document.addEventListener('touchmove', (e) => {
         isBackendSwiping = true;
     }
 }, { passive: true });
-
 window.isSwipeAction = () => isBackendSwiping;
-
 // 頁面記憶已停用 — 每次開啟都回首頁
-
 // Path → Page 映射（支援 clean URL 和舊版 hash 相容）
 function getAllBibleBooks() {
     return [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
 }
-
 function getBibleChapterPath(book, chapter) {
     return `/bible/${book.id}${chapter}`;
 }
-
 function parseBibleChapterPath(pathname = window.location.pathname) {
     const path = String(pathname).replace(/^\//, '').replace(/\/$/, '');
     if (!path.startsWith('bible/')) return null;
-
     const slug = path.slice('bible/'.length).toLowerCase();
     const booksByIdLength = getAllBibleBooks().sort((a, b) => b.id.length - a.id.length);
     for (const book of booksByIdLength) {
@@ -356,7 +331,6 @@ function parseBibleChapterPath(pathname = window.location.pathname) {
     }
     return null;
 }
-
 function getPageFromPath() {
     // 優先讀取 pathname
     const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
@@ -406,7 +380,6 @@ function getPageFromPath() {
     }
     return 'home';
 }
-
 // 監聽瀏覽器上一頁/下一頁
 window.addEventListener('popstate', () => {
     const bibleSection = document.getElementById('bibleSection');
@@ -421,7 +394,6 @@ window.addEventListener('popstate', () => {
         switchPage(page);
     }
 });
-
 function closeTransientBiblePanels() {
     document.getElementById('bibleSearchPreview')?.classList.remove('show');
     document.getElementById('bibleSearchPanel')?.classList.remove('show');
@@ -429,10 +401,8 @@ function closeTransientBiblePanels() {
     document.getElementById('biblePartialCopyModal')?.classList.remove('show');
     closeBibleChaptersPopover?.();
 }
-
 window.onload = function() {
     document.querySelector('.lang-select').value = currentLang;
-    
     // 處理 404.html SPA 路由轉址（?p=bible → /bible）
     const urlParams = new URLSearchParams(window.location.search);
     const redirectPage = urlParams.get('p');
@@ -450,7 +420,6 @@ window.onload = function() {
             : (pathMap[redirectPage] || '/');
         history.replaceState(null, '', cleanPath);
     }
-    
     // 讀取 URL path（支援 clean URL + 舊版 hash 相容）
     const currentPage = getPageFromPath();
     if (currentPage && currentPage !== 'home') {
@@ -458,17 +427,14 @@ window.onload = function() {
     } else {
         switchPage('home');
     }
-    
     applyLanguage();
     updateDateInput();
     initBackToTop();
     checkForAppUpdates();
     setInterval(checkForAppUpdates, 2 * 60 * 1000);
 };
-
 const PAGE_LOAD_VERSION = APP_VERSION;
 const UPDATE_RELOAD_KEY = 'app_update_reload_version';
-
 async function checkForAppUpdates() {
     try {
         const res = await fetch(`/app.js?_v=${Date.now()}`, { cache: 'no-store' });
@@ -476,7 +442,6 @@ async function checkForAppUpdates() {
         const source = await res.text();
         const match = source.match(/const\s+APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
         if (!match) return;
-
         const remoteVersion = match[1];
         if (remoteVersion && remoteVersion !== PAGE_LOAD_VERSION) {
             if (sessionStorage.getItem(UPDATE_RELOAD_KEY) === remoteVersion) return;
@@ -487,11 +452,9 @@ async function checkForAppUpdates() {
         console.warn('App update check failed:', err);
     }
 }
-
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) checkForAppUpdates();
 });
-
 window.setLanguage = (lang) => {
     currentLang = lang;
     localStorage.setItem('app_lang', lang); // 永久儲存語言設定
@@ -501,11 +464,10 @@ window.setLanguage = (lang) => {
     const nameVal = document.getElementById('nameInput').value;
     window.updateReplyOption(nameVal);
 };
-
 function applyLanguage() {
     const t = i18n[currentLang];
     const map = {
-        'txt-app-title': t.appTitle, 
+        'txt-app-title': t.appTitle,
         // 主選單
         'menu-home-title': t.menuHome, 'menu-faith-auto-title': t.menuFaithAuto, 'menu-fruit-title': t.menuFruit,
         'menu-books-title': t.menuBooks,
@@ -535,7 +497,7 @@ function applyLanguage() {
         'txt-bible-back': t.txtBibleBack,
         // 果子資訊
         'btn-entry': t.btnEntry, 'btn-offline-entry': t.btnOfflineEntry,
-        'btn-profile': t.btnProfile, 
+        'btn-profile': t.btnProfile,
         'btn-backend': t.btnBackend, 'btn-offline-backend': t.btnOfflineBackend,
         'txt-entry-header': t.headerEntry, 'lbl-id': t.lblId, 'lbl-name': t.lblName,
         'lbl-date': t.lblDate, 'lbl-type': t.lblType, 'lbl-content': t.lblContent,
@@ -577,24 +539,19 @@ function applyLanguage() {
     }
     const editBtn = document.getElementById('btn-toggle-edit');
     if(editBtn) editBtn.textContent = isEditMode ? t.btnDone : t.btnEdit;
-    
     const offlineEditBtn = document.getElementById('btn-offline-toggle-edit');
     if(offlineEditBtn) offlineEditBtn.textContent = isOfflineEditMode ? t.btnDone : t.btnEdit;
-
     document.getElementById('idInput').placeholder = t.phId;
     document.getElementById('nameInput').placeholder = t.phName;
     document.getElementById('content').placeholder = t.phContent;
-    
     // 線下登錄 placeholder
     const offlineIdInput = document.getElementById('offlineIdInput');
     if(offlineIdInput) offlineIdInput.placeholder = t.phOfflineId;
     const offlineContent = document.getElementById('offlineContent');
     if(offlineContent) offlineContent.placeholder = t.phOfflineContent;
-    
     // 更新開發中徽章
     const devBadge = document.querySelector('.dev-badge');
     if (devBadge) devBadge.textContent = t.devBadge;
-    
     // 更新當前頁面標題
     const pageTitleEl = document.getElementById('current-page-title');
     const activeSection = document.querySelector('.page-section.active-section');
@@ -613,10 +570,8 @@ function applyLanguage() {
         else if (sectionId === 'backendSection') pageTitleEl.textContent = t.btnBackend;
         else if (sectionId === 'offlineBackendSection') pageTitleEl.textContent = t.btnOfflineBackend;
     }
-    
     updateCounter();
     updateOfflineCounter();
-    
     // 首頁第二頁翻譯
     const featBibleTitle = document.getElementById('home-feat-bible-title');
     const featBibleDesc = document.getElementById('home-feat-bible-desc');
@@ -630,44 +585,35 @@ function applyLanguage() {
     if (featAutoDesc) featAutoDesc.innerHTML = t.homeFeatAutoDesc.replace(/\n/g, '<br>');
     if (featDataTitle) featDataTitle.textContent = t.homeFeatDataTitle;
     if (featDataDesc) featDataDesc.innerHTML = t.homeFeatDataDesc.replace(/\n/g, '<br>');
-    
     // AI 面板語言更新
     const aiTitle = document.getElementById('aiPanelTitle');
     const aiNote = document.getElementById('aiPanelNote');
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
     if (aiNote) aiNote.innerHTML = currentLang === 'ko'
-        ? '이동: <b>cd 계1</b> / <b>계1:5 가요</b> | 복사: <b>cp 창1:1</b> / <b>cp 주기도문</b>' 
+        ? '이동: <b>cd 계1</b> / <b>계1:5 가요</b> | 복사: <b>cp 창1:1</b> / <b>cp 주기도문</b>'
         : '跳轉: <b>cd 啟1</b> / <b>到 啟1:5</b> | 複製: <b>cp 創1:1</b> / <b>cp 主祈禱文</b>';
     if (aiInput) aiInput.placeholder = currentLang === 'ko' ? 'cd 계1 / 계1:5 가요 / cp 창1:1 / cp 주기도문' : 'cd 啟1 / 到 啟1:5 / cp 創1:1 / cp 主祈禱文';
-    
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
         initDailyVerse();
     }
-    
     // 如果在首頁，重新載入天氣（更新語言）
     if (document.getElementById('homeSection').classList.contains('active-section')) {
-        
     }
-    
     // 更新訊息重點區塊語言
     updateMessagePointsLanguage();
 }
-
 // --- 邏輯修正區塊 ---
-
 window.handleIdInput = () => {
     const t = i18n[currentLang];
     const idVal = document.getElementById('idInput').value.trim();
-    
     if (!idVal) {
         document.getElementById('nameInput').value = '';
         document.getElementById('statusMsg').style.display = 'none';
         window.updateReplyOption(null);
         return;
     }
-
     const user = localDb.find(u => u.id === idVal);
     if (user) {
         document.getElementById('nameInput').value = user.name;
@@ -679,18 +625,15 @@ window.handleIdInput = () => {
         window.updateReplyOption(null);
     }
 };
-
 window.handleNameInput = () => {
     const t = i18n[currentLang];
     const nameVal = document.getElementById('nameInput').value.trim();
-    
     if (!nameVal) {
         document.getElementById('idInput').value = '';
         document.getElementById('statusMsg').style.display = 'none';
         window.updateReplyOption(null);
         return;
     }
-
     const user = localDb.find(u => u.name === nameVal);
     if (user) {
         document.getElementById('idInput').value = user.id;
@@ -700,46 +643,39 @@ window.handleNameInput = () => {
         if (document.getElementById('idInput').value === '') {
             const newId = generateNewId();
             showStatus(t.statusNewId + newId, 'new');
-            document.getElementById('idInput').value = newId; 
+            document.getElementById('idInput').value = newId;
         }
         window.updateReplyOption(null);
     }
 };
-
 window.updateReplyOption = (name) => {
     const t = i18n[currentLang];
     const option = document.getElementById('opt-other');
     option.textContent = name ? `${t.optOther} (${name})` : t.optOther;
 };
-
 function showStatus(msg, type) {
     const el = document.getElementById('statusMsg');
     el.textContent = msg;
     el.className = `status-bar status-${type}`;
     el.style.display = 'block';
 }
-
 // ===== 訊息重點與需確認訊息功能 =====
 const pointTags = {
     ko: ['학업', '학습', '직장', '가정', '감정', '직접 입력'],
     zh: ['學業', '學習', '工作', '家庭', '感情', '自訂']
 };
-
 let messagePointsCounter = 0;
 let confirmPointsCounter = 0;
-
 // 創建標籤選項HTML
 function createTagOptions() {
     const tags = pointTags[currentLang] || pointTags.ko;
     return tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
 }
-
 // 新增訊息重點
 window.addMessagePoint = () => {
     const list = document.getElementById('messagePointsList');
     const empty = document.getElementById('messagePointsEmpty');
     if (empty) empty.style.display = 'none';
-    
     const itemId = `messagePoint_${messagePointsCounter++}`;
     const item = document.createElement('div');
     item.className = 'message-point-item';
@@ -755,25 +691,21 @@ window.addMessagePoint = () => {
     `;
     list.appendChild(item);
 };
-
 // 移除訊息重點
 window.removeMessagePoint = (itemId) => {
     const item = document.getElementById(itemId);
     if (item) item.remove();
-    
     const list = document.getElementById('messagePointsList');
     const empty = document.getElementById('messagePointsEmpty');
     if (list && list.querySelectorAll('.message-point-item').length === 0 && empty) {
         empty.style.display = 'block';
     }
 };
-
 // 新增需確認訊息
 window.addConfirmPoint = () => {
     const list = document.getElementById('confirmPointsList');
     const empty = document.getElementById('confirmPointsEmpty');
     if (empty) empty.style.display = 'none';
-    
     const itemId = `confirmPoint_${confirmPointsCounter++}`;
     const item = document.createElement('div');
     item.className = 'message-point-item';
@@ -789,19 +721,16 @@ window.addConfirmPoint = () => {
     `;
     list.appendChild(item);
 };
-
 // 移除需確認訊息
 window.removeConfirmPoint = (itemId) => {
     const item = document.getElementById(itemId);
     if (item) item.remove();
-    
     const list = document.getElementById('confirmPointsList');
     const empty = document.getElementById('confirmPointsEmpty');
     if (list && list.querySelectorAll('.message-point-item').length === 0 && empty) {
         empty.style.display = 'block';
     }
 };
-
 // 處理標籤選擇變化（自訂選項）
 window.handleTagChange = (selectEl) => {
     const lastOption = pointTags[currentLang]?.[5] || '직접 입력';
@@ -820,7 +749,6 @@ window.handleTagChange = (selectEl) => {
         }
     }
 };
-
 // 獲取訊息重點數據
 function getMessagePoints() {
     const list = document.getElementById('messagePointsList');
@@ -835,7 +763,6 @@ function getMessagePoints() {
     });
     return points;
 }
-
 // 獲取需確認訊息數據
 function getConfirmPoints() {
     const list = document.getElementById('confirmPointsList');
@@ -850,7 +777,6 @@ function getConfirmPoints() {
     });
     return points;
 }
-
 // 清空訊息重點和需確認訊息
 function clearMessagePoints() {
     const msgList = document.getElementById('messagePointsList');
@@ -859,7 +785,6 @@ function clearMessagePoints() {
         msgList.querySelectorAll('.message-point-item').forEach(item => item.remove());
     }
     if (msgEmpty) msgEmpty.style.display = 'block';
-    
     const confList = document.getElementById('confirmPointsList');
     const confEmpty = document.getElementById('confirmPointsEmpty');
     if (confList) {
@@ -867,31 +792,25 @@ function clearMessagePoints() {
     }
     if (confEmpty) confEmpty.style.display = 'block';
 }
-
 // 更新訊息重點區塊的語言
 function updateMessagePointsLanguage() {
     const t = i18n[currentLang];
     const isKo = currentLang === 'ko';
-    
     // 更新標題
     const msgTitle = document.getElementById('messagePointsTitle');
     const confTitle = document.getElementById('confirmPointsTitle');
     const msgEmpty = document.getElementById('messagePointsEmpty');
     const confEmpty = document.getElementById('confirmPointsEmpty');
-    
     if (msgTitle) msgTitle.textContent = isKo ? '📌 메시지 포인트' : '📌 訊息重點';
     if (confTitle) confTitle.textContent = isKo ? '❓ 확인 필요 사항' : '❓ 需確認的訊息';
     if (msgEmpty) msgEmpty.textContent = isKo ? '+ 버튼을 눌러 추가하세요' : '點擊 + 新增訊息重點';
     if (confEmpty) confEmpty.textContent = isKo ? '+ 버튼을 눌러 추가하세요' : '點擊 + 新增需確認的訊息';
-    
     // 更新現有項目的選項和placeholder
     const tags = pointTags[currentLang] || pointTags.ko;
     document.querySelectorAll('.message-point-tag-select').forEach(select => {
         const currentValue = select.value;
         const isCustom = !tags.includes(currentValue);
-        
         select.innerHTML = createTagOptions();
-        
         if (isCustom && currentValue) {
             const option = document.createElement('option');
             option.value = currentValue;
@@ -902,22 +821,18 @@ function updateMessagePointsLanguage() {
             select.value = currentValue;
         }
     });
-    
     document.querySelectorAll('#messagePointsList .message-point-content').forEach(input => {
         input.placeholder = isKo ? '내용을 입력하세요...' : '請輸入內容...';
     });
-    
     document.querySelectorAll('#confirmPointsList .message-point-content').forEach(input => {
         input.placeholder = isKo ? '확인할 내용...' : '需確認的內容...';
     });
 }
-
 // ===== AI整理功能 =====
 const AI_SETTINGS_KEY = 'ai_summary_settings';
 let currentAiUid = null;
 let currentAiLogIndex = null;
 let currentAiSummary = null;
-
 // 載入AI設定
 function loadAiSettings() {
     try {
@@ -926,49 +841,38 @@ function loadAiSettings() {
     } catch (e) {}
     return { provider: 'gemini' };
 }
-
 // Cloudflare Worker 代理 URL
 const AI_WORKER_URL = 'https://gemini-proxy.may90613may90613.workers.dev';
-
 // 觸發AI整理
 window.triggerAiSummary = async (event, uid, logIndex) => {
     event.stopPropagation();
-    
     const settings = loadAiSettings();
-    
     currentAiUid = uid;
     currentAiLogIndex = logIndex;
-    
     // 獲取內容
     const user = localDb.find(u => u.id === uid);
     if (!user || !user.logs) return;
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dateA = a.date || '0000-00-00';
         const dateB = b.date || '0000-00-00';
         if (dateA !== dateB) return dateB.localeCompare(dateA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
-    
     const log = sortedLogs[logIndex];
     if (!log) return;
-    
     // 找到該則內容的DOM元素並添加文字閃光動畫
     const targetRow = document.querySelector(`.detail-row[data-uid="${uid}"][data-idx="${logIndex}"]`);
     const contentText = targetRow?.querySelector('.log-content-text');
     const aiBtn = targetRow?.querySelector('.ai-summary-btn');
-    
     if (contentText) {
         contentText.classList.add('ai-analyzing-text');
     }
     if (aiBtn) {
         aiBtn.classList.add('ai-analyzing-btn');
     }
-    
     try {
         const summary = await callAiApi(settings.provider, settings.apiKey, log.content);
         currentAiSummary = summary;
-        
         // 移除閃光動畫
         if (contentText) {
             contentText.classList.remove('ai-analyzing-text');
@@ -976,23 +880,19 @@ window.triggerAiSummary = async (event, uid, logIndex) => {
         if (aiBtn) {
             aiBtn.classList.remove('ai-analyzing-btn');
         }
-        
         // 顯示結果彈窗
         const overlay = document.getElementById('aiModalOverlay');
         const loading = document.getElementById('aiModalLoading');
         const content = document.getElementById('aiModalContent');
         const footer = document.getElementById('aiModalFooter');
-        
         overlay.classList.add('show');
         loading.style.display = 'none';
         content.style.display = 'block';
         content.textContent = summary;
         footer.style.display = 'flex';
         document.getElementById('aiSaveBtn').style.display = 'inline-block';
-        
         // 更新語言
         updateAiModalLanguage();
-        
     } catch (error) {
         // 移除閃光動畫
         if (contentText) {
@@ -1001,82 +901,65 @@ window.triggerAiSummary = async (event, uid, logIndex) => {
         if (aiBtn) {
             aiBtn.classList.remove('ai-analyzing-btn');
         }
-        
         // 顯示錯誤彈窗
         const overlay = document.getElementById('aiModalOverlay');
         const loading = document.getElementById('aiModalLoading');
         const content = document.getElementById('aiModalContent');
         const footer = document.getElementById('aiModalFooter');
-        
         overlay.classList.add('show');
         loading.style.display = 'none';
         content.style.display = 'block';
         content.innerHTML = `<div style="color:#c62828;">❌ ${currentLang === 'ko' ? '오류 발생' : '發生錯誤'}: ${error.message}</div>`;
         footer.style.display = 'flex';
         document.getElementById('aiSaveBtn').style.display = 'none';
-        
         updateAiModalLanguage();
     }
 };
-
 // 調用AI API (透過 Cloudflare Worker 代理)
 async function callAiApi(provider, apiKey, content) {
     // 檢測內文主要語言（韓文字符範圍：AC00-D7AF）
     const koreanChars = (content.match(/[\uAC00-\uD7AF]/g) || []).length;
     const chineseChars = (content.match(/[\u4E00-\u9FFF]/g) || []).length;
     const isKoreanContent = koreanChars > chineseChars;
-    
-    const prompt = isKoreanContent 
+    const prompt = isKoreanContent
         ? `다음 대화 내용의 핵심 포인트를 간결하게 요약해주세요. 중요한 정보, 질문, 약속 등을 포함해주세요. 반드시 한국어로만 답변해주세요:\n\n${content}`
         : `請簡潔地整理以下對話內容的重點。包含重要資訊、問題、約定等。請務必只用繁體中文回答：\n\n${content}`;
-    
     // 透過 Cloudflare Worker 代理呼叫 Gemini API
     const response = await fetch(AI_WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt })
     });
-    
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'AI API Error');
     }
-    
     const data = await response.json();
     return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
 }
-
 // 儲存AI摘要到Firebase
 window.saveAiSummary = async () => {
     if (!currentAiUid || currentAiLogIndex === null || !currentAiSummary) return;
-    
     const user = localDb.find(u => u.id === currentAiUid);
     if (!user) return;
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dateA = a.date || '0000-00-00';
         const dateB = b.date || '0000-00-00';
         if (dateA !== dateB) return dateB.localeCompare(dateA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
-    
     const settings = loadAiSettings();
     const providerNames = { gemini: 'Gemini', openai: 'GPT', claude: 'Claude' };
     const today = new Date().toISOString().split('T')[0];
-    
     sortedLogs[currentAiLogIndex].aiSummary = currentAiSummary;
     sortedLogs[currentAiLogIndex].aiProvider = providerNames[settings.provider] || 'AI';
     sortedLogs[currentAiLogIndex].aiSummaryDate = today;
-    
     await updateDoc(doc(dbInstance, "missionary_data", currentAiUid), { logs: sortedLogs });
-    
     window.closeAiModal();
     restoreExpand(currentAiUid);
-    
     const t = i18n[currentLang];
     alert(currentLang === 'ko' ? 'AI 요약이 저장되었습니다.' : 'AI摘要已儲存！');
 };
-
 // 關閉AI彈窗
 window.closeAiModal = (event) => {
     if (event && event.target !== event.currentTarget) return;
@@ -1086,7 +969,6 @@ window.closeAiModal = (event) => {
     currentAiLogIndex = null;
     currentAiSummary = null;
 };
-
 // 更新AI彈窗語言
 function updateAiModalLanguage() {
     const isKo = currentLang === 'ko';
@@ -1095,53 +977,42 @@ function updateAiModalLanguage() {
     document.getElementById('aiCancelBtn').textContent = isKo ? '취소' : '取消';
     document.getElementById('aiSaveBtn').textContent = isKo ? '요약 저장' : '儲存摘要';
 }
-
 // --- 核心資料操作 (Cloud) ---
-
 window.submitData = async () => {
     if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
-
     const t = i18n[currentLang];
     const id = document.getElementById('idInput').value.trim();
     const name = document.getElementById('nameInput').value.trim();
     const date = document.getElementById('recordDate').value;
     const typeSelect = document.getElementById('replyType').value;
     const content = document.getElementById('content').value.trim();
-
     if (!id || !name || !date || !content) { alert(t.alertIncomplete); return; }
-
     const existingUserById = localDb.find(u => u.id === id);
     if (existingUserById && existingUserById.name !== name) {
         alert(t.errIdConflict + `\n(ID: ${id} -> ${existingUserById.name})`);
         return;
     }
-
     const existingUserByName = localDb.find(u => u.name === name);
     if (existingUserByName && existingUserByName.id !== id) {
         alert(t.errNameConflict + `\n(${name} -> ID: ${existingUserByName.id})`);
         return;
     }
-
     let typeLabel = (typeSelect === 'me') ? 'me' : 'other';
     const userRef = doc(dbInstance, "missionary_data", id);
-    
     // 獲取訊息重點和需確認訊息
     const messagePoints = getMessagePoints();
     const confirmPoints = getConfirmPoints();
-    
     // 使用時間戳記 (timestamp) 來進行秒數排序
     const timestamp = new Date().getTime();
-    const newLogEntry = { 
-        date, 
-        type: typeLabel, 
-        content, 
+    const newLogEntry = {
+        date,
+        type: typeLabel,
+        content,
         createdAt: timestamp,
         messagePoints: messagePoints.length > 0 ? messagePoints : null,
         confirmPoints: confirmPoints.length > 0 ? confirmPoints : null
     };
-
     let updatedLogs = [];
-    
     if (existingUserById) {
         updatedLogs = [...existingUserById.logs, newLogEntry];
         await setDoc(userRef, { id, name, logs: updatedLogs }, { merge: true });
@@ -1152,18 +1023,15 @@ window.submitData = async () => {
         alert(t.alertCreate + name);
     }
     document.getElementById('content').value = '';
-    
     // 清空訊息重點和需確認訊息
     clearMessagePoints();
 };
-
 window.deleteSelected = async () => {
     if (!cloudEnabled) return;
     const t = i18n[currentLang];
     const checks = document.getElementsByName('selectUser');
     const toDelete = [];
     checks.forEach(c => { if(c.checked) toDelete.push(c.value); });
-
     if (toDelete.length === 0) return;
     if (confirm(t.alertConfirmDelete)) {
         for (const uid of toDelete) {
@@ -1178,41 +1046,32 @@ window.deleteSelected = async () => {
         }
     }
 };
-
 // 刪除選項相關變數
 let deleteTargetUid = null;
 let deleteTargetLogIndex = null;
-
 window.deleteSingleLog = async (event, uid, logIndex) => {
     if (!cloudEnabled) return;
     event.stopPropagation();
-    
     deleteTargetUid = uid;
     deleteTargetLogIndex = logIndex;
-    
     // 獲取該筆記錄的資料來判斷哪些選項可用
     const user = localDb.find(u => u.id === uid);
     if (!user) return;
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dateA = a.date || '0000-00-00';
         const dateB = b.date || '0000-00-00';
         if (dateA !== dateB) return dateB.localeCompare(dateA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
-    
     const log = sortedLogs[logIndex];
     if (!log) return;
-    
     // 更新選項狀態
     const hasAi = !!log.aiSummary;
     const hasPoints = log.messagePoints && log.messagePoints.length > 0;
     const hasConfirm = log.confirmPoints && log.confirmPoints.length > 0;
-    
     document.getElementById('deleteOptionAi').classList.toggle('disabled', !hasAi);
     document.getElementById('deleteOptionPoints').classList.toggle('disabled', !hasPoints);
     document.getElementById('deleteOptionConfirm').classList.toggle('disabled', !hasConfirm);
-    
     document.getElementById('deleteAi').checked = false;
     document.getElementById('deleteAi').disabled = !hasAi;
     document.getElementById('deletePoints').checked = false;
@@ -1220,45 +1079,36 @@ window.deleteSingleLog = async (event, uid, logIndex) => {
     document.getElementById('deleteConfirm').checked = false;
     document.getElementById('deleteConfirm').disabled = !hasConfirm;
     document.getElementById('deleteContent').checked = false;
-    
     // 更新語言
     updateDeleteOptionsLanguage();
-    
     // 顯示彈窗
     document.getElementById('deleteOptionsOverlay').classList.add('show');
 };
-
 window.closeDeleteOptions = (event) => {
     if (event && event.target !== event.currentTarget) return;
     document.getElementById('deleteOptionsOverlay').classList.remove('show');
     deleteTargetUid = null;
     deleteTargetLogIndex = null;
 };
-
 window.confirmDeleteOptions = async () => {
     if (!deleteTargetUid || deleteTargetLogIndex === null) return;
-    
     const deleteContent = document.getElementById('deleteContent').checked;
     const deleteAi = document.getElementById('deleteAi').checked;
     const deletePoints = document.getElementById('deletePoints').checked;
     const deleteConfirm = document.getElementById('deleteConfirm').checked;
-    
     // 至少要選擇一項
     if (!deleteContent && !deleteAi && !deletePoints && !deleteConfirm) {
         alert(currentLang === 'ko' ? '삭제할 항목을 선택해주세요.' : '請選擇要刪除的項目。');
         return;
     }
-    
     const user = localDb.find(u => u.id === deleteTargetUid);
     if (!user) return;
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dateA = a.date || '0000-00-00';
         const dateB = b.date || '0000-00-00';
         if (dateA !== dateB) return dateB.localeCompare(dateA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
-    
     if (deleteContent) {
         // 刪除整則記錄
         sortedLogs.splice(deleteTargetLogIndex, 1);
@@ -1277,15 +1127,12 @@ window.confirmDeleteOptions = async () => {
             log.confirmPoints = [];
         }
     }
-    
     await updateDoc(doc(dbInstance, "missionary_data", deleteTargetUid), {
         logs: sortedLogs
     });
-    
     window.closeDeleteOptions();
     restoreExpand(deleteTargetUid);
 };
-
 function updateDeleteOptionsLanguage() {
     const isKo = currentLang === 'ko';
     document.getElementById('deleteOptionsTitle').textContent = isKo ? '🗑️ 삭제 항목 선택' : '🗑️ 選擇刪除項目';
@@ -1296,18 +1143,15 @@ function updateDeleteOptionsLanguage() {
     document.getElementById('deleteOptionsCancelBtn').textContent = isKo ? '취소' : '取消';
     document.getElementById('deleteOptionsConfirmBtn').textContent = isKo ? '삭제 확인' : '確認刪除';
 }
-
 window.editDate = (event, uid, logIndex, el) => {
     if (!isEditMode) return;
     if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
     event.stopPropagation();
     if (el.querySelector('input')) return;
-
     const originalDate = el.innerText;
     const input = document.createElement('input');
     input.type = 'date'; input.value = originalDate; input.style.width = '100%';
     el.innerHTML = ''; el.appendChild(input); input.focus();
-
     input.onblur = async () => {
         const newDate = input.value;
         if (newDate && newDate !== originalDate) {
@@ -1329,18 +1173,15 @@ window.editDate = (event, uid, logIndex, el) => {
     };
     input.onclick = (e) => e.stopPropagation();
 };
-
 window.editContent = (event, uid, logIndex, el) => {
     if (!isEditMode) return;
     if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
     event.stopPropagation();
     if (el.querySelector('textarea')) return;
-
     const originalText = el.innerText;
     const input = document.createElement('textarea');
     input.value = originalText; input.style.width = '100%'; input.style.padding='4px'; input.rows = 3;
     el.innerHTML = ''; el.appendChild(input); input.focus();
-
     input.onblur = async () => {
         const newText = input.value.trim();
         if (newText && newText !== originalText) {
@@ -1362,21 +1203,17 @@ window.editContent = (event, uid, logIndex, el) => {
     };
     input.onclick = (e) => e.stopPropagation();
 };
-
 function renderBackend() {
     if (!cloudEnabled) return;
     const t = i18n[currentLang];
     const listContainer = document.getElementById('dataList');
-    
     // 如果 Firebase 還沒回傳資料，顯示載入動畫
     if (!window.firebaseLoaded) {
         listContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
         if (typeof updateCounter === 'function') updateCounter();
         return;
     }
-    
     listContainer.innerHTML = '';
-
     // 排序輔助函數：主要以選擇的日期排序，同一天則以 createdAt (秒級) 排序
     const sortByDateThenTime = (a, b) => {
         const dateA = a.date || '0000-00-00';
@@ -1390,17 +1227,14 @@ function renderBackend() {
         const timeB = b.createdAt || 0;
         return timeB - timeA;
     };
-
     const processedUsers = localDb.map(user => {
         // 排序邏輯：主要以選擇的日期排序，同一天則以 createdAt 排序
         const sortedLogs = [...user.logs].sort(sortByDateThenTime);
         const lastLog = sortedLogs[0] || { date: '0000-00-00', content: t.msgEmpty, createdAt: 0 };
         return { ...user, logs: sortedLogs, lastLog };
     });
-
     processedUsers.sort((a, b) => {
         let compareResult = 0;
-        
         if (sortBy === 'date') {
             const dateA = a.lastLog.date || '0000-00-00';
             const dateB = b.lastLog.date || '0000-00-00';
@@ -1427,22 +1261,18 @@ function renderBackend() {
             };
             compareResult = getActivityScore(b) - getActivityScore(a);
         }
-        
         return sortDesc ? compareResult : -compareResult;
     });
-
     processedUsers.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
         const displayDate = user.lastLog.date === '0000-00-00' ? '-' : user.lastLog.date;
-
         // 計算活躍度（3天內活躍、3-7天一般、7天以上低活躍）
         const now = new Date();
         const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
         let activityLevel = 'low';
         let activityText = t.activityLow;
         let activityClass = 'activity-low';
-        
         if (lastLogDate) {
             const daysDiff = Math.floor((now - lastLogDate) / (1000 * 60 * 60 * 24));
             if (daysDiff <= 3) {
@@ -1455,10 +1285,8 @@ function renderBackend() {
                 activityClass = 'activity-normal';
             }
         }
-
         // 獲取用戶首字母作為頭像
         const avatarLetter = user.name ? user.name.charAt(0).toUpperCase() : '?';
-        
         // 獲取個人資料
         const profile = user.profile || {};
         const locationText = profile.location || '-';
@@ -1466,7 +1294,6 @@ function renderBackend() {
         const contactText = profile.contact || '-';
         const contactIdText = profile.contactId || '-';
         const jobText = profile.job || '-';
-        
         // 計算生日和年紀顯示
         let birthdayText = '-';
         let ageText = '-';
@@ -1487,9 +1314,7 @@ function renderBackend() {
         } else if (profile.age) {
             ageText = profile.age + t.ageUnit;
         }
-        
         const mbtiText = profile.mbti || '-';
-
         const summaryHtml = `
             <div class="user-summary grid-row" onclick="window.toggleDetails('${user.id}')">
                 <div class="check-cell" onclick="event.stopPropagation()">
@@ -1538,12 +1363,10 @@ function renderBackend() {
                 <div class="col-date" style="color:#2e7d32;">${displayDate}</div>
                 <div class="action-cell"></div>
             </div>`;
-
         let logsHtml = '';
         user.logs.forEach((log, idx) => {
             const typeText = log.type === 'me' ? t.tagMe : t.tagOther;
             const typeClass = log.type === 'me' ? 'tag-me' : 'tag-other';
-            
             // 生成AI摘要HTML（如果有）
             let aiSummaryHtml = '';
             if (log.aiSummary) {
@@ -1556,13 +1379,11 @@ function renderBackend() {
                         <div class="ai-summary-meta">${providerName} · ${log.aiSummaryDate || ''}</div>
                     </div>`;
             }
-            
             // 生成訊息重點和需確認訊息的HTML
             let pointsHtml = '';
-            if ((log.messagePoints && log.messagePoints.length > 0) || 
+            if ((log.messagePoints && log.messagePoints.length > 0) ||
                 (log.confirmPoints && log.confirmPoints.length > 0)) {
                 pointsHtml = '<div class="log-points-container">';
-                
                 if (log.messagePoints && log.messagePoints.length > 0) {
                     const msgTitle = currentLang === 'ko' ? '📌 메시지 포인트' : '📌 訊息重點';
                     pointsHtml += `<div class="log-points-section"><div class="log-points-title">${msgTitle}</div>`;
@@ -1571,7 +1392,6 @@ function renderBackend() {
                     });
                     pointsHtml += '</div>';
                 }
-                
                 if (log.confirmPoints && log.confirmPoints.length > 0) {
                     const confTitle = currentLang === 'ko' ? '❓ 확인 필요' : '❓ 需確認';
                     pointsHtml += `<div class="log-points-section"><div class="log-points-title">${confTitle}</div>`;
@@ -1580,10 +1400,8 @@ function renderBackend() {
                     });
                     pointsHtml += '</div>';
                 }
-                
                 pointsHtml += '</div>';
             }
-            
             logsHtml += `
                 <div class="detail-row grid-row" data-uid="${user.id}" data-idx="${idx}">
                     <div class="check-cell"></div>
@@ -1596,24 +1414,19 @@ function renderBackend() {
                     </div>
                 </div>`;
         });
-
         card.innerHTML = summaryHtml + `<div class="user-details" id="details-${user.id}">${logsHtml}</div>`;
         listContainer.appendChild(card);
     });
-
     if (isEditMode) {
         document.getElementById('dataListContainer').classList.add('edit-mode');
     }
     updateCounter();
 }
-
 // 雙擊複製對話內容
 window.copyContent = (event, element) => {
     event.stopPropagation();
     event.preventDefault();
-    
     const content = element.textContent || element.innerText;
-    
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(content).then(() => {
             // 顯示複製成功提示
@@ -1626,7 +1439,6 @@ window.copyContent = (event, element) => {
         fallbackCopy(content);
     }
 };
-
 // 備用複製方法
 function fallbackCopy(text) {
     const textArea = document.createElement('textarea');
@@ -1643,7 +1455,6 @@ function fallbackCopy(text) {
     }
     document.body.removeChild(textArea);
 }
-
 // 顯示複製成功提示
 function showCopyToast() {
     const t = i18n[currentLang];
@@ -1651,11 +1462,9 @@ function showCopyToast() {
     toast.className = 'copy-toast';
     toast.textContent = t.msgCopied || '已複製！';
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.classList.add('show');
     }, 10);
-    
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => {
@@ -1663,7 +1472,6 @@ function showCopyToast() {
         }, 300);
     }, 1500);
 }
-
 // 切換個人資訊彈出框
 window.toggleProfilePopup = (uid) => {
     const popup = document.getElementById(`popup-${uid}`);
@@ -1675,14 +1483,12 @@ window.toggleProfilePopup = (uid) => {
     });
     popup.classList.toggle('show');
 };
-
 // 點擊其他地方關閉彈出框
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.user-avatar') && !e.target.closest('.profile-popup')) {
         document.querySelectorAll('.profile-popup').forEach(p => p.classList.remove('show'));
     }
 });
-
 window.toggleEditMode = () => {
     isEditMode = !isEditMode;
     const container = document.getElementById('dataListContainer');
@@ -1690,7 +1496,6 @@ window.toggleEditMode = () => {
     const btn = document.getElementById('btn-toggle-edit');
     const t = i18n[currentLang];
     if (!container || !controls || !btn) return;
-
     if (isEditMode) {
         container.classList.add('edit-mode');
         controls.style.display = 'flex';
@@ -1707,7 +1512,6 @@ window.toggleEditMode = () => {
         if (selectAll) selectAll.checked = false;
     }
 };
-
 window.toggleDetails = (uid) => {
     if (window.isSwipeAction && window.isSwipeAction()) return; // 滑動時不觸發
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
@@ -1721,14 +1525,12 @@ window.toggleDetails = (uid) => {
         summary.classList.add('expanded');
     }
 };
-
 function restoreExpand(uid) {
     setTimeout(() => {
         const d = document.getElementById(`details-${uid}`);
         if(d) { d.style.display = 'block'; d.previousElementSibling.classList.add('expanded'); }
-    }, 100); 
+    }, 100);
 }
-
 window.toggleSortBy = (field) => {
     if (sortBy === field) {
         sortDesc = !sortDesc;
@@ -1753,14 +1555,12 @@ window.toggleSelectAll = () => {
     document.getElementsByName('selectUser').forEach(c => c.checked = m.checked);
 };
 window.toggleOfflineSelectAll = () => { const m = document.getElementById('offlineSelectAll'); document.getElementsByName('selectOfflineUser').forEach(c => c.checked = m.checked); };
-
 window.toggleMenu = () => {
     const dropdown = document.getElementById('menuDropdown');
     const toggle = document.querySelector('.menu-toggle');
     dropdown.classList.toggle('show');
     toggle.classList.toggle('open');
 };
-
 // 點擊其他地方關閉選單
 document.addEventListener('click', (e) => {
     const dropdown = document.getElementById('menuDropdown');
@@ -1770,17 +1570,14 @@ document.addEventListener('click', (e) => {
         toggle.classList.remove('open');
     }
 });
-
 window.switchPage = (page) => {
     const t = i18n[currentLang];
     const bibleRoute = page === 'bible' ? parseBibleChapterPath() : null;
     document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-section'));
     document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-    
     // 關閉選單
     document.getElementById('menuDropdown').classList.remove('show');
     document.querySelector('.menu-toggle').classList.remove('open');
-    
     // 更新 URL（clean URL，無 #）
     const pathMap = {
         'home': '/',
@@ -1800,13 +1597,10 @@ window.switchPage = (page) => {
     if (window.location.pathname !== newPath) {
         history.pushState(null, '', newPath);
     }
-    
     // 更新當前頁面標題
     const pageTitleEl = document.getElementById('current-page-title');
-    
     // 根據頁面自動展開對應的子選單
     document.querySelectorAll('.menu-category').forEach(c => c.classList.remove('open'));
-    
     // 隱藏功能按鈕群組（預設）
     document.getElementById('bibleFabContainer').classList.remove('show');
     if (page !== 'bible') {
@@ -1814,22 +1608,18 @@ window.switchPage = (page) => {
     }
     // 重置搜尋按鈕
     document.getElementById('bibleFabMain').classList.remove('active');
-    
     // 退出複製模式
     if (typeof window.exitCopyMode === 'function') {
         window.exitCopyMode();
     }
-    
     // 離開首頁時清理
     if (page !== 'home') {
         cleanupDailyVerse();
     }
-    
     if (page === 'home') {
         document.getElementById('homeSection').classList.add('active-section');
         pageTitleEl.textContent = currentLang === 'ko' ? '홈' : '首頁';
         // 載入天氣
-        
         // 初始化今日默想
         initDailyVerse();
     } else if (page === 'daily-faith') {
@@ -1879,38 +1669,36 @@ window.switchPage = (page) => {
         document.getElementById('menu-category-books').classList.add('open');
         pageTitleEl.textContent = t.btnLordsPrayer;
         renderLordsPrayer();
-    } else if (page === 'entry') { 
-        document.getElementById('entrySection').classList.add('active-section'); 
+    } else if (page === 'entry') {
+        document.getElementById('entrySection').classList.add('active-section');
         document.getElementById('btn-entry')?.classList.add('active');
         document.getElementById('menu-category-fruit').classList.add('open');
         pageTitleEl.textContent = t.btnEntry;
     } else if (page === 'offline-entry') {
-        document.getElementById('offlineEntrySection').classList.add('active-section'); 
+        document.getElementById('offlineEntrySection').classList.add('active-section');
         document.getElementById('btn-offline-entry')?.classList.add('active');
         document.getElementById('menu-category-fruit').classList.add('open');
         pageTitleEl.textContent = t.btnOfflineEntry;
     } else if (page === 'profile') {
-        document.getElementById('profileSection').classList.add('active-section'); 
+        document.getElementById('profileSection').classList.add('active-section');
         document.getElementById('btn-profile')?.classList.add('active');
         document.getElementById('menu-category-fruit').classList.add('open');
         pageTitleEl.textContent = t.btnProfile;
-    } else if (page === 'backend') { 
-        document.getElementById('backendSection').classList.add('active-section'); 
-        document.getElementById('btn-backend').classList.add('active'); 
+    } else if (page === 'backend') {
+        document.getElementById('backendSection').classList.add('active-section');
+        document.getElementById('btn-backend').classList.add('active');
         document.getElementById('menu-category-fruit').classList.add('open');
         pageTitleEl.textContent = t.btnBackend;
-        renderBackend(); 
+        renderBackend();
     } else if (page === 'offline-backend') {
-        document.getElementById('offlineBackendSection').classList.add('active-section'); 
+        document.getElementById('offlineBackendSection').classList.add('active-section');
         document.getElementById('btn-offline-backend')?.classList.add('active');
         document.getElementById('menu-category-fruit').classList.add('open');
         pageTitleEl.textContent = t.btnOfflineBackend;
-        renderOfflineBackend(); 
+        renderOfflineBackend();
     }
-
     setTimeout(() => window.refreshBackToTop?.(), 0);
 };
-
 // 切換子選單
 window.toggleSubMenu = (category) => {
     const categoryEl = document.getElementById(`menu-category-${category}`);
@@ -1918,15 +1706,12 @@ window.toggleSubMenu = (category) => {
         categoryEl.classList.toggle('open');
     }
 };
-
 function updateCounter() {
     const t = i18n[currentLang];
     document.getElementById('txt-total-count').textContent = t.txtTotal + localDb.length + t.txtPerson;
-    
     // 計算週間交流人數（最近7天內有記錄的人數）
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
     const weeklyInteractionCount = localDb.filter(user => {
         if (!user.logs || user.logs.length === 0) return false;
         return user.logs.some(log => {
@@ -1934,28 +1719,23 @@ function updateCounter() {
             return logDate >= oneWeekAgo;
         });
     }).length;
-    
     document.getElementById('txt-interaction-count').textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
 }
-
 // ===== 每日經文系統（首爾時間 UTC+9） =====
 const DAILY_VERSE_KEY = 'daily_verse_cache';
 const DAILY_VERSE_HISTORY_KEY = 'daily_verse_history';
-
 // 一次性清除舊版快取
 const VERSE_CACHE_VERSION = '2026.05.04.v3';
 if (localStorage.getItem('verse_cache_version') !== VERSE_CACHE_VERSION) {
     localStorage.removeItem(DAILY_VERSE_KEY);
     localStorage.setItem('verse_cache_version', VERSE_CACHE_VERSION);
 }
-
 // 取得今日種子（首爾時間 UTC+9，所有裝置統一）
 function getDailySeed() {
     const now = new Date();
     const seoulTime = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
     return seoulTime.getFullYear() * 10000 + (seoulTime.getMonth() + 1) * 100 + seoulTime.getDate();
 }
-
 function seededRandom(seed) {
     // Mulberry32 - 確定性PRNG，所有裝置結果一致
     seed = (seed | 0) + 0x6D2B79F5 | 0;
@@ -1963,7 +1743,6 @@ function seededRandom(seed) {
     t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
     return ((t ^ t >>> 14) >>> 0) / 4294967296;
 }
-
 function getVerseHistory() {
     try {
         const data = JSON.parse(localStorage.getItem(DAILY_VERSE_HISTORY_KEY) || '[]');
@@ -1972,16 +1751,13 @@ function getVerseHistory() {
         return data.filter(item => (now - item.timestamp) < sixtyDays);
     } catch (e) { return []; }
 }
-
 function recordVerseUsed(verseKey) {
     const history = getVerseHistory();
     history.push({ key: verseKey, timestamp: Date.now() });
     localStorage.setItem(DAILY_VERSE_HISTORY_KEY, JSON.stringify(history));
 }
-
 function getDailyVerse() {
     const todaySeed = getDailySeed();
-    
     const cached = localStorage.getItem(DAILY_VERSE_KEY);
     if (cached) {
         try {
@@ -1989,7 +1765,6 @@ function getDailyVerse() {
             if (cacheData.seed === todaySeed) return cacheData;
         } catch(e) {}
     }
-    
     // 每日默想經文池（固定清單，涵蓋常用章節）
     const versePool = [
         { ko: '창세기 1:1', zh: '創世記 1:1', textKo: '태초에 하나님이 천지를 창조하시니라', textZh: '起初，神創造天地。' },
@@ -2008,20 +1783,16 @@ function getDailyVerse() {
         { ko: '잠언 3:5', zh: '箴言 3:5', textKo: '너는 마음을 다하여 여호와를 의뢰하고', textZh: '你要專心仰賴耶和華，不可倚靠自己的聰明。' },
         { ko: '마태복음 11:28', zh: '馬太福音 11:28', textKo: '수고하고 무거운 짐 진 자들아 다 내게로 오라', textZh: '凡勞苦擔重擔的人可以到我這裡來，我就使你們得安息。' },
     ];
-    
     const idx = Math.floor(seededRandom(todaySeed * 7 + 13) * versePool.length);
     const v = versePool[idx];
-    
     const result = {
         seed: todaySeed,
         reference: { ko: v.ko, zh: v.zh },
         text: { ko: v.textKo, zh: v.textZh }
     };
-    
     localStorage.setItem(DAILY_VERSE_KEY, JSON.stringify(result));
     return result;
 }
-
 function getDailyVerseDefault(seed) {
     return {
         seed: seed,
@@ -2029,42 +1800,31 @@ function getDailyVerseDefault(seed) {
         text: { ko: '태초에 하나님이 천지를 창조하시니라', zh: '起初，神創造天地。' }
     };
 }
-
 // 首頁（不再需要滾動監聽器）
 let homeScrollHandler = null;
 let homeScrollContainer = null;
-
 function initDailyVerse() {
     const slide1 = document.getElementById('dailyVerseSection');
     const labelEl = document.getElementById('dailyVerseLabel');
     const refEl = document.getElementById('dailyVerseReference');
     const textEl = document.getElementById('dailyVerseText');
     const themeColorMeta = document.getElementById('themeColorMeta');
-    
     if (!slide1) return;
-    
     document.body.classList.add('home-active');
     document.documentElement.style.backgroundColor = '#f5f0e8';
     if (themeColorMeta) themeColorMeta.setAttribute('content', '#f5f0e8');
-    
     const verse = getDailyVerse();
-    
     if (labelEl) labelEl.textContent = currentLang === 'ko' ? '매일묵상' : '每日默想';
     if (refEl) refEl.textContent = currentLang === 'ko' ? verse.reference.ko : verse.reference.zh;
     if (textEl) textEl.textContent = currentLang === 'ko' ? verse.text.ko : verse.text.zh;
-    
     const homeContainer = document.querySelector('#homeSection .home-container');
     if (homeContainer) homeContainer.scrollTo(0, 0);
-    
     setTimeout(() => { slide1.classList.add('loaded'); }, 100);
     setTimeout(() => { slide1.classList.add('verse-show'); }, 1200);
-    
     window.refreshBackToTop?.();
     initHomeFeatureAnimations();
 }
-
 function setupHomeScrollListener(container) {}
-
 function cleanupDailyVerse() {
     document.body.classList.remove('home-active');
     document.documentElement.style.backgroundColor = '#f5f0e8';
@@ -2073,7 +1833,6 @@ function cleanupDailyVerse() {
     const slide1 = document.getElementById('dailyVerseSection');
     if (slide1) { slide1.classList.remove('loaded'); slide1.classList.remove('verse-show'); }
 }
-
 function initHomeFeatureAnimations() {
     const features = document.querySelectorAll('.home-feature');
     if (!features.length) return;
@@ -2088,9 +1847,7 @@ function initHomeFeatureAnimations() {
     }, { threshold: 0.15 });
     features.forEach(f => observer.observe(f));
 }
-
 // (版本檢查已移除)
-
 function scheduleDailyVerseUpdate() {
     const now = new Date();
     const seoulNow = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
@@ -2098,7 +1855,6 @@ function scheduleDailyVerseUpdate() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 5, 0); // 00:00:05 首爾時間
     const msUntilMidnight = tomorrow.getTime() - seoulNow.getTime();
-    
     setTimeout(() => {
         localStorage.removeItem(DAILY_VERSE_KEY);
         if (document.getElementById('homeSection')?.classList.contains('active-section')) {
@@ -2108,18 +1864,15 @@ function scheduleDailyVerseUpdate() {
     }, msUntilMidnight);
 }
 scheduleDailyVerseUpdate();
-
 function updateOfflineCounter() {
     const t = i18n[currentLang];
     const offlineTotalEl = document.getElementById('txt-offline-total-count');
     if (offlineTotalEl) {
         offlineTotalEl.textContent = t.txtTotal + offlineDb.length + t.txtPerson;
     }
-    
     // 計算週間交流人數
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
     const weeklyInteractionCount = offlineDb.filter(user => {
         if (!user.logs || user.logs.length === 0) return false;
         return user.logs.some(log => {
@@ -2127,25 +1880,21 @@ function updateOfflineCounter() {
             return logDate >= oneWeekAgo;
         });
     }).length;
-    
     const offlineInteractionEl = document.getElementById('txt-offline-interaction-count');
     if (offlineInteractionEl) {
         offlineInteractionEl.textContent = t.txtWeeklyInteraction + weeklyInteractionCount + t.txtPerson;
     }
 }
-
 function generateNewId() {
     if (localDb.length === 0) return '0001';
     const maxId = localDb.reduce((max, u) => Math.max(max, parseInt(u.id, 10)), 0);
     return String(maxId + 1).padStart(4, '0');
 }
-
 function generateNewOfflineId() {
     if (offlineDb.length === 0) return '5000';
     const maxId = offlineDb.reduce((max, u) => Math.max(max, parseInt(u.id, 10)), 5000);
     return String(maxId + 1);
 }
-
 // --- 個人資料頁面功能 ---
 function showProfileStatus(msg, type) {
     const el = document.getElementById('profileStatusMsg');
@@ -2153,11 +1902,9 @@ function showProfileStatus(msg, type) {
     el.className = `status-bar status-${type}`;
     el.style.display = 'block';
 }
-
 window.handleProfileIdInput = () => {
     const t = i18n[currentLang];
     const idVal = document.getElementById('profileIdInput').value.trim();
-    
     if (!idVal) {
         document.getElementById('profileNameInput').value = '';
         document.getElementById('profileLocation').value = '';
@@ -2173,7 +1920,6 @@ window.handleProfileIdInput = () => {
         document.getElementById('profileStatusMsg').style.display = 'none';
         return;
     }
-
     const user = localDb.find(u => u.id === idVal);
     if (user) {
         document.getElementById('profileNameInput').value = user.name;
@@ -2210,11 +1956,9 @@ window.handleProfileIdInput = () => {
         document.getElementById('profileJob').value = '';
     }
 };
-
 window.handleProfileNameInput = () => {
     const t = i18n[currentLang];
     const nameVal = document.getElementById('profileNameInput').value.trim();
-    
     if (!nameVal) {
         document.getElementById('profileIdInput').value = '';
         document.getElementById('profileLocation').value = '';
@@ -2230,7 +1974,6 @@ window.handleProfileNameInput = () => {
         document.getElementById('profileStatusMsg').style.display = 'none';
         return;
     }
-
     const user = localDb.find(u => u.name === nameVal);
     if (user) {
         document.getElementById('profileIdInput').value = user.id;
@@ -2256,43 +1999,35 @@ window.handleProfileNameInput = () => {
         if (document.getElementById('profileIdInput').value === '') {
             const newId = generateNewId();
             showProfileStatus(t.statusNewId + newId, 'new');
-            document.getElementById('profileIdInput').value = newId; 
+            document.getElementById('profileIdInput').value = newId;
         }
     }
 };
-
 window.saveProfile = async () => {
     if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
-    
     const t = i18n[currentLang];
     const id = document.getElementById('profileIdInput').value.trim();
     const name = document.getElementById('profileNameInput').value.trim();
-    
-    if (!id) { 
-        alert(t.alertProfileIdRequired); 
-        return; 
+    if (!id) {
+        alert(t.alertProfileIdRequired);
+        return;
     }
-
     const location = document.getElementById('profileLocation').value.trim();
     const phone = document.getElementById('profilePhone').value.trim();
     const contact = document.getElementById('profileContact').value;
     const contactId = document.getElementById('profileContactId').value.trim();
-
     const userRef = doc(dbInstance, "missionary_data", id);
     const existingUser = localDb.find(u => u.id === id);
-    
     const birthYear = document.getElementById('profileBirthYear').value.trim();
     const birthMonth = document.getElementById('profileBirthMonth').value.trim();
     const birthDay = document.getElementById('profileBirthDay').value.trim();
     const age = document.getElementById('profileAge').value.trim();
     const mbti = document.getElementById('profileMbti').value.trim().toUpperCase();
     const job = document.getElementById('profileJob').value.trim();
-    
-    const profileData = { 
+    const profileData = {
         location, phone, contact, contactId,
         birthYear, birthMonth, birthDay, age, mbti, job
     };
-
     if (existingUser) {
         await updateDoc(userRef, { profile: profileData });
     } else if (name) {
@@ -2301,81 +2036,65 @@ window.saveProfile = async () => {
         alert(t.alertIncomplete);
         return;
     }
-
     alert(t.alertProfileSaved);
 };
-
 // 生日年份輸入處理（自動跳轉到月份）
 window.handleBirthYearInput = (input) => {
     // 只允許數字
     input.value = input.value.replace(/[^0-9]/g, '');
-    
     // 輸入滿4位後自動跳到月份
     if (input.value.length === 4) {
         document.getElementById('profileBirthMonth').focus();
     }
     window.calculateAge();
 };
-
 // 生日月份輸入處理（自動跳轉到日期）
 window.handleBirthMonthInput = (input) => {
     // 只允許數字
     input.value = input.value.replace(/[^0-9]/g, '');
-    
     // 輸入滿2位後自動跳到日期
     if (input.value.length === 2) {
         document.getElementById('profileBirthDay').focus();
     }
     window.calculateAge();
 };
-
 // 生日日期輸入處理（自動跳轉到年齡）
 window.handleBirthDayInput = (input) => {
     // 只允許數字
     input.value = input.value.replace(/[^0-9]/g, '');
-    
     // 輸入滿2位後自動跳到年齡（或完成輸入）
     if (input.value.length === 2) {
         document.getElementById('profileAge').focus();
     }
     window.calculateAge();
 };
-
 // 計算年齡
 window.calculateAge = () => {
     const yearInput = document.getElementById('profileBirthYear').value.trim();
     const monthInput = document.getElementById('profileBirthMonth').value.trim();
     const dayInput = document.getElementById('profileBirthDay').value.trim();
-    
     // 只有年月日都填寫時才自動計算年齡
-    if (yearInput && monthInput && dayInput && 
+    if (yearInput && monthInput && dayInput &&
         yearInput.length === 4 && monthInput.length >= 1 && dayInput.length >= 1) {
-        
         const year = parseInt(yearInput, 10);
         const month = parseInt(monthInput, 10);
         const day = parseInt(dayInput, 10);
-        
-        if (!isNaN(year) && !isNaN(month) && !isNaN(day) && 
+        if (!isNaN(year) && !isNaN(month) && !isNaN(day) &&
             month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-            
             const today = new Date();
             const birthDate = new Date(year, month - 1, day);
-            
             let age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
-            
             // 如果還沒過生日，年齡減1
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
-            
             if (age >= 0 && age < 150) {
                 document.getElementById('profileAge').value = age;
             }
         }
     }
 };
-
 // --- 線下登錄功能 ---
 function showOfflineStatus(msg, type) {
     const el = document.getElementById('offlineStatusMsg');
@@ -2383,23 +2102,19 @@ function showOfflineStatus(msg, type) {
     el.className = `status-bar status-${type}`;
     el.style.display = 'block';
 }
-
 window.handleOfflineIdInput = () => {
     const t = i18n[currentLang];
     const idVal = document.getElementById('offlineIdInput').value.trim();
-    
     if (!idVal) {
         document.getElementById('offlineNameInput').value = '';
         document.getElementById('offlineStatusMsg').style.display = 'none';
         return;
     }
-
     const idNum = parseInt(idVal, 10);
     if (idNum < 5000) {
         showOfflineStatus(t.errOfflineIdTooLow, 'new');
         return;
     }
-
     const user = offlineDb.find(u => u.id === idVal);
     if (user) {
         document.getElementById('offlineNameInput').value = user.name;
@@ -2408,17 +2123,14 @@ window.handleOfflineIdInput = () => {
         showOfflineStatus(t.statusNew, 'new');
     }
 };
-
 window.handleOfflineNameInput = () => {
     const t = i18n[currentLang];
     const nameVal = document.getElementById('offlineNameInput').value.trim();
-    
     if (!nameVal) {
         document.getElementById('offlineIdInput').value = '';
         document.getElementById('offlineStatusMsg').style.display = 'none';
         return;
     }
-
     const user = offlineDb.find(u => u.name === nameVal);
     if (user) {
         document.getElementById('offlineIdInput').value = user.id;
@@ -2427,16 +2139,14 @@ window.handleOfflineNameInput = () => {
         if (document.getElementById('offlineIdInput').value === '') {
             const newId = generateNewOfflineId();
             showOfflineStatus(t.statusOfflineNewId + newId, 'new');
-            document.getElementById('offlineIdInput').value = newId; 
+            document.getElementById('offlineIdInput').value = newId;
         }
     }
 };
-
 // Google Maps 地點搜尋功能
 window.openGoogleMaps = () => {
     const locationInput = document.getElementById('offlineLocation');
     const currentValue = locationInput.value.trim();
-    
     // 構建 Google Maps 搜尋 URL
     let mapsUrl;
     if (currentValue) {
@@ -2446,14 +2156,11 @@ window.openGoogleMaps = () => {
         // 如果沒有輸入，打開 Google Maps 首頁讓用戶搜尋
         mapsUrl = `https://www.google.com/maps`;
     }
-    
     // 在新視窗打開 Google Maps
     window.open(mapsUrl, '_blank');
 };
-
 window.submitOfflineData = async () => {
     if (!cloudEnabled) { alert(i18n[currentLang].msgCloudError); return; }
-
     const t = i18n[currentLang];
     const id = document.getElementById('offlineIdInput').value.trim();
     const name = document.getElementById('offlineNameInput').value.trim();
@@ -2461,34 +2168,27 @@ window.submitOfflineData = async () => {
     const location = document.getElementById('offlineLocation').value.trim();
     const activity = document.getElementById('offlineActivity').value.trim();
     const content = document.getElementById('offlineContent').value.trim();
-
     if (!id || !name || !date) { alert(t.alertIncomplete); return; }
-
     const idNum = parseInt(id, 10);
     if (idNum < 5000) {
         alert(t.errOfflineIdTooLow);
         return;
     }
-
     const existingUserById = offlineDb.find(u => u.id === id);
     if (existingUserById && existingUserById.name !== name) {
         alert(t.errIdConflict + `\n(ID: ${id} -> ${existingUserById.name})`);
         return;
     }
-
     const existingUserByName = offlineDb.find(u => u.name === name);
     if (existingUserByName && existingUserByName.id !== id) {
         alert(t.errNameConflict + `\n(${name} -> ID: ${existingUserByName.id})`);
         return;
     }
-
     try {
         const userRef = doc(dbInstance, "offline_missionary_data", id);
         const timestamp = new Date().getTime();
         const newLogEntry = { date, location, activity, content, createdAt: timestamp };
-
         let updatedLogs = [];
-        
         if (existingUserById) {
             updatedLogs = [...existingUserById.logs, newLogEntry];
             await setDoc(userRef, { id, name, logs: updatedLogs }, { merge: true });
@@ -2498,7 +2198,6 @@ window.submitOfflineData = async () => {
             await setDoc(userRef, { id, name, logs: updatedLogs });
             alert(t.alertCreate + name);
         }
-
         // 清空表單
         document.getElementById('offlineLocation').value = '';
         document.getElementById('offlineActivity').value = '';
@@ -2508,21 +2207,17 @@ window.submitOfflineData = async () => {
         alert('上傳失敗: ' + error.message);
     }
 };
-
 // --- 線下後台功能 ---
 function renderOfflineBackend() {
     if (!cloudEnabled) return;
     const t = i18n[currentLang];
     const listContainer = document.getElementById('offlineDataList');
     if (!listContainer) return;
-    
     if (!window.offlineFirebaseLoaded) {
         listContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
         return;
     }
-    
     listContainer.innerHTML = '';
-
     // 排序輔助函數：主要以選擇的日期排序，同一天則以 createdAt (秒級) 排序
     const sortByDateThenTime = (a, b) => {
         const dateA = a.date || '0000-00-00';
@@ -2534,19 +2229,16 @@ function renderOfflineBackend() {
         const timeB = b.createdAt || 0;
         return timeB - timeA;
     };
-
     const processedUsers = offlineDb.map(user => {
         const sortedLogs = [...user.logs].sort(sortByDateThenTime);
         const lastLog = sortedLogs[0] || { date: '0000-00-00', content: t.msgEmpty, createdAt: 0 };
         return { ...user, logs: sortedLogs, lastLog };
     });
-
     processedUsers.sort((a, b) => {
         const dateA = a.lastLog.date || '0000-00-00';
         const dateB = b.lastLog.date || '0000-00-00';
         const timeA = a.lastLog.createdAt || 0;
         const timeB = b.lastLog.createdAt || 0;
-        
         if (offlineSortDesc) {
             if (dateA !== dateB) return dateB.localeCompare(dateA);
             return timeB - timeA;
@@ -2555,18 +2247,15 @@ function renderOfflineBackend() {
             return timeA - timeB;
         }
     });
-
     processedUsers.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
         const displayDate = user.lastLog.date === '0000-00-00' ? '-' : user.lastLog.date;
-
         // 計算活躍度
         const now = new Date();
         const lastLogDate = user.lastLog.date !== '0000-00-00' ? new Date(user.lastLog.date) : null;
         let activityText = t.activityLow;
         let activityClass = 'activity-low';
-        
         if (lastLogDate) {
             const daysDiff = Math.floor((now - lastLogDate) / (1000 * 60 * 60 * 24));
             if (daysDiff <= 3) {
@@ -2577,10 +2266,8 @@ function renderOfflineBackend() {
                 activityClass = 'activity-normal';
             }
         }
-
         const avatarLetter = user.name ? user.name.charAt(0).toUpperCase() : '?';
         const locationText = user.lastLog.location || '-';
-
         const summaryHtml = `
             <div class="user-summary offline-grid-row" onclick="window.toggleOfflineDetails('${user.id}')">
                 <div class="check-cell" onclick="event.stopPropagation()">
@@ -2596,7 +2283,6 @@ function renderOfflineBackend() {
                 <div style="color:#555;">${locationText}</div>
                 <div class="action-cell"></div>
             </div>`;
-
         let logsHtml = '';
         user.logs.forEach((log, idx) => {
             logsHtml += `
@@ -2613,24 +2299,20 @@ function renderOfflineBackend() {
                     </div>
                 </div>`;
         });
-
         card.innerHTML = summaryHtml + `<div class="user-details" id="offline-details-${user.id}">${logsHtml}</div>`;
         listContainer.appendChild(card);
     });
-
     if (isOfflineEditMode) {
         document.getElementById('offlineDataListContainer').classList.add('edit-mode');
     }
     updateOfflineCounter();
 }
-
 window.toggleOfflineEditMode = () => {
     isOfflineEditMode = !isOfflineEditMode;
     const container = document.getElementById('offlineDataListContainer');
     const controls = document.getElementById('offlineEditControls');
     const btn = document.getElementById('btn-offline-toggle-edit');
     const t = i18n[currentLang];
-
     if (isOfflineEditMode) {
         container.classList.add('edit-mode');
         controls.style.display = 'flex';
@@ -2646,7 +2328,6 @@ window.toggleOfflineEditMode = () => {
         document.getElementById('offlineSelectAll').checked = false;
     }
 };
-
 window.toggleOfflineDetails = (uid) => {
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
     const details = document.getElementById(`offline-details-${uid}`);
@@ -2659,7 +2340,6 @@ window.toggleOfflineDetails = (uid) => {
         summary.classList.add('expanded');
     }
 };
-
 window.deleteOfflineSelected = async () => {
     if (!cloudEnabled) return;
     const t = i18n[currentLang];
@@ -2672,7 +2352,6 @@ window.deleteOfflineSelected = async () => {
         alert(t.alertDeleted);
     }
 };
-
 window.deleteOfflineSingleLog = async (event, uid, logIndex) => {
     if (!cloudEnabled) return;
     event.stopPropagation();
@@ -2689,16 +2368,13 @@ window.deleteOfflineSingleLog = async (event, uid, logIndex) => {
                 return timeB - timeA;
             });
             sortedLogs.splice(logIndex, 1);
-            
             await updateDoc(doc(dbInstance, "offline_missionary_data", uid), {
                 logs: sortedLogs
             });
         }
     }
 };
-
 // ===== 聖經功能 =====
-
 // 聖經書卷資料 (韓文/中文名稱, 章數)
 const bibleBooks = {
     oldTestament: [
@@ -2772,14 +2448,12 @@ const bibleBooks = {
         { id: 'rev', ko: '요한계시록', zh: '啟示錄', chapters: 22 }
     ]
 };
-
 // 聖經經文內容資料庫
 // 格式: bibleContent['書卷id']['章數'] = [ {verse: 節數, ko: '韓文', zh: '中文'}, ... ]
 // ===== 聖經經文：從 /bible/ JSON 動態載入 =====
 // 格式：/bible/{bookId}/{chapter}.json → [{verse:1, zh:'...'}, ...]
 const bibleCache = {}; // { 'gen_1': [...], 'rev_3': [...] }
 let lordsPrayerCache = null;
-
 async function fetchBibleChapter(bookId, chapter) {
     const key = `${bookId}_${chapter}`;
     if (bibleCache[key]) return bibleCache[key];
@@ -2794,7 +2468,6 @@ async function fetchBibleChapter(bookId, chapter) {
         return null;
     }
 }
-
 async function fetchLordsPrayer() {
     if (lordsPrayerCache) return lordsPrayerCache;
     const res = await fetch(`/prayers/lords-prayer.json?v=${encodeURIComponent(APP_VERSION)}`);
@@ -2802,23 +2475,19 @@ async function fetchLordsPrayer() {
     lordsPrayerCache = await res.json();
     return lordsPrayerCache;
 }
-
 async function renderLordsPrayer() {
     const content = document.getElementById('lordsPrayerContent');
     const title = document.getElementById('lordsPrayerTitle');
     const kicker = document.getElementById('lordsPrayerKicker');
     if (!content) return;
-
     content.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
     try {
         const data = await fetchLordsPrayer();
         if (title) title.textContent = `${data.titles?.ko || '주기도문'} / ${data.titles?.zh || '主祈禱文'}`;
         if (kicker) kicker.textContent = currentLang === 'ko' ? '기도문 / 祈禱文' : '祈禱文 / 기도문';
-
         const renderLines = (lines = []) => lines
             .map((line) => `<p>${escapeHtml(line)}</p>`)
             .join('');
-
         content.innerHTML = `
             <section class="prayer-language-card ko">
                 <div class="prayer-language-label">한국어</div>
@@ -2838,7 +2507,6 @@ async function renderLordsPrayer() {
         `;
     }
 }
-
 // 相容舊版 bibleContent 同步存取 — 若快取有資料就回傳，否則回傳 undefined
 const bibleContent = new Proxy({}, {
     get(_, bookId) {
@@ -2850,7 +2518,6 @@ const bibleContent = new Proxy({}, {
         });
     }
 });
-
 // 書卷簡稱對照表
 const bookAbbreviations = {
     'gen': { ko: '창', zh: '創' },
@@ -2920,7 +2587,6 @@ const bookAbbreviations = {
     'jud': { ko: '유', zh: '猶' },
     'rev': { ko: '계', zh: '啟' }
 };
-
 let currentBibleBook = null;
 let currentBibleChapter = null;
 let selectedVerseData = null;
@@ -2929,18 +2595,15 @@ let bibleChaptersScrollCloseRaf = 0;
 let suppressBibleChaptersScrollCloseUntil = 0;
 let bibleChapterHistoryActive = false;
 let activeWordStudyVerseElement = null;
-
 // 初始化聖經頁面
 function initBiblePage() {
     renderBibleBooks('oldTestament', 'oldTestamentBooks');
     renderBibleBooks('newTestament', 'newTestamentBooks');
 }
-
 // 渲染書卷列表
 function renderBibleBooks(testament, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
     container.innerHTML = '';
     bibleBooks[testament].forEach(book => {
         const btn = document.createElement('div');
@@ -2954,27 +2617,21 @@ function renderBibleBooks(testament, containerId) {
         container.appendChild(btn);
     });
 }
-
 // 選擇書卷
 function selectBibleBook(book, anchorEl = null) {
     // 移除其他書卷的選中狀態
     document.querySelectorAll('.bible-book-btn').forEach(btn => btn.classList.remove('active'));
-    
     // 選中當前書卷
     const currentBtn = anchorEl || document.getElementById(`bible-book-${book.id}`);
     if (currentBtn) currentBtn.classList.add('active');
     activeBibleBookButton = currentBtn;
-    
     currentBibleBook = book;
-    
     // 顯示章節選擇
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     const chaptersTitle = document.getElementById('bibleChaptersTitle');
     const chaptersGrid = document.getElementById('bibleChaptersGrid');
-    
     chaptersTitle.innerHTML = `${book.ko} / ${book.zh}`;
     chaptersGrid.innerHTML = '';
-    
     for (let i = 1; i <= book.chapters; i++) {
         const btn = document.createElement('div');
         btn.className = 'bible-chapter-btn';
@@ -2985,32 +2642,26 @@ function selectBibleBook(book, anchorEl = null) {
         };
         chaptersGrid.appendChild(btn);
     }
-    
     chaptersContainer.classList.add('show');
     positionBibleChaptersPopover(currentBtn);
 }
-
 function positionBibleChaptersPopover(anchorEl = activeBibleBookButton) {
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     if (!chaptersContainer || !chaptersContainer.classList.contains('show') || !anchorEl) return;
-
     const rect = anchorEl.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const panelWidth = Math.min(380, Math.max(260, viewportWidth - 24));
     let left = rect.left + (rect.width / 2) - (panelWidth / 2);
     left = Math.max(12, Math.min(left, viewportWidth - panelWidth - 12));
-
     chaptersContainer.style.width = `${panelWidth}px`;
     chaptersContainer.style.left = `${left}px`;
     chaptersContainer.style.top = `${rect.bottom + 10}px`;
-
     requestAnimationFrame(() => {
         const panelHeight = chaptersContainer.offsetHeight;
         const spaceBelow = viewportHeight - rect.bottom;
         const spaceAbove = rect.top;
         let top = rect.bottom + 10;
-
         if (spaceBelow < panelHeight + 22 && spaceAbove > spaceBelow) {
             top = Math.max(12, rect.top - panelHeight - 10);
             chaptersContainer.classList.add('above-anchor');
@@ -3018,11 +2669,9 @@ function positionBibleChaptersPopover(anchorEl = activeBibleBookButton) {
             top = Math.min(top, viewportHeight - panelHeight - 12);
             chaptersContainer.classList.remove('above-anchor');
         }
-
         chaptersContainer.style.top = `${Math.max(12, top)}px`;
     });
 }
-
 function closeBibleChaptersPopover({ keepActiveBook = false } = {}) {
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     if (chaptersContainer) {
@@ -3034,14 +2683,12 @@ function closeBibleChaptersPopover({ keepActiveBook = false } = {}) {
         activeBibleBookButton = null;
     }
 }
-
 document.addEventListener('click', (event) => {
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
     if (!chaptersContainer || !chaptersContainer.classList.contains('show')) return;
     if (chaptersContainer.contains(event.target) || event.target.closest('.bible-book-btn')) return;
     closeBibleChaptersPopover();
 });
-
 function closeBibleChaptersOnPageScroll(event) {
     hideWordStudyActionBubble();
     const chaptersContainer = document.getElementById('bibleChaptersContainer');
@@ -3052,24 +2699,20 @@ function closeBibleChaptersOnPageScroll(event) {
         return;
     }
     if (bibleChaptersScrollCloseRaf) return;
-
     bibleChaptersScrollCloseRaf = requestAnimationFrame(() => {
         bibleChaptersScrollCloseRaf = 0;
         closeBibleChaptersPopover();
     });
 }
-
 window.addEventListener('resize', () => positionBibleChaptersPopover());
 document.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: true, capture: true });
 window.addEventListener('scroll', closeBibleChaptersOnPageScroll, { passive: true });
-
 // 開啟聖經章節
 async function openBibleChapter(book, chapter, options = {}) {
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
     const contentTitle = document.getElementById('bibleContentTitle');
     const versesContainer = document.getElementById('bibleVerses');
-    
     // 記錄當前章節
     currentBibleChapter = chapter;
     currentBibleBook = book;
@@ -3084,21 +2727,17 @@ async function openBibleChapter(book, chapter, options = {}) {
     } else if (window.location.pathname !== chapterPath) {
         history.replaceState(chapterState, '', chapterPath);
     }
-    
     // 設定標題
     contentTitle.querySelector('.ko').textContent = `${book.ko} ${chapter}장`;
     contentTitle.querySelector('.zh').textContent = `${book.zh} 第${chapter}章`;
-    
     // 先切換視圖 + 顯示載入動畫
     closeBibleChaptersPopover({ keepActiveBook: true });
     booksList.style.display = 'none';
     contentView.classList.add('show');
     versesContainer.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     // 從 JSON 載入經文
     const verses = await fetchBibleChapter(book.id, chapter);
-    
     if (verses && verses.length > 0) {
         versesContainer.innerHTML = verses.map((v) => {
             if (v.type === 'heading') {
@@ -3107,9 +2746,9 @@ async function openBibleChapter(book, chapter, options = {}) {
                     <span class="heading-zh">${v.zh || ''}</span>
                 </div>`;
             }
-            return `<div class="bible-verse" 
-                     data-verse="${v.verse}" 
-                     data-ko="${encodeURIComponent(v.ko || '')}" 
+            return `<div class="bible-verse"
+                     data-verse="${v.verse}"
+                     data-ko="${encodeURIComponent(v.ko || '')}"
                      data-zh="${encodeURIComponent(v.zh || '')}"
                      oncontextmenu="window.handleVerseContextMenu(event, this)"
                      ontouchstart="window.handleVerseTouchStart(event, this)"
@@ -3136,34 +2775,28 @@ async function openBibleChapter(book, chapter, options = {}) {
     }
     setTimeout(() => window.refreshBackToTop?.(), 100);
 }
-
 function scrollToBibleVerse(verse) {
     const verseText = String(verse);
     const target = [...document.querySelectorAll('#bibleVerses .bible-verse')]
         .find((el) => el.dataset.verse === verseText);
     if (!target) return;
-
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     target.classList.add('verse-jump-highlight');
     setTimeout(() => target.classList.remove('verse-jump-highlight'), 1800);
 }
-
 // 關閉聖經內容，返回書卷列表
 window.closeBibleContent = (options = {}) => {
     const { fromHistory = false } = options;
     const booksList = document.getElementById('bibleBooksList');
     const contentView = document.getElementById('bibleContentView');
-    
     hideWordStudyActionBubble();
     contentView.classList.remove('show');
     booksList.style.display = 'block';
     bibleChapterHistoryActive = false;
     suppressBibleChaptersScrollCloseUntil = Date.now() + 900;
-    
     if (!fromHistory && (history.state?.bibleChapter || /^\/bible\/[a-z0-9]+\d+$/i.test(window.location.pathname))) {
         history.replaceState(null, '', '/bible');
     }
-
     if (currentBibleBook) {
         setTimeout(() => {
             suppressBibleChaptersScrollCloseUntil = Date.now() + 700;
@@ -3172,7 +2805,6 @@ window.closeBibleContent = (options = {}) => {
         }, 100);
     }
 };
-
 // Back-to-top controller: self-contained, no dependency on index.html or style.css.
 const BACK_TO_TOP_THRESHOLD = 140;
 const BACK_TO_TOP_ID = 'siteBackToTop';
@@ -3180,11 +2812,9 @@ const BACK_TO_TOP_STYLE_ID = 'siteBackToTopStyle';
 let backToTopInitialized = false;
 let backToTopRaf = 0;
 let backToTopObserver = null;
-
 function getDocumentScrollTop() {
     return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
 }
-
 function getBackToTopScrollTargets() {
     const activeSection = document.querySelector('.page-section.active-section');
     const roots = [
@@ -3194,7 +2824,6 @@ function getBackToTopScrollTargets() {
         document.querySelector('.container'),
         activeSection
     ].filter(Boolean);
-
     const selector = [
         '.home-container',
         '.bible-container',
@@ -3205,28 +2834,23 @@ function getBackToTopScrollTargets() {
         '.bible-search-panel',
         '.bible-search-preview-body'
     ].join(',');
-
     if (activeSection) roots.push(...activeSection.querySelectorAll(selector));
-
     return [...new Set(roots)].filter((el) => {
         if (!el || el === document) return false;
         if (el === document.documentElement || el === document.body || el === document.scrollingElement) return true;
         return el.scrollHeight > el.clientHeight + 2;
     });
 }
-
 function getBackToTopAmount() {
     const elementTop = getBackToTopScrollTargets()
         .reduce((max, el) => Math.max(max, el.scrollTop || 0), 0);
     return Math.max(getDocumentScrollTop(), elementTop);
 }
-
 function setBackToTopVisible() {
     const btn = document.getElementById(BACK_TO_TOP_ID);
     if (!btn) return;
     btn.classList.toggle('is-visible', getBackToTopAmount() > BACK_TO_TOP_THRESHOLD);
 }
-
 function scheduleBackToTopRefresh() {
     if (backToTopRaf) return;
     backToTopRaf = requestAnimationFrame(() => {
@@ -3234,7 +2858,6 @@ function scheduleBackToTopRefresh() {
         setBackToTopVisible();
     });
 }
-
 function injectBackToTopStyle() {
     if (document.getElementById(BACK_TO_TOP_STYLE_ID)) return;
     const style = document.createElement('style');
@@ -3299,11 +2922,9 @@ function injectBackToTopStyle() {
     `;
     document.head.appendChild(style);
 }
-
 function createBackToTopButton() {
     const existing = document.getElementById(BACK_TO_TOP_ID);
     if (existing) return existing;
-
     const btn = document.createElement('button');
     btn.id = BACK_TO_TOP_ID;
     btn.type = 'button';
@@ -3320,11 +2941,9 @@ function createBackToTopButton() {
     document.body.appendChild(btn);
     return btn;
 }
-
 function initBackToTop() {
     injectBackToTopStyle();
     createBackToTopButton();
-
     if (!backToTopInitialized) {
         window.addEventListener('scroll', scheduleBackToTopRefresh, { passive: true });
         document.addEventListener('scroll', scheduleBackToTopRefresh, { passive: true, capture: true });
@@ -3333,17 +2952,13 @@ function initBackToTop() {
         backToTopObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
         backToTopInitialized = true;
     }
-
     scheduleBackToTopRefresh();
 }
-
 window.refreshBackToTop = () => {
     if (!backToTopInitialized) initBackToTop();
     scheduleBackToTopRefresh();
 };
-
 document.addEventListener('DOMContentLoaded', initBackToTop);
-
 // ===== 新複製模式系統 =====
 const LONG_PRESS_DURATION = 300; // 長按時間 300ms（快速觸發）
 const COPY_LANG_PREF_KEY = 'copy_lang_preference';
@@ -3354,18 +2969,15 @@ let touchStartX = 0;
 let touchStartY = 0;
 let isCopyModeActive = false;
 let selectedVerses = new Set(); // 存儲選中的經文節數
-
 // 載入語言偏好設定（預設兩個都打勾）
 function loadCopyLangPreference() {
     try {
         const zhEl = document.getElementById('copyLangZh');
         const koEl = document.getElementById('copyLangKo');
         if (!zhEl || !koEl) return;
-        
         // 預設兩個都打勾
         zhEl.checked = true;
         koEl.checked = true;
-        
         // 如果有儲存的偏好，則使用儲存的設定
         const saved = localStorage.getItem(COPY_LANG_PREF_KEY);
         if (saved) {
@@ -3378,14 +2990,12 @@ function loadCopyLangPreference() {
         // 使用預設值（兩個都打勾）
     }
 }
-
 // 儲存語言偏好設定
 function saveCopyLangPreference() {
     try {
         const zhEl = document.getElementById('copyLangZh');
         const koEl = document.getElementById('copyLangKo');
         if (!zhEl || !koEl) return;
-        
         const pref = {
             zh: zhEl.checked,
             ko: koEl.checked
@@ -3395,18 +3005,15 @@ function saveCopyLangPreference() {
         // 忽略錯誤
     }
 }
-
 // 初始化複製模式
 document.addEventListener('DOMContentLoaded', () => {
     loadCopyLangPreference();
-    
     // 監聽語言勾選變化
     const zhEl = document.getElementById('copyLangZh');
     const koEl = document.getElementById('copyLangKo');
     if (zhEl) zhEl.addEventListener('change', saveCopyLangPreference);
     if (koEl) koEl.addEventListener('change', saveCopyLangPreference);
 });
-
 // 清除長按狀態
 function clearLongPressState() {
     if (longPressTimer) {
@@ -3419,24 +3026,20 @@ function clearLongPressState() {
     }
     longPressTriggered = false;
 }
-
 // 觸發長按成功 - 進入複製模式並顯示小圖示
 function triggerLongPress(event, element) {
     clearLongPressState();
     longPressTriggered = true;
     showWordStudyAction(event, element);
 }
-
 // 顯示複製小圖示
 function showCopyFabButton() {
     return;
 }
-
 // 隱藏複製小圖示
 function hideCopyFabButton() {
     return;
 }
-
 // 點擊複製小圖示 - 打開複製面板
 window.openCopyModePanel = () => {
     // 確保語言預設都打勾
@@ -3444,26 +3047,20 @@ window.openCopyModePanel = () => {
     const koEl = document.getElementById('copyLangKo');
     if (zhEl) zhEl.checked = true;
     if (koEl) koEl.checked = true;
-    
     // 顯示複製模式面板
     const panel = document.getElementById('copyModePanel');
     if (panel) panel.classList.add('show');
-    
     // 隱藏複製小圖示
     hideCopyFabButton();
-    
     // 更新選中計數
     updateSelectedCount();
-    
     // 更新面板語言
     updateCopyModePanelLanguage();
 };
-
 // 進入複製模式（保留給右鍵使用）
 function enterCopyMode(element) {
     clearLongPressState();
 }
-
 function getVersePointerPosition(event) {
     const touch = event?.touches?.[0] || event?.changedTouches?.[0];
     if (touch) return { x: touch.clientX, y: touch.clientY };
@@ -3472,11 +3069,9 @@ function getVersePointerPosition(event) {
         y: event?.clientY || window.innerHeight / 2
     };
 }
-
 function createWordStudyActionBubble() {
     let bubble = document.getElementById('wordStudyActionBubble');
     if (bubble) return bubble;
-
     bubble = document.createElement('div');
     bubble.id = 'wordStudyActionBubble';
     bubble.className = 'word-study-action-bubble';
@@ -3492,11 +3087,9 @@ function createWordStudyActionBubble() {
     document.body.appendChild(bubble);
     return bubble;
 }
-
 function hideWordStudyActionBubble() {
     document.getElementById('wordStudyActionBubble')?.classList.remove('show');
 }
-
 function showWordStudyAction(event, element) {
     activeWordStudyVerseElement = element;
     const bubble = createWordStudyActionBubble();
@@ -3509,14 +3102,12 @@ function showWordStudyAction(event, element) {
     bubble.style.top = `${top}px`;
     bubble.classList.add('show');
 }
-
 document.addEventListener('click', (event) => {
     const bubble = document.getElementById('wordStudyActionBubble');
     if (!bubble?.classList.contains('show')) return;
     if (bubble.contains(event.target) || event.target.closest('.bible-verse')) return;
     hideWordStudyActionBubble();
 });
-
 function escapeHtml(value = '') {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -3525,11 +3116,9 @@ function escapeHtml(value = '') {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
-
 function createWordStudyPanel() {
     let overlay = document.getElementById('wordStudyOverlay');
     if (overlay) return overlay;
-
     overlay = document.createElement('div');
     overlay.id = 'wordStudyOverlay';
     overlay.className = 'word-study-overlay';
@@ -3549,11 +3138,9 @@ function createWordStudyPanel() {
     document.body.appendChild(overlay);
     return overlay;
 }
-
 window.closeWordStudyPanel = () => {
     document.getElementById('wordStudyOverlay')?.classList.remove('show');
 };
-
 function getActiveWordStudyVerseData() {
     const element = activeWordStudyVerseElement;
     if (!element) return null;
@@ -3566,7 +3153,6 @@ function getActiveWordStudyVerseData() {
         chapter: currentBibleChapter
     };
 }
-
 function highlightWordStudyText(text, pairs, langKey) {
     let html = escapeHtml(text);
     const seen = new Set();
@@ -3575,7 +3161,6 @@ function highlightWordStudyText(text, pairs, langKey) {
         .filter(({ term }) => term && String(term).trim())
         .map(({ term, index }) => ({ term: String(term).trim(), index }))
         .sort((a, b) => b.term.length - a.term.length);
-
     for (const { term, index } of terms) {
         const key = `${langKey}:${term}`;
         if (seen.has(key)) continue;
@@ -3587,7 +3172,6 @@ function highlightWordStudyText(text, pairs, langKey) {
     }
     return html;
 }
-
 function normalizeWordStudyPairs(aiText) {
     const jsonText = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     const parsed = JSON.parse(jsonText);
@@ -3605,13 +3189,11 @@ function normalizeWordStudyPairs(aiText) {
             .slice(0, 24)
     };
 }
-
 function renderWordStudyResult(data, analysis) {
     const body = document.getElementById('wordStudyBody');
     const pairs = analysis.pairs || [];
     const koHtml = highlightWordStudyText(data.ko, pairs, 'ko');
     const zhHtml = highlightWordStudyText(data.zh, pairs, 'zh');
-
     const rows = pairs.length
         ? pairs.map((pair, index) => `
             <div class="word-study-row">
@@ -3627,7 +3209,6 @@ function renderWordStudyResult(data, analysis) {
             </div>
         `).join('')
         : `<div class="word-study-empty">${currentLang === 'ko' ? '분석 결과가 비어 있습니다.' : '解析結果為空。'}</div>`;
-
     body.innerHTML = `
         <div class="word-study-verses">
             <div class="word-study-verse ko">${koHtml}</div>
@@ -3636,11 +3217,9 @@ function renderWordStudyResult(data, analysis) {
         <div class="word-study-list">${rows}</div>
     `;
 }
-
 window.openWordStudyPanel = async () => {
     const data = getActiveWordStudyVerseData();
     if (!data) return;
-
     hideWordStudyActionBubble();
     const overlay = createWordStudyPanel();
     const body = document.getElementById('wordStudyBody');
@@ -3656,9 +3235,7 @@ window.openWordStudyPanel = async () => {
         `;
     }
     overlay.classList.add('show');
-
     const prompt = `你是聖經中韓文逐詞解析助手。請分析以下同一節經文的韓文與中文對應。
-
 請只回傳 JSON，不要 markdown。格式：
 {
   "summary": "一句話說明句子核心",
@@ -3666,17 +3243,14 @@ window.openWordStudyPanel = async () => {
     {"ko":"韓文詞或短語","zh":"對應中文詞或短語","label":"詞性或語法功能","explanation":"簡短解釋"}
   ]
 }
-
 規則：
 - pairs 依照經文出現順序排列。
 - ko 與 zh 請盡量使用原經文中實際出現的字詞，方便前端標色。
 - 可以用短語，不必逐字硬切，但要有教學價值。
 - explanation 使用繁體中文，若需要可補充韓文敬語、時態、連接語尾、名詞角色。
 - 最多 16 組。
-
 韓文：${data.ko}
 中文：${data.zh}`;
-
     try {
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
@@ -3699,38 +3273,30 @@ window.openWordStudyPanel = async () => {
         }
     }
 };
-
 // 退出複製模式
 window.exitCopyMode = () => {
     isCopyModeActive = false;
     selectedVerses.clear();
-    
     // 移除所有選中狀態
     document.querySelectorAll('.bible-verse.selected').forEach(el => {
         el.classList.remove('selected');
     });
-    
     // 隱藏複製模式面板
     const panel = document.getElementById('copyModePanel');
     const hint = document.getElementById('copyModeHint');
     const rangeStart = document.getElementById('copyModeRangeStart');
     const rangeEnd = document.getElementById('copyModeRangeEnd');
-    
     if (panel) panel.classList.remove('show');
     if (hint) hint.classList.remove('show');
-    
     // 隱藏複製小圖示
     hideCopyFabButton();
-    
     // 清空範圍輸入
     if (rangeStart) rangeStart.value = '';
     if (rangeEnd) rangeEnd.value = '';
 };
-
 // 切換經文選中狀態
 function toggleVerseSelection(element) {
     const verse = parseInt(element.dataset.verse);
-    
     if (selectedVerses.has(verse)) {
         selectedVerses.delete(verse);
         element.classList.remove('selected');
@@ -3738,26 +3304,21 @@ function toggleVerseSelection(element) {
         selectedVerses.add(verse);
         element.classList.add('selected');
     }
-    
     updateSelectedCount();
 }
-
 // 更新選中計數
 function updateSelectedCount() {
     const count = selectedVerses.size;
     const countEl = document.getElementById('copyModeSelectedCount');
     if (countEl) countEl.textContent = count;
-    
     // 如果沒有選中任何經文
     if (count === 0) {
         // 禁用反白複製按鈕
         const copySelectedBtn = document.getElementById('copySelectedBtn');
         if (copySelectedBtn) copySelectedBtn.disabled = true;
-        
         // 隱藏複製小圖示並退出複製模式
         hideCopyFabButton();
         isCopyModeActive = false;
-        
         // 如果面板開著，也關閉它
         const panel = document.getElementById('copyModePanel');
         if (panel) panel.classList.remove('show');
@@ -3767,11 +3328,9 @@ function updateSelectedCount() {
         if (copySelectedBtn) copySelectedBtn.disabled = false;
     }
 }
-
 // 更新複製模式面板語言
 function updateCopyModePanelLanguage() {
     const isKo = currentLang === 'ko';
-    
     const el1 = document.getElementById('copyModePanelTitle');
     const el2 = document.getElementById('copyModeSelectedText');
     const el3 = document.getElementById('copyModeLangTitle');
@@ -3783,9 +3342,8 @@ function updateCopyModePanelLanguage() {
     const el9 = document.getElementById('copyChapterBtnText');
     const rangeStart = document.getElementById('copyModeRangeStart');
     const rangeEnd = document.getElementById('copyModeRangeEnd');
-    
     if (el1) el1.textContent = isKo ? '복사 모드' : '複製模式';
-    if (el2) el2.innerHTML = isKo 
+    if (el2) el2.innerHTML = isKo
         ? `<span class="copy-mode-selected-count" id="copyModeSelectedCount">${selectedVerses.size}</span>절 선택됨`
         : `已選擇 <span class="copy-mode-selected-count" id="copyModeSelectedCount">${selectedVerses.size}</span> 節經文`;
     if (el3) el3.textContent = isKo ? '📝 언어 선택' : '📝 語言選擇';
@@ -3795,31 +3353,26 @@ function updateCopyModePanelLanguage() {
     if (el7) el7.textContent = isKo ? '지정 범위 복사' : '複製指定範圍';
     if (el8) el8.textContent = isKo ? '📖 전체 장 복사' : '📖 全章複製';
     if (el9) el9.textContent = isKo ? '전체 장 복사' : '複製整章經文';
-    
     // 更新範圍輸入框的placeholder
     if (rangeStart) rangeStart.placeholder = isKo ? '시작' : '起';
     if (rangeEnd) rangeEnd.placeholder = isKo ? '끝' : '迄';
 }
-
 // 檢查語言選擇是否有效
 function validateLangSelection() {
     const zhEl = document.getElementById('copyLangZh');
     const koEl = document.getElementById('copyLangKo');
     if (!zhEl || !koEl) return true; // 元素不存在時預設通過
-    
     const zh = zhEl.checked;
     const ko = koEl.checked;
-    
     if (!zh && !ko) {
-        const msg = currentLang === 'ko' 
-            ? '최소 하나의 언어를 선택해주세요.' 
+        const msg = currentLang === 'ko'
+            ? '최소 하나의 언어를 선택해주세요.'
             : '請至少選擇一種語言。';
         alert(msg);
         return false;
     }
     return true;
 }
-
 // 獲取選中的語言
 function getSelectedLangs() {
     const zhEl = document.getElementById('copyLangZh');
@@ -3829,7 +3382,6 @@ function getSelectedLangs() {
         ko: koEl ? koEl.checked : true
     };
 }
-
 // 複製選取的經文
 window.copySelectedVerses = () => {
     if (!validateLangSelection()) return;
@@ -3838,16 +3390,13 @@ window.copySelectedVerses = () => {
         alert(msg);
         return;
     }
-    
     const langs = getSelectedLangs();
     const sortedVerses = Array.from(selectedVerses).sort((a, b) => a - b);
     const bookId = currentBibleBook.id;
     const chapter = currentBibleChapter;
     const content = bibleContent[bookId][chapter];
     const abbr = bookAbbreviations[bookId];
-    
     let textToCopy = '';
-    
     sortedVerses.forEach(verseNum => {
         const verseData = content.find(v => v.verse === verseNum);
         if (verseData) {
@@ -3861,35 +3410,27 @@ window.copySelectedVerses = () => {
             }
         }
     });
-    
     copyToClipboard(textToCopy.trim());
 };
-
 // 複製指定範圍
 window.copyRangeVerses = () => {
     if (!validateLangSelection()) return;
-    
     const startEl = document.getElementById('copyModeRangeStart');
     const endEl = document.getElementById('copyModeRangeEnd');
     if (!startEl || !endEl) return;
-    
     const start = parseInt(startEl.value);
     const end = parseInt(endEl.value);
-    
     if (!start || !end || start > end) {
         const msg = currentLang === 'ko' ? '유효한 범위를 입력해주세요.' : '請輸入有效的範圍。';
         alert(msg);
         return;
     }
-    
     const langs = getSelectedLangs();
     const bookId = currentBibleBook.id;
     const chapter = currentBibleChapter;
     const content = bibleContent[bookId][chapter];
     const abbr = bookAbbreviations[bookId];
-    
     let textToCopy = '';
-    
     for (let v = start; v <= end; v++) {
         const verseData = content.find(item => item.verse === v);
         if (verseData) {
@@ -3903,28 +3444,22 @@ window.copyRangeVerses = () => {
             }
         }
     }
-    
     if (!textToCopy.trim()) {
         const msg = currentLang === 'ko' ? '해당 범위에 구절이 없습니다.' : '該範圍內沒有經文。';
         alert(msg);
         return;
     }
-    
     copyToClipboard(textToCopy.trim());
 };
-
 // 複製整章
 window.copyWholeChapter = () => {
     if (!validateLangSelection()) return;
-    
     const langs = getSelectedLangs();
     const bookId = currentBibleBook.id;
     const chapter = currentBibleChapter;
     const content = bibleContent[bookId][chapter];
     const abbr = bookAbbreviations[bookId];
-    
     let textToCopy = '';
-    
     content.forEach(item => {
         if (item.verse) {
             if (langs.ko && langs.zh) {
@@ -3937,10 +3472,8 @@ window.copyWholeChapter = () => {
             }
         }
     });
-    
     copyToClipboard(textToCopy.trim());
 };
-
 // 通用複製函數
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -3955,40 +3488,33 @@ function copyToClipboard(text) {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        
         const t = i18n[currentLang];
         alert(t.msgCopied || '已複製！');
         window.exitCopyMode();
     });
 }
-
 // ===== AI 助手面板 =====
 const AI_PANEL_CACHE_KEY = 'ai_panel_results';
 const AI_PANEL_CACHE_DURATION = 60 * 60 * 1000; // 1小時
 const BIBLE_FONT_KEY = 'bible_font_mode';
-
 function getBibleFontMode() {
     return localStorage.getItem(BIBLE_FONT_KEY) === 'sans' ? 'sans' : 'serif';
 }
-
 function getBibleFontLabel(mode = getBibleFontMode()) {
     if (currentLang === 'ko') return mode === 'sans' ? '고딕체' : '명조체';
     return mode === 'sans' ? '黑體' : '宋體';
 }
-
 function applyBibleFontPreference(mode = getBibleFontMode()) {
     const normalizedMode = mode === 'sans' ? 'sans' : 'serif';
     localStorage.setItem(BIBLE_FONT_KEY, normalizedMode);
     if (document.body) document.body.dataset.bibleFont = normalizedMode;
     return normalizedMode;
 }
-
 function isBibleFontCommand(query) {
     const normalized = query.trim();
     if (!normalized || normalized.startsWith('@')) return false;
     return /聖經字體|圣经字体|經文字體|经文字体|字體|字体|font|폰트|글꼴|서체|黑體|黑体|宋體|宋体|고딕체|명조체|sans|serif/i.test(normalized);
 }
-
 function renderBibleFontOptions() {
     const mode = getBibleFontMode();
     const serifSelected = mode === 'serif' ? ' selected' : '';
@@ -4001,7 +3527,6 @@ function renderBibleFontOptions() {
     const sansTitle = currentLang === 'ko' ? '고딕체' : '黑體';
     const serifPreview = currentLang === 'ko' ? '태초에 하나님이 천지를 창조하시니라' : '起初，神創造天地';
     const sansPreview = currentLang === 'ko' ? '말씀을 또렷하게 읽기' : '清楚俐落地閱讀經文';
-
     return `
         <div class="ai-panel-result-item success ai-panel-font-picker">
             <div class="result-query">${title}</div>
@@ -4019,12 +3544,10 @@ function renderBibleFontOptions() {
         </div>
     `;
 }
-
 function showBibleFontOptions(resultContainer) {
     resultContainer.querySelector('.ai-panel-font-picker')?.remove();
     resultContainer.insertAdjacentHTML('afterbegin', renderBibleFontOptions());
 }
-
 window.setBibleFontMode = (mode) => {
     const appliedMode = applyBibleFontPreference(mode);
     const resultContainer = document.getElementById('aiPanelResult');
@@ -4035,14 +3558,11 @@ window.setBibleFontMode = (mode) => {
     const picker = document.querySelector('.ai-panel-font-picker .result-text');
     if (picker) picker.textContent = message;
 };
-
 applyBibleFontPreference();
-
 window.toggleAiPanel = () => {
     const panel = document.getElementById('aiPanel');
     const overlay = document.getElementById('aiPanelOverlay');
     const isOpen = panel.classList.contains('show');
-    
     if (isOpen) {
         panel.classList.remove('show');
         overlay.classList.remove('show');
@@ -4054,7 +3574,6 @@ window.toggleAiPanel = () => {
         loadAiPanelCache();
     }
 };
-
 function loadAiPanelCache() {
     try {
         const cached = JSON.parse(localStorage.getItem(AI_PANEL_CACHE_KEY) || '[]');
@@ -4067,7 +3586,6 @@ function loadAiPanelCache() {
         renderAiPanelResults([]);
     }
 }
-
 function renderAiPanelResults(results) {
     const container = document.getElementById('aiPanelResult');
     if (!results.length) {
@@ -4078,8 +3596,8 @@ function renderAiPanelResults(results) {
     const searchSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:4px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
     const editSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
     container.innerHTML = results.map(r => {
-        const composeLink = r.composeUserId 
-            ? `<button class="ai-panel-compose-link" onclick="window.openFullCompose('${r.composeUserId}')">${editSvg}${currentLang === 'ko' ? 'AI 통합 작문 열기' : '開啟 AI 整合作文'}</button>` 
+        const composeLink = r.composeUserId
+            ? `<button class="ai-panel-compose-link" onclick="window.openFullCompose('${r.composeUserId}')">${editSvg}${currentLang === 'ko' ? 'AI 통합 작문 열기' : '開啟 AI 整合作文'}</button>`
             : '';
         const copiedLabel = r.success && !r.isPreview ? `<div class="result-copied">${checkSvg} ${currentLang === 'ko' ? '복사됨' : '已複製'}</div>` : '';
         return `
@@ -4092,7 +3610,6 @@ function renderAiPanelResults(results) {
         </div>`;
     }).join('');
 }
-
 window.openFullCompose = (userId) => {
     // 關閉 AI 面板，跳到 AI 整合作文頁面，帶入 ID
     window.toggleAiPanel();
@@ -4105,7 +3622,6 @@ window.openFullCompose = (userId) => {
         }
     }, 300);
 };
-
 // ===== 聖經經文本地解析器（不依賴 AI API，即時辨識） =====
 function buildBookLookup() {
     const lookup = {};
@@ -4155,18 +3671,14 @@ function buildBookLookup() {
     for (const [k, v] of Object.entries(engMap)) lookup[k.toLowerCase()] = v;
     return lookup;
 }
-
 function resolveBibleBookId(bookName, bookLookup) {
     if (!bookName) return null;
-
     const normalized = bookName.trim();
     const direct = bookLookup[normalized] || bookLookup[normalized.toLowerCase()];
     if (direct) return direct;
-
     const compact = normalized.replace(/\s+/g, '');
     const compactDirect = bookLookup[compact] || bookLookup[compact.toLowerCase()];
     if (compactDirect) return compactDirect;
-
     const sortedKeys = Object.keys(bookLookup).sort((a, b) => b.length - a.length);
     for (const key of sortedKeys) {
         if (!key) continue;
@@ -4178,13 +3690,11 @@ function resolveBibleBookId(bookName, bookLookup) {
     }
     return null;
 }
-
 function parseBibleNavigationQuery(input) {
     const bookLookup = buildBookLookup();
     const cleanInput = input.trim().replace(/\s+/g, ' ');
     const englishPrefix = /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
     const asianPrefix = /^(?:到|去|가|가자|가세요|가요|가지)\s*/;
-
     let navText = '';
     if (englishPrefix.test(cleanInput)) {
         navText = cleanInput.replace(englishPrefix, '').trim();
@@ -4195,10 +3705,8 @@ function parseBibleNavigationQuery(input) {
         if (!suffixMatch) return null;
         navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}${suffixMatch[3] ? `:${suffixMatch[3]}` : ''}`;
     }
-
     const match = navText.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장|chapter|chapters|ch)?\s*$/i);
     if (!match) return null;
-
     const bookName = match[1].trim();
     const chapter = parseInt(match[2], 10);
     const verse = match[3] ? parseInt(match[3], 10) : null;
@@ -4206,14 +3714,12 @@ function parseBibleNavigationQuery(input) {
     if (!bookId || !Number.isFinite(chapter)) return null;
     return { bookId, chapter, verse };
 }
-
 function parseBibleCopyCommand(input) {
     const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
     if (!match) return null;
     const parsed = parseBibleQuery(match[1].trim());
     return parsed.queries.length > 0 ? parsed : null;
 }
-
 function parsePrayerCopyCommand(input) {
     const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
     if (!match) return null;
@@ -4227,44 +3733,36 @@ function parsePrayerCopyCommand(input) {
         return target === normalizedAlias || target.includes(normalizedAlias);
     });
 }
-
 function formatPrayerForCopy(data) {
     const koTitle = data.titles?.ko || '주기도문';
     const zhTitle = data.titles?.zh || '主祈禱文';
     return `${koTitle}\n${(data.ko || []).join('\n')}\n\n${zhTitle}\n${(data.zh || []).join('\n')}`;
 }
-
 function startsBibleReferenceSegment(fragment, bookLookup) {
     const trimmed = fragment.trim();
     if (!trimmed || /^\d/.test(trimmed)) return false;
-
     const bookName = trimmed.match(/^([^\d:：,、，;；]+)/)?.[1]?.trim() || '';
     return Boolean(resolveBibleBookId(bookName, bookLookup));
 }
-
 function markImplicitBibleReferenceBreaks(input, bookLookup) {
     const sortedKeys = [...new Set(Object.keys(bookLookup))]
         .filter(Boolean)
         .sort((a, b) => b.length - a.length);
-
     return sortedKeys.reduce((text, key) => {
         const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const pattern = new RegExp(`([0-9０-９,、，])(${escapedKey})(?=\\d)`, 'gi');
         return text.replace(pattern, '$1;$2');
     }, input);
 }
-
 function splitBibleReferenceSegments(input, bookLookup) {
     const normalized = markImplicitBibleReferenceBreaks(input, bookLookup)
         .replace(/[；]/g, ';')
         .replace(/\s+/g, ' ')
         .trim();
     const segments = [];
-
     for (const raw of normalized.split(';')) {
         const trimmed = raw.trim();
         if (!trimmed) continue;
-
         const pieces = trimmed.split(' ');
         let current = pieces[0] || '';
         for (let i = 1; i < pieces.length; i++) {
@@ -4278,14 +3776,11 @@ function splitBibleReferenceSegments(input, bookLookup) {
         }
         if (current.trim()) segments.push(current.trim());
     }
-
     return segments;
 }
-
 function detectBibleCopyLanguage(input) {
     let cleanInput = input.trim();
     let language = null;
-
     const stripPatterns = (patterns) => {
         let matched = false;
         for (const pattern of patterns) {
@@ -4296,7 +3791,6 @@ function detectBibleCopyLanguage(input) {
         }
         return matched;
     };
-
     const bothPatterns = [
         /(?:中韓|韓中|中韩|韩中|中文韓文|韓文中文|中文韩文|韩文中文|雙語|双语|兩語|两语|중한|한중|중\s*한|한\s*중|중국어\s*한국어|한국어\s*중국어|전부|전체|全部|全|都|다|all|both|양쪽|兩個|两个)\s*$/i,
         /^(?:中韓|韓中|中韩|韩中|中文韓文|韓文中文|中文韩文|韩文中文|雙語|双语|兩語|两语|중한|한중|중\s*한|한\s*중|중국어\s*한국어|한국어\s*중국어|전부|전체|全部|全|都|다|all|both|양쪽|兩個|两个)\s*/i,
@@ -4309,7 +3803,6 @@ function detectBibleCopyLanguage(input) {
         /(?:韓文|韩文|韓|韩|한국어|한)\s*$/i,
         /^(?:韓文|韩文|韓|韩|한국어|한)\s*/i,
     ];
-
     if (stripPatterns(bothPatterns)) {
         language = 'both';
     } else if (stripPatterns(zhPatterns)) {
@@ -4317,7 +3810,6 @@ function detectBibleCopyLanguage(input) {
     } else if (stripPatterns(koPatterns)) {
         language = 'ko';
     }
-
     if (!language) {
         const hasKorean = /[\uAC00-\uD7AF]/.test(cleanInput);
         const hasChinese = /[\u4E00-\u9FFF]/.test(cleanInput);
@@ -4325,22 +3817,17 @@ function detectBibleCopyLanguage(input) {
         else if (hasChinese && !hasKorean) language = 'zh';
         else language = currentLang === 'ko' ? 'ko' : 'zh';
     }
-
     return { language, cleanInput };
 }
-
 function parseBibleQuery(input) {
     const bookLookup = buildBookLookup();
-    
     const { language, cleanInput } = detectBibleCopyLanguage(input);
-    
     // 拆分多段引用：分號、；、以及空格+書名開頭
     // 例：啟1:1-2 創1:2-7、9 → ['啟1:1-2', '創1:2-7、9']
     // 例：啟1:1;創1:2 → ['啟1:1', '創1:2']
     const segments = splitBibleReferenceSegments(cleanInput, bookLookup);
     const queries = [];
     let lastBookId = null;
-    
     for (const seg of segments) {
         // 章對章格式：啟5章到7章 / 계 1장 가 7장 / 創1-3章 / 啟5~7
         // 支援關鍵字：到、去、가、세요、까지、~、-
@@ -4357,7 +3844,6 @@ function parseBibleQuery(input) {
             }
             continue;
         }
-        
         // 純章節格式：啟5章 / 啟5 / 계 1장
         const chapterOnlyMatch = seg.match(/^([^\d]*?)(\d+)\s*(?:章|장)$/);
         if (chapterOnlyMatch) {
@@ -4369,15 +3855,12 @@ function parseBibleQuery(input) {
             queries.push({ bookId, chapter, verses: 'all' });
             continue;
         }
-        
         // 標準格式：書卷名 章:節範圍
         const match = seg.match(/^([^\d]*?)(\d+)\s*[:：]\s*(.+)$/);
         if (!match) continue;
-        
         let bookName = match[1].trim();
         const chapter = parseInt(match[2]);
         const verseStr = match[3].trim();
-        
         let bookId = null;
         if (bookName) {
             bookId = resolveBibleBookId(bookName, bookLookup);
@@ -4385,7 +3868,6 @@ function parseBibleQuery(input) {
         if (!bookId) bookId = lastBookId;
         if (!bookId) continue;
         lastBookId = bookId;
-        
         const verses = [];
         if (/^(all|both|다|전부|전체|全部|全|都)$/i.test(verseStr)) {
             queries.push({ bookId, chapter, verses: 'all' });
@@ -4404,15 +3886,12 @@ function parseBibleQuery(input) {
         }
         if (verses.length > 0) queries.push({ bookId, chapter, verses });
     }
-    
     return { queries, language };
 }
-
 async function formatBibleResult(parsed) {
     const { queries, language } = parsed;
     let fullText = '';
     let foundCount = 0;
-    
     for (const q of queries) {
         const abbr = bookAbbreviations[q.bookId] || { ko: q.bookId, zh: q.bookId };
         // Fetch chapter data (uses cache if already loaded)
@@ -4427,7 +3906,6 @@ async function formatBibleResult(parsed) {
         const verses = q.verses === 'all'
             ? chapterData.filter(v => v.verse).map(v => v.verse)
             : q.verses;
-        
         for (const vNum of verses) {
             const vd = chapterData.find(v => v.verse === vNum);
             if (!vd) continue;
@@ -4443,21 +3921,17 @@ async function formatBibleResult(parsed) {
     }
     return { text: fullText.trim(), foundCount };
 }
-
 window.aiPanelSearch = async () => {
     const input = document.getElementById('aiPanelInput');
     const sendBtn = document.querySelector('.ai-panel-send');
     const resultContainer = document.getElementById('aiPanelResult');
-    
     const query = input.value.trim();
     if (!query) return;
-
     if (isBibleFontCommand(query)) {
         showBibleFontOptions(resultContainer);
         input.value = '';
         return;
     }
-
     // 模式 0-a：Linux 風格移動指令，例如 cd gen1 / cd 계 1 / cd 啟1:5
     const cdNav = parseBibleNavigationQuery(query);
     if (cdNav && /^cd\s+/i.test(query)) {
@@ -4475,7 +3949,6 @@ window.aiPanelSearch = async () => {
             return;
         }
     }
-
     // 模式 0-b：複製主祈禱文，例如 cp 主禱文 / cp 주기도문 / cp lords prayer
     if (parsePrayerCopyCommand(query)) {
         sendBtn.disabled = true;
@@ -4492,7 +3965,6 @@ window.aiPanelSearch = async () => {
         }
         return;
     }
-
     // 模式 0：明確複製指令，例如 copy gen1:1 / cp gen1:1
     const copyCommand = parseBibleCopyCommand(query);
     if (copyCommand) {
@@ -4512,7 +3984,6 @@ window.aiPanelSearch = async () => {
         }
         return;
     }
-    
     // 模式 1：跳轉到聖經章節
     // 「到 啟5章」「去 創1章」「계 1장 가」「to gen 1」「go to rev 3」
     const nav = parseBibleNavigationQuery(query);
@@ -4534,14 +4005,12 @@ window.aiPanelSearch = async () => {
             }
         }
     }
-    
     // 模式 2：@編號 = 回覆生成模式
     const composeMatch = query.match(/^@(\d{1,4})\s*(.*)/);
     if (composeMatch) {
         await aiPanelCompose(composeMatch[1].padStart(4, '0'), composeMatch[2].trim(), input, sendBtn, resultContainer);
         return;
     }
-    
     // --- 聖經查詢模式（先本地解析，失敗時用 AI 輔助） ---
     sendBtn.disabled = true;
     let loadingEl = null;
@@ -4549,14 +4018,12 @@ window.aiPanelSearch = async () => {
         // 1. 本地 regex 解析
         let parsed = parseBibleQuery(query);
         let formatted = parsed.queries.length > 0 ? await formatBibleResult(parsed) : { text: '', foundCount: 0 };
-        
         // 2. 如果本地解析失敗或沒找到任何節，試 AI 輔助
         if (!parsed.queries.length || formatted.foundCount === 0) {
             loadingEl = document.createElement('div');
             loadingEl.className = 'ai-panel-loading';
             loadingEl.textContent = currentLang === 'ko' ? 'AI 분석 중...' : 'AI 分析中...';
             resultContainer.prepend(loadingEl);
-            
             try {
                 const aiResult = await parseBibleWithAI(query);
                 if (aiResult && aiResult.queries && aiResult.queries.length > 0) {
@@ -4567,13 +4034,11 @@ window.aiPanelSearch = async () => {
                 console.warn('AI 解析失敗:', e);
             }
         }
-        
         if (formatted.foundCount === 0) {
-            throw new Error(currentLang === 'ko' 
-                ? '경문 형식을 인식할 수 없습니다.\n예: 창1:1-3 한 / 사1:1;계3:5 중 / 계5장 / 계1장-3장' 
+            throw new Error(currentLang === 'ko'
+                ? '경문 형식을 인식할 수 없습니다.\n예: 창1:1-3 한 / 사1:1;계3:5 중 / 계5장 / 계1장-3장'
                 : '無法辨識經文格式\n例：創1:1-3 中 / 賽1:1；啟3:5 韓 / 啟5章 / 啟1章到3章');
         }
-        
         await navigator.clipboard.writeText(formatted.text);
         const cacheItem = { query, text: formatted.text, success: true, timestamp: Date.now() };
         saveAiPanelResult(cacheItem);
@@ -4586,7 +4051,6 @@ window.aiPanelSearch = async () => {
         sendBtn.disabled = false;
     }
 };
-
 // AI 輔助解析（當本地解析失敗時呼叫）
 async function parseBibleWithAI(query) {
     const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
@@ -4594,14 +4058,10 @@ async function parseBibleWithAI(query) {
         const abbr = bookAbbreviations[b.id] || {};
         return `${b.id}:${abbr.ko||b.ko}/${abbr.zh||b.zh}`;
     }).join(',');
-    
     const prompt = `解析聖經經文引用，返回純JSON（無markdown）。
-
 書卷ID: ${bookRef}
-
 格式：{"queries":[{"bookId":"gen","chapter":1,"verses":[1,2,3]}],"language":"both"}
 或章節: {"bookId":"gen","chapter":1,"verses":"all"}
-
 規則：
 - bookId必須用上方ID
 - verses是數字陣列；連續範圍展開如1-5→[1,2,3,4,5]
@@ -4612,18 +4072,14 @@ async function parseBibleWithAI(query) {
 - 語言觸發詞：中/中文/중/중국어→zh; 韓/韓文/한/한국어→ko; 全/全部/都/다/all→both
 - 沒指定語言時，根據輸入語言判斷
 - 支援關鍵字：到/去/까지/가/세요/요/가지/~/-（章對章）
-
 範例：
 "創1:1-3 中"→{"queries":[{"bookId":"gen","chapter":1,"verses":[1,2,3]}],"language":"zh"}
 "啟5章 韓"→{"queries":[{"bookId":"rev","chapter":5,"verses":"all"}],"language":"ko"}
 "啟1章到3章 全"→{"queries":[{"bookId":"rev","chapter":1,"verses":"all"},{"bookId":"rev","chapter":2,"verses":"all"},{"bookId":"rev","chapter":3,"verses":"all"}],"language":"both"}
 "창1:1;계3:5 다"→{"queries":[{"bookId":"gen","chapter":1,"verses":[1]},{"bookId":"rev","chapter":3,"verses":[5]}],"language":"both"}
 "創1:2-3、6 出2:1 中"→{"queries":[{"bookId":"gen","chapter":1,"verses":[2,3,6]},{"bookId":"exo","chapter":2,"verses":[1]}],"language":"zh"}
-
 無法解析→{"queries":[]}
-
 輸入：${query}`;
-
     const response = await fetch(AI_WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4635,23 +4091,20 @@ async function parseBibleWithAI(query) {
     const cleaned = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     return JSON.parse(cleaned);
 }
-
 // --- AI 面板：回覆生成模式 ---
 async function aiPanelCompose(userId, instruction, input, sendBtn, resultContainer) {
     sendBtn.disabled = true;
-    
     const user = localDb.find(u => u.id === userId);
     if (!user) {
-        const errItem = { 
-            query: `@${userId}`, 
-            text: currentLang === 'ko' ? `ID ${userId}를 찾을 수 없습니다` : `找不到 ID ${userId}`, 
-            success: false, timestamp: Date.now() 
+        const errItem = {
+            query: `@${userId}`,
+            text: currentLang === 'ko' ? `ID ${userId}를 찾을 수 없습니다` : `找不到 ID ${userId}`,
+            success: false, timestamp: Date.now()
         };
         saveAiPanelResult(errItem);
         sendBtn.disabled = false;
         return;
     }
-    
     // 如果沒有指示，先顯示對話預覽讓使用者知道下一步
     if (!instruction) {
         const sortedLogs = [...user.logs].sort((a, b) => {
@@ -4668,10 +4121,9 @@ async function aiPanelCompose(userId, instruction, input, sendBtn, resultContain
         }
         const typeLabel = lastLog.type === 'me' ? (currentLang === 'ko' ? '본인' : '我') : (currentLang === 'ko' ? '상대방' : '對方');
         const preview = `👤 ${user.name} (${userId})\n📅 ${lastLog.date} [${typeLabel}]\n\n${lastLog.content.substring(0, 150)}${lastLog.content.length > 150 ? '...' : ''}`;
-        const hint = currentLang === 'ko' 
+        const hint = currentLang === 'ko'
             ? `\n\n💡 빠른 생성: @${userId} [지시]\n예: @${userId} 관심사 물어보기\n\n📝 상세 작문 → AI 통합 작문 페이지`
             : `\n\n💡 快速生成：@${userId} [指示]\n例：@${userId} 詢問興趣\n\n📝 詳細作文 → AI 整合作文頁面`;
-        
         const previewItem = { query: `@${userId}`, text: preview + hint, success: true, timestamp: Date.now(), isPreview: true, composeUserId: userId };
         saveAiPanelResult(previewItem);
         input.value = `@${userId} `;
@@ -4679,13 +4131,11 @@ async function aiPanelCompose(userId, instruction, input, sendBtn, resultContain
         sendBtn.disabled = false;
         return;
     }
-    
     // 有指示 → 開始生成
     const loadingEl = document.createElement('div');
     loadingEl.className = 'ai-panel-loading';
     loadingEl.textContent = currentLang === 'ko' ? '메시지 생성 중...' : '訊息生成中...';
     resultContainer.prepend(loadingEl);
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dA = a.date || '0000-00-00', dB = b.date || '0000-00-00';
         if (dA !== dB) return dB.localeCompare(dA);
@@ -4693,39 +4143,32 @@ async function aiPanelCompose(userId, instruction, input, sendBtn, resultContain
     });
     const lastLog = sortedLogs[0];
     if (!lastLog) { loadingEl.remove(); sendBtn.disabled = false; return; }
-    
     const koreanChars = (lastLog.content.match(/[\uAC00-\uD7AF]/g) || []).length;
     const chineseChars = (lastLog.content.match(/[\u4E00-\u9FFF]/g) || []).length;
     const isKoreanContent = koreanChars > chineseChars;
-    
     // 收集使用者過去的回覆來分析寫作風格
     const myReplies = sortedLogs
         .filter(log => log.type === 'me' && log.content && log.content.length > 10)
         .slice(0, 3).map(log => log.content.substring(0, 150));
     const hasStyleRef = myReplies.length > 0;
-    const styleSection = hasStyleRef 
+    const styleSection = hasStyleRef
         ? `\n\n【寫作風格參考】\n${myReplies.map((r, i) => `範例${i+1}: ${r}`).join('\n')}`
         : '';
     const styleRule = hasStyleRef ? '\n6. 分析使用者過去的回覆風格，生成的訊息要貼近使用者的寫作習慣' : '';
-    
     const prompt = `你是一個傳道訊息寫作助手。請根據以下資訊，幫我寫一段要發給對方的訊息。
-
 嚴格規則：
 1. 只能根據「對方最後一篇對話內容」和「使用者的指示」來寫，絕對不可以捏造對方沒提到的事情
 2. 不可以畫蛇添足，不要加入任何未被提及的話題或資訊
 3. 語氣要自然親切，像朋友之間的對話
 4. 回覆語言必須是${isKoreanContent ? '韓文' : '中文'}（與對方對話語言一致）
 5. 只回覆訊息內容本身，不要加任何解釋或前言${styleRule}
-
 對方名稱：${user.name}
 對方最後一篇對話（${lastLog.date}，${lastLog.type === 'me' ? '我方回覆' : '對方回覆'}）：
 ${lastLog.content}
 ${lastLog.messagePoints ? '\n訊息重點：' + lastLog.messagePoints.map(p => `[${p.tag}] ${p.content}`).join('、') : ''}
 ${lastLog.confirmPoints ? '\n需確認事項：' + lastLog.confirmPoints.map(p => `[${p.tag}] ${p.content}`).join('、') : ''}
 ${styleSection}
-
 使用者的指示：${instruction}`;
-    
     try {
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
@@ -4736,7 +4179,6 @@ ${styleSection}
         const data = await response.json();
         const result = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         if (!result) throw new Error(currentLang === 'ko' ? '응답이 비어 있습니다' : '回應為空');
-        
         await navigator.clipboard.writeText(result);
         const label = currentLang === 'ko' ? ' (복사됨!)' : ' (已複製！)';
         const cacheItem = { query: `@${userId} ${instruction}`, text: `→ ${user.name}\n\n${result}\n\n${label}`, success: true, timestamp: Date.now() };
@@ -4750,7 +4192,6 @@ ${styleSection}
         sendBtn.disabled = false;
     }
 }
-
 function saveAiPanelResult(item) {
     try {
         const cached = JSON.parse(localStorage.getItem(AI_PANEL_CACHE_KEY) || '[]');
@@ -4761,9 +4202,7 @@ function saveAiPanelResult(item) {
         loadAiPanelCache();
     } catch (e) {}
 }
-
 // ===== 聖經經文相關 =====
-
 // ===== AI 智能複製功能（複製模式面板用） =====
 window.smartCopy = async () => {
     const input = document.getElementById('smartCopyInput');
@@ -4771,27 +4210,22 @@ window.smartCopy = async () => {
     const resultDiv = document.getElementById('smartCopyResult');
     const resultText = document.getElementById('smartCopyResultText');
     const previewDiv = document.getElementById('smartCopyPreview');
-    
     const query = input.value.trim();
     if (!query) {
         input.focus();
         return;
     }
-    
     // 構建書卷對照表（給AI用）
     const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
     const bookRef = allBooks.map(b => {
         const abbr = bookAbbreviations[b.id] || {};
         return `${b.id}: ${b.ko}(${abbr.ko||''}) / ${b.zh}(${abbr.zh||''}) [${b.chapters}章]`;
     }).join('\n');
-    
     // 構建已有 JSON 的書卷清單（用 bibleBooks 的完整列表）
     const allBooksForPrompt = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
     const prompt = `你是一個聖經經文解析助手。用戶輸入了一段文字，請解析出他想要複製的聖經經文。
-
 書卷ID對照表：
 ${bookRef}
-
 請務必返回純JSON格式（不要markdown），格式如下：
 {
   "queries": [
@@ -4799,21 +4233,18 @@ ${bookRef}
   ],
   "language": "both"
 }
-
 規則：
 - bookId 必須使用上方對照表中的ID（如 gen, exo, mat, rev 等）
 - verses 是數字陣列，如 [1,2,3] 或連續範圍展開如 1-5 → [1,2,3,4,5]
 - 用戶可能用縮寫（創、창、Gen）、全名（創世記、창세기）或混合語言
 - 如果用戶寫"全部"/"전체"/"all"/"全"/"都"/"다"，verses設為"all"
 - 多個引用可能用空格分隔，例如「創1:2-3、6 出2:1」要解析成兩筆 queries
-
 語言判斷規則（language 欄位）：
 - "zh" = 只要中文。觸發詞：中文、中、중국어、중
 - "ko" = 只要韓文。觸發詞：韓文、韓、한국어、한
 - "both" = 兩種都要。觸發詞：中韓、韓中、雙語、한중、중한、한 중、중 한、全部、全、都、다、all、兩個、양쪽
 - 如果沒有任何語言關鍵字，根據用戶主要輸入語言推斷：中文書名輸入→"zh"，韓文書名輸入→"ko"
 - 語言關鍵字可能出現在經文引用的前面或後面，甚至用空格或不用空格分隔
-
 輸入格式範例（都要能正確解析）：
 - "創1:1-4 中" → gen 1章 1-4節 language=zh
 - "창1:1-4 한국어" → gen 1章 1-4節 language=ko
@@ -4826,22 +4257,17 @@ ${bookRef}
 - "賽2:4 韓" → isa 2章 4節 language=ko
 - "사2:4 중국어" → isa 2章 4節 language=zh
 - "創1:2-3、6 出2:1 中" → gen 1章 2,3,6節 + exo 2章 1節 language=zh
-
 - 如果無法解析，返回 { "error": "無法識別的經文格式" }
-
 用戶輸入：${query}`;
-    
     // UI 狀態
     btn.classList.add('loading');
     btn.disabled = true;
     resultDiv.classList.remove('show');
-    
     try {
         const localParsed = parseBibleQuery(query);
         const localFormatted = localParsed.queries.length > 0
             ? await formatBibleResult(localParsed)
             : { text: '', foundCount: 0 };
-
         if (localFormatted.foundCount > 0) {
             resultDiv.className = 'smart-copy-result show success';
             resultText.textContent = currentLang === 'ko'
@@ -4855,18 +4281,14 @@ ${bookRef}
             input.value = '';
             return;
         }
-
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt })
         });
-        
         if (!response.ok) throw new Error('API Error');
-        
         const data = await response.json();
         const aiText = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        
         // 解析JSON（容錯處理）
         let parsed;
         try {
@@ -4875,16 +4297,13 @@ ${bookRef}
         } catch (e) {
             throw new Error('AI 回應格式錯誤');
         }
-        
         if (parsed.error) {
             throw new Error(parsed.error);
         }
-        
         // 從 JSON 中提取經文（async fetch）
         const lang = parsed.language || 'both';
         let fullText = '';
         let foundCount = 0;
-        
         for (const q of parsed.queries) {
             const chapterData = await fetchBibleChapter(q.bookId, q.chapter);
             if (!chapterData) {
@@ -4893,16 +4312,13 @@ ${bookRef}
                 fullText += `[${bookName} ${q.chapter}${currentLang === 'ko' ? '장' : '章'} - ${currentLang === 'ko' ? '미수록' : '尚未收錄'}]\n`;
                 continue;
             }
-            
             const abbr = bookAbbreviations[q.bookId] || { ko: q.bookId, zh: q.bookId };
-            const verses = q.verses === 'all' 
+            const verses = q.verses === 'all'
                 ? chapterData.filter(v => v.verse).map(v => v.verse)
                 : q.verses;
-            
             for (const vNum of verses) {
                 const verseData = chapterData.find(v => v.verse === vNum);
                 if (!verseData) continue;
-                
                 foundCount++;
                 if (lang === 'ko') {
                     fullText += `${abbr.ko} ${q.chapter}:${vNum} ${verseData.ko || ''}\n`;
@@ -4914,24 +4330,19 @@ ${bookRef}
                 }
             }
         }
-        
         fullText = fullText.trim();
-        
         if (foundCount === 0) {
             throw new Error(currentLang === 'ko' ? '해당 경문을 찾을 수 없습니다' : '找不到對應的經文');
         }
-        
         // 顯示預覽
         resultDiv.className = 'smart-copy-result show success';
-        resultText.textContent = currentLang === 'ko' 
-            ? `✅ ${foundCount}절 찾았습니다` 
+        resultText.textContent = currentLang === 'ko'
+            ? `✅ ${foundCount}절 찾았습니다`
             : `✅ 找到 ${foundCount} 節經文`;
         previewDiv.textContent = fullText.length > 300 ? fullText.substring(0, 300) + '...' : fullText;
-        
         // 複製到剪貼簿
         await navigator.clipboard.writeText(fullText);
         resultText.textContent += currentLang === 'ko' ? ' (복사됨!)' : ' (已複製！)';
-        
     } catch (err) {
         resultDiv.className = 'smart-copy-result show error';
         resultText.textContent = '❌ ' + (err.message || 'Error');
@@ -4941,12 +4352,10 @@ ${bookRef}
         btn.disabled = false;
     }
 };
-
 // 複製模式下的觸控追蹤
 let copyModeTouchStartX = 0;
 let copyModeTouchStartY = 0;
 let copyModeTouchMoved = false;
-
 // 手機觸控開始
 window.handleVerseTouchStart = (event, element) => {
     // 如果已在複製模式，記錄觸控起始位置
@@ -4956,7 +4365,6 @@ window.handleVerseTouchStart = (event, element) => {
         copyModeTouchMoved = false;
         return;
     }
-    
     clearLongPressState();
     const touch = event.touches[0];
     touchStartX = touch.clientX;
@@ -4967,7 +4375,6 @@ window.handleVerseTouchStart = (event, element) => {
         triggerLongPress(event, element);
     }, LONG_PRESS_DURATION);
 };
-
 // 手機觸控結束
 window.handleVerseTouchEnd = (event, element) => {
     // 如果在複製模式，處理選取切換（只在沒有滑動時）
@@ -4978,12 +4385,10 @@ window.handleVerseTouchEnd = (event, element) => {
         }
         return;
     }
-    
     if (!longPressTriggered) {
         clearLongPressState();
     }
 };
-
 // 手機觸控移動（取消長按）
 window.handleVerseTouchMove = (event, element) => {
     // 如果在複製模式，檢測是否滑動
@@ -4991,7 +4396,6 @@ window.handleVerseTouchMove = (event, element) => {
         const touch = event.touches[0];
         const moveX = Math.abs(touch.clientX - copyModeTouchStartX);
         const moveY = Math.abs(touch.clientY - copyModeTouchStartY);
-        
         // 移動超過10px視為滑動
         if (moveX > 10 || moveY > 10) {
             copyModeTouchMoved = true;
@@ -4999,12 +4403,10 @@ window.handleVerseTouchMove = (event, element) => {
         }
         return;
     }
-    
     if (longPressTimer) {
         const touch = event.touches[0];
         const moveX = Math.abs(touch.clientX - touchStartX);
         const moveY = Math.abs(touch.clientY - touchStartY);
-        
         // 移動超過10px則取消長按
         if (moveX > 10 || moveY > 10) {
             hideWordStudyActionBubble();
@@ -5012,17 +4414,14 @@ window.handleVerseTouchMove = (event, element) => {
         }
     }
 };
-
 // 電腦滑鼠按下（左鍵長按）
 window.handleVerseMouseDown = (event, element) => {
     // 只處理左鍵
     if (event.button !== 0) return;
-    
     // 如果已在複製模式，不需要長按計時
     if (isCopyModeActive) {
         return;
     }
-    
     clearLongPressState();
     longPressElement = element;
     element.classList.add('long-press');
@@ -5030,7 +4429,6 @@ window.handleVerseMouseDown = (event, element) => {
         triggerLongPress(event, element);
     }, LONG_PRESS_DURATION);
 };
-
 // 電腦滑鼠放開
 window.handleVerseMouseUp = (event, element) => {
     // 如果在複製模式，處理選取切換
@@ -5039,19 +4437,16 @@ window.handleVerseMouseUp = (event, element) => {
         toggleVerseSelection(element);
         return;
     }
-    
     if (!longPressTriggered) {
         clearLongPressState();
     }
 };
-
 // 電腦滑鼠離開
 window.handleVerseMouseLeave = (event, element) => {
     if (!longPressTriggered && !isCopyModeActive) {
         clearLongPressState();
     }
 };
-
 // 電腦右鍵選單 - 也進入複製模式
 window.handleVerseContextMenu = (event, element) => {
     event.preventDefault();
@@ -5059,12 +4454,10 @@ window.handleVerseContextMenu = (event, element) => {
     showWordStudyAction(event, element);
     return false;
 };
-
 // 禁用聖經內容區域的系統右鍵選單
 document.addEventListener('DOMContentLoaded', () => {
     const bibleVerses = document.getElementById('bibleVerses');
     const previewBody = document.getElementById('bibleSearchPreviewBody');
-    
     if (bibleVerses) {
         bibleVerses.addEventListener('contextmenu', (e) => {
             if (e.target.closest('.bible-verse')) {
@@ -5072,7 +4465,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
     if (previewBody) {
         previewBody.addEventListener('contextmenu', (e) => {
             if (e.target.closest('.bible-search-preview-verse')) {
@@ -5081,23 +4473,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
 // 關閉部分複製彈窗
 window.closePartialCopy = () => {
     document.getElementById('biblePartialCopyModal').classList.remove('show');
 };
-
 // 複製選取的文字（部分複製用）
 window.copySelectedText = () => {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
-    
     if (!selectedText) {
         const msg = currentLang === 'ko' ? '텍스트를 먼저 선택하세요.' : '請先選取文字。';
         alert(msg);
         return;
     }
-    
     navigator.clipboard.writeText(selectedText).then(() => {
         const t = i18n[currentLang];
         alert(t.msgCopied || '已複製！');
@@ -5110,19 +4498,16 @@ window.copySelectedText = () => {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        
         const t = i18n[currentLang];
         alert(t.msgCopied || '已複製！');
         closePartialCopy();
     });
 };
-
 // ===== 滑動時退出複製模式 =====
 let scrollTouchStartY = 0;
 document.addEventListener('touchstart', (e) => {
     scrollTouchStartY = e.touches[0].clientY;
 }, { passive: true });
-
 document.addEventListener('touchmove', (e) => {
     const touchMoveY = e.touches[0].clientY;
     const diff = Math.abs(touchMoveY - scrollTouchStartY);
@@ -5131,12 +4516,10 @@ document.addEventListener('touchmove', (e) => {
         clearLongPressState();
     }
 }, { passive: true });
-
 // ===== 聖經搜尋功能 =====
 const SEARCH_HISTORY_KEY = 'bible_search_history';
 const MAX_HISTORY_ITEMS = 5;
 let searchHistory = [];
-
 // 載入搜尋歷史
 function loadSearchHistory() {
     try {
@@ -5149,18 +4532,15 @@ function loadSearchHistory() {
     }
     renderSearchHistory();
 }
-
 // 儲存搜尋歷史
 function saveSearchHistory() {
     try {
         localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
     } catch (e) {}
 }
-
 // 新增搜尋歷史
 function addSearchHistory(keyword) {
     if (!keyword || keyword.length < 2) return;
-    
     // 移除重複的
     searchHistory = searchHistory.filter(k => k !== keyword);
     // 加到最前面
@@ -5172,23 +4552,19 @@ function addSearchHistory(keyword) {
     saveSearchHistory();
     renderSearchHistory();
 }
-
 // 渲染搜尋歷史
 function renderSearchHistory() {
     const container = document.getElementById('bibleSearchHistory');
     const section = document.getElementById('bibleSearchHistorySection');
-    
     if (searchHistory.length === 0) {
         section.style.display = 'none';
         return;
     }
-    
     section.style.display = 'block';
-    container.innerHTML = searchHistory.map(keyword => 
+    container.innerHTML = searchHistory.map(keyword =>
         `<button class="bible-search-history-item" onclick="window.searchFromHistory('${keyword}')">${keyword}</button>`
     ).join('');
 }
-
 // 從歷史搜尋（點擊歷史紀錄直接觸發）
 window.searchFromHistory = (keyword) => {
     const input = document.getElementById('bibleSearchInput');
@@ -5206,18 +4582,15 @@ window.searchFromHistory = (keyword) => {
     addSearchHistory(keyword);
     searchBibleWithAI(keyword, localResults);
 };
-
 // 開啟搜尋面板
 window.openBibleSearch = () => {
     document.getElementById('bibleSearchPanel').classList.add('show');
     document.getElementById('bibleSearchOverlay').classList.add('show');
     document.getElementById('bibleSearchInput').focus();
-    
     // 更新搜尋提示語言
     updateSearchLanguage();
     loadSearchHistory();
 };
-
 // 關閉搜尋面板
 window.closeBibleSearch = () => {
     document.getElementById('bibleSearchPreview')?.classList.remove('show');
@@ -5225,14 +4598,12 @@ window.closeBibleSearch = () => {
     document.getElementById('bibleSearchOverlay').classList.remove('show');
     clearSearchInput();
 };
-
 // 更新搜尋面板語言
 function updateSearchLanguage() {
     const input = document.getElementById('bibleSearchInput');
     const hint = document.getElementById('txtSearchHint');
     const historyTitle = document.getElementById('txtSearchHistory');
     const cancelBtn = document.getElementById('bibleSearchCancelText');
-    
     if (currentLang === 'ko') {
         if (input) input.placeholder = '성경 검색 또는 주제 검색...';
         if (hint) hint.textContent = '키워드 또는 의미 검색 가능 (예: 게으름, 용기)';
@@ -5245,7 +4616,6 @@ function updateSearchLanguage() {
         if (cancelBtn) cancelBtn.textContent = '取消';
     }
 }
-
 // 清除搜尋輸入
 window.clearSearchInput = () => {
     document.getElementById('bibleSearchInput').value = '';
@@ -5254,19 +4624,15 @@ window.clearSearchInput = () => {
     document.getElementById('bibleSearchHint').style.display = 'block';
     document.getElementById('bibleSearchHistorySection').style.display = searchHistory.length > 0 ? 'block' : 'none';
 };
-
 // 處理搜尋輸入
 let bibleSearchAiDebounce = null;
-
 window.handleSearchInput = (value) => {
     const clearBtn = document.getElementById('bibleSearchClear');
     const results = document.getElementById('bibleSearchResults');
     const hint = document.getElementById('bibleSearchHint');
     const historySection = document.getElementById('bibleSearchHistorySection');
     const aiLoading = document.getElementById('bibleSearchAiLoading');
-    
     clearBtn?.classList.toggle('show', value.length > 0);
-    
     if (value.length === 0) {
         results.style.display = 'none';
         aiLoading.style.display = 'none';
@@ -5277,7 +4643,6 @@ window.handleSearchInput = (value) => {
         historySection.style.display = 'none';
     }
 };
-
 // 按 Enter 才執行搜尋
 window.handleSearchKeydown = (e) => {
     if (e.key !== 'Enter') return;
@@ -5285,10 +4650,8 @@ window.handleSearchKeydown = (e) => {
     const value = e.target.value.trim();
     if (!value || value.length < 1) return;
     e.target.blur();
-    
     const results = document.getElementById('bibleSearchResults');
     const aiLoading = document.getElementById('bibleSearchAiLoading');
-    
     // 先做本地關鍵字搜尋（立即回應）
     const localResults = searchBible(value);
     if (localResults.length > 0) {
@@ -5298,13 +4661,11 @@ window.handleSearchKeydown = (e) => {
         results.innerHTML = '';
         results.style.display = 'block';
     }
-    
     // AI 語意搜尋
     aiLoading.style.display = 'flex';
     addSearchHistory(value);
     searchBibleWithAI(value, localResults);
 };
-
 // 本地關鍵字搜尋（只搜已快取的章節）
 function searchBible(keyword) {
     const results = [];
@@ -5331,18 +4692,14 @@ function searchBible(keyword) {
     }
     return results;
 }
-
 // AI 語意搜尋
 async function searchBibleWithAI(keyword, localResults) {
     const aiLoading = document.getElementById('bibleSearchAiLoading');
     const results = document.getElementById('bibleSearchResults');
-    
     const loadingText = document.getElementById('bibleSearchAiLoadingText');
     if (loadingText) loadingText.textContent = currentLang === 'ko' ? 'AI 분석 중...' : 'AI 語意分析中...';
-    
     try {
         const prompt = `你是聖經語意搜尋助手。用戶搜尋「${keyword}」，請找出聖經中與此概念相關的章節（包含意義上相近的內容，不只是字面匹配）。
-
 規則：
 1. 回傳純JSON陣列，不要markdown
 2. 最多回傳10個最相關的結果
@@ -5351,23 +4708,18 @@ async function searchBibleWithAI(keyword, localResults) {
 5. bookId 使用縮寫：gen exo lev num deu jos jdg rut 1sa 2sa 1ki 2ki 1ch 2ch ezr neh est job psa pro ecc sng isa jer lam ezk dan hos jol amo oba jon mic nam hab zep hag zec mal mat mrk luk jhn act rom 1co 2co gal eph php col 1th 2th 1ti 2ti tit phm heb jas 1pe 2pe 1jn 2jn 3jn jud rev
 6. 只回傳已確定存在的章節（不要猜測）
 7. 如果找不到相關內容，回傳空陣列 []
-
 搜尋概念：${keyword}`;
-
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt })
         });
-        
         if (!response.ok) throw new Error('API error');
         const data = await response.json();
         const text = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const cleaned = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
         const aiSuggestions = JSON.parse(cleaned);
-        
         if (!Array.isArray(aiSuggestions)) throw new Error('Invalid response');
-        
         // 載入 AI 建議的章節
         const aiResults = [];
         for (const s of aiSuggestions.slice(0, 10)) {
@@ -5397,17 +4749,14 @@ async function searchBibleWithAI(keyword, localResults) {
                 });
             }
         }
-        
         // 合併並去重
         const combined = [...localResults];
         for (const ai of aiResults) {
             const isDup = localResults.some(l => l.bookId === ai.bookId && l.chapter === ai.chapter && l.verse === ai.verse);
             if (!isDup) combined.push(ai);
         }
-        
         renderSearchResults(combined, keyword, aiResults.length > 0);
         results.style.display = combined.length > 0 ? 'block' : 'none';
-        
     } catch (e) {
         // AI 失敗時只顯示本地結果
         if (localResults.length > 0) {
@@ -5418,23 +4767,18 @@ async function searchBibleWithAI(keyword, localResults) {
         aiLoading.style.display = 'none';
     }
 }
-
 // 渲染搜尋結果
 function renderSearchResults(results, keyword, aiActive = false) {
     const container = document.getElementById('bibleSearchResults');
-    
     if (results.length === 0) {
         container.innerHTML = `<div class="bible-search-no-result">${currentLang === 'ko' ? '검색 결과가 없습니다' : '找不到相關結果'}</div>`;
         return;
     }
-    
     const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const safeKeyword = escapeRegExp(keyword);
-    
     // 分組：關鍵字命中 / AI 建議
     const keywordResults = results.filter(r => r.type !== 'ai');
     const aiResults = results.filter(r => r.type === 'ai');
-    
     const renderItem = (r, index) => {
         const abbr = bookAbbreviations[r.bookId] || { ko: r.bookId, zh: r.bookId };
         const refZh = `${abbr.zh} ${r.chapter}:${r.verse}`;
@@ -5453,44 +4797,35 @@ function renderSearchResults(results, keyword, aiActive = false) {
                 <div class="bible-search-result-text">${zhText}</div>
             </div>`;
     };
-    
     let html = '';
-    
     if (keywordResults.length > 0) {
         if (aiActive || aiResults.length > 0) {
             html += `<div class="bible-search-result-group-title">${currentLang === 'ko' ? '직접 일치' : '直接相符'}</div>`;
         }
         html += keywordResults.slice(0, 30).map((r, i) => renderItem(r, results.indexOf(r))).join('');
     }
-    
     if (aiResults.length > 0) {
         html += `<div class="bible-search-result-group-title">AI ${currentLang === 'ko' ? '관련 구절' : '語意相關'}</div>`;
         html += aiResults.map((r) => renderItem(r, results.indexOf(r))).join('');
     }
-    
     if (!html) {
         html = `<div class="bible-search-no-result">${currentLang === 'ko' ? '검색 결과가 없습니다' : '找不到相關結果'}</div>`;
     }
-    
     container.innerHTML = html;
     window.currentSearchResults = results;
 }
-
 // 開啟搜尋結果預覽
 window.openSearchPreview = (index) => {
     const result = window.currentSearchResults[index];
     if (!result) return;
     window.currentSearchPreviewResult = result;
-    
     const preview = document.getElementById('bibleSearchPreview');
     const title = document.getElementById('bibleSearchPreviewTitle');
     const body = document.getElementById('bibleSearchPreviewBody');
-    
     const abbr = bookAbbreviations[result.bookId];
-    title.textContent = currentLang === 'ko' 
+    title.textContent = currentLang === 'ko'
         ? `${result.bookKo} ${result.chapter}:${result.verse}`
         : `${result.bookZh} ${result.chapter}:${result.verse}`;
-    
     // 渲染經文內容（可長按或右鍵複製）
     body.innerHTML = `
         <div class="bible-search-preview-verse"
@@ -5517,22 +4852,17 @@ window.openSearchPreview = (index) => {
             </div>
         </div>
     `;
-    
     preview.classList.add('show');
 };
-
 // 關閉搜尋預覽
 window.closeSearchPreview = (openChapter = true) => {
     document.getElementById('bibleSearchPreview').classList.remove('show');
     if (!openChapter) return;
-
     const result = window.currentSearchPreviewResult;
     if (!result) return;
-
     const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
     const book = allBooks.find(b => b.id === result.bookId);
     if (!book) return;
-
     window.closeBibleSearch();
     window.switchPage('bible');
     setTimeout(() => {
@@ -5540,14 +4870,12 @@ window.closeSearchPreview = (openChapter = true) => {
         setTimeout(() => openBibleChapter(book, result.chapter), 120);
     }, 80);
 };
-
 // 預覽頁長按相關變數
 let previewLongPressTimer = null;
 let previewLongPressElement = null;
 let previewLongPressTriggered = false;
 let previewTouchStartX = 0;
 let previewTouchStartY = 0;
-
 // 清除預覽頁長按狀態
 function clearPreviewLongPressState() {
     if (previewLongPressTimer) {
@@ -5560,24 +4888,20 @@ function clearPreviewLongPressState() {
     }
     previewLongPressTriggered = false;
 }
-
 // 觸發預覽頁長按成功
 function triggerPreviewLongPress(event, element) {
     previewLongPressTriggered = true;
     element.classList.remove('long-press');
     element.classList.add('long-press-success');
-    
     if (navigator.vibrate) {
         navigator.vibrate(50);
     }
-    
     setTimeout(() => {
         element.classList.remove('long-press-success');
         // 直接複製雙語版本
         copyPreviewVerse(element);
     }, 100);
 }
-
 // 複製預覽頁經文（雙語）
 function copyPreviewVerse(element) {
     const verse = element.dataset.verse;
@@ -5585,10 +4909,8 @@ function copyPreviewVerse(element) {
     const zh = decodeURIComponent(element.dataset.zh);
     const bookId = element.dataset.bookId;
     const chapter = element.dataset.chapter;
-    
     const abbr = bookAbbreviations[bookId];
     const textToCopy = `${abbr.ko} ${chapter}:${verse} ${ko}\n${abbr.zh} ${chapter}:${verse} ${zh}`;
-    
     navigator.clipboard.writeText(textToCopy).then(() => {
         const t = i18n[currentLang];
         alert(t.msgCopied || '已複製！');
@@ -5599,74 +4921,60 @@ function copyPreviewVerse(element) {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        
         const t = i18n[currentLang];
         alert(t.msgCopied || '已複製！');
     });
 }
-
 // 預覽頁觸控開始
 window.handlePreviewTouchStart = (event, element) => {
     clearPreviewLongPressState();
     previewLongPressElement = element;
     previewTouchStartX = event.touches[0].clientX;
     previewTouchStartY = event.touches[0].clientY;
-    
     element.classList.add('long-press');
-    
     previewLongPressTimer = setTimeout(() => {
         triggerPreviewLongPress(event, element);
     }, LONG_PRESS_DURATION);
 };
-
 // 預覽頁觸控結束
 window.handlePreviewTouchEnd = (event, element) => {
     if (!previewLongPressTriggered) {
         clearPreviewLongPressState();
     }
 };
-
 // 預覽頁觸控移動
 window.handlePreviewTouchMove = (event, element) => {
     if (previewLongPressTimer) {
         const touch = event.touches[0];
         const moveX = Math.abs(touch.clientX - previewTouchStartX);
         const moveY = Math.abs(touch.clientY - previewTouchStartY);
-        
         if (moveX > 10 || moveY > 10) {
             clearPreviewLongPressState();
         }
     }
 };
-
 // 預覽頁滑鼠按下
 window.handlePreviewMouseDown = (event, element) => {
     if (event.button !== 0) return;
-    
     clearPreviewLongPressState();
     previewLongPressElement = element;
-    
     element.classList.add('long-press');
-    
     previewLongPressTimer = setTimeout(() => {
         triggerPreviewLongPress(event, element);
     }, LONG_PRESS_DURATION);
 };
-
 // 預覽頁滑鼠放開
 window.handlePreviewMouseUp = (event, element) => {
     if (!previewLongPressTriggered) {
         clearPreviewLongPressState();
     }
 };
-
 // 預覽頁滑鼠離開
 window.handlePreviewMouseLeave = (event, element) => {
     if (!previewLongPressTriggered) {
         clearPreviewLongPressState();
     }
 };
-
 // 預覽頁右鍵選單
 window.handlePreviewContextMenu = (event, element) => {
     event.preventDefault();
@@ -5675,28 +4983,23 @@ window.handlePreviewContextMenu = (event, element) => {
     showPreviewCopyMenu(event, element);
     return false;
 };
-
 // 頁面載入時初始化聖經
 initBiblePage();
 loadSearchHistory();
-
 // 搜尋輸入框事件監聽（處理輸入法組字問題）
 (function() {
     const searchInput = document.getElementById('bibleSearchInput');
     let isComposing = false; // 是否正在組字中
-    
     // 開始組字（輸入法開始輸入）
     searchInput.addEventListener('compositionstart', () => {
         isComposing = true;
     });
-    
     // 結束組字（輸入法完成輸入）
     searchInput.addEventListener('compositionend', (e) => {
         isComposing = false;
         // 組字完成後執行搜尋
         handleSearchInput(e.target.value);
     });
-    
     // 一般輸入事件
     searchInput.addEventListener('input', (e) => {
         // 如果正在組字中，不執行搜尋
@@ -5704,8 +5007,6 @@ loadSearchHistory();
         handleSearchInput(e.target.value);
     });
 })();
-
-
 // ===== AI 整合作文功能 =====
 function applyComposeLanguage() {
     const t = i18n[currentLang];
@@ -5716,52 +5017,42 @@ function applyComposeLanguage() {
     const hintTexts = [t.aiComposeHint1, t.aiComposeHint2, t.aiComposeHint3, t.aiComposeHint4];
     hints.forEach((hint, i) => { if (hintTexts[i]) hint.textContent = hintTexts[i]; });
 }
-
 window.loadComposeTarget = (idVal) => {
     const nameEl = document.getElementById('aiComposeTargetName');
     const previewStep = document.getElementById('aiComposePreviewStep');
     const instructionStep = document.getElementById('aiComposeInstructionStep');
     const resultStep = document.getElementById('aiComposeResultStep');
     const previewBox = document.getElementById('aiComposePreview');
-    
     // 隱藏後續步驟
     previewStep.style.display = 'none';
     instructionStep.style.display = 'none';
     resultStep.style.display = 'none';
     nameEl.textContent = '';
-    
     if (!idVal || idVal.length < 4) return;
-    
     const user = localDb.find(u => u.id === idVal);
     if (!user) {
         nameEl.textContent = currentLang === 'ko' ? '(찾을 수 없음)' : '（找不到）';
         nameEl.style.color = '#e53935';
         return;
     }
-    
     nameEl.textContent = user.name;
     nameEl.style.color = '';
-    
     // 找最新一筆對話（按日期+時間排序）
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dA = a.date || '0000-00-00', dB = b.date || '0000-00-00';
         if (dA !== dB) return dB.localeCompare(dA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
-    
     const lastLog = sortedLogs[0];
     if (!lastLog) {
         previewBox.textContent = currentLang === 'ko' ? '(대화 기록 없음)' : '（無對話紀錄）';
         previewStep.style.display = 'block';
         return;
     }
-    
-    const typeLabel = lastLog.type === 'me' 
+    const typeLabel = lastLog.type === 'me'
         ? (currentLang === 'ko' ? '[본인 회신]' : '[我回覆]')
         : (currentLang === 'ko' ? '[상대방 회신]' : '[對方回覆]');
-    
     let previewText = `${lastLog.date} ${typeLabel}\n${lastLog.content}`;
-    
     // 加上訊息重點
     if (lastLog.messagePoints && lastLog.messagePoints.length > 0) {
         previewText += '\n\n📌 ' + (currentLang === 'ko' ? '메시지 포인트:' : '訊息重點:');
@@ -5771,66 +5062,53 @@ window.loadComposeTarget = (idVal) => {
         previewText += '\n\n❓ ' + (currentLang === 'ko' ? '확인 필요:' : '需確認:');
         lastLog.confirmPoints.forEach(p => { previewText += `\n• [${p.tag}] ${p.content}`; });
     }
-    
     previewBox.textContent = previewText;
     previewStep.style.display = 'block';
     instructionStep.style.display = 'block';
 };
-
 window.appendHint = (el) => {
     const input = document.getElementById('aiComposeInstruction');
     if (input.value) input.value += '、' + el.textContent;
     else input.value = el.textContent;
     input.focus();
 };
-
 window.generateCompose = async () => {
     const idVal = document.getElementById('aiComposeIdInput').value.trim();
     const instruction = document.getElementById('aiComposeInstruction').value.trim();
     const resultStep = document.getElementById('aiComposeResultStep');
     const resultBox = document.getElementById('aiComposeResult');
     const generateBtn = document.getElementById('btn-ai-compose-generate');
-    
     if (!idVal || !instruction) {
         alert(currentLang === 'ko' ? '번호와 지시 사항을 입력해주세요.' : '請輸入編號和指示內容。');
         return;
     }
-    
     const user = localDb.find(u => u.id === idVal);
     if (!user || !user.logs || user.logs.length === 0) return;
-    
     const sortedLogs = [...user.logs].sort((a, b) => {
         const dA = a.date || '0000-00-00', dB = b.date || '0000-00-00';
         if (dA !== dB) return dB.localeCompare(dA);
         return (b.createdAt || 0) - (a.createdAt || 0);
     });
     const lastLog = sortedLogs[0];
-    
     // 判斷對話語言
     const koreanChars = (lastLog.content.match(/[\uAC00-\uD7AF]/g) || []).length;
     const chineseChars = (lastLog.content.match(/[\u4E00-\u9FFF]/g) || []).length;
     const isKoreanContent = koreanChars > chineseChars;
-    
     // 收集使用者過去的回覆（type === 'me'）來分析寫作風格
     const myReplies = sortedLogs
         .filter(log => log.type === 'me' && log.content && log.content.length > 10)
         .slice(0, 5) // 最多取最近5筆
         .map(log => log.content.substring(0, 200)); // 每筆最多200字
-    
     const hasStyleRef = myReplies.length > 0;
-    
-    const styleSection = hasStyleRef 
+    const styleSection = hasStyleRef
         ? `\n\n【寫作風格參考】
 以下是使用者過去回覆此人的訊息範例，請分析其語氣、用詞習慣和風格，生成的訊息要盡量貼近這個風格：
 ${myReplies.map((r, i) => `--- 範例 ${i + 1} ---\n${r}`).join('\n')}`
         : '';
-    
-    const styleRule = hasStyleRef 
+    const styleRule = hasStyleRef
         ? '6. 仔細分析使用者過去的回覆風格（語氣、用詞、表達方式），生成的訊息必須貼近使用者的寫作習慣'
         : '';
-    
     const prompt = `你是一個傳道訊息寫作助手。請根據以下資訊，幫我寫一段要發給對方的訊息。
-
 嚴格規則：
 1. 只能根據「對方最後一篇對話內容」和「使用者的指示」來寫，絕對不可以捏造對方沒提到的事情
 2. 不可以畫蛇添足，不要加入任何未被提及的話題或資訊
@@ -5838,23 +5116,19 @@ ${myReplies.map((r, i) => `--- 範例 ${i + 1} ---\n${r}`).join('\n')}`
 4. 回覆語言必須是${isKoreanContent ? '韓文' : '中文'}（與對方對話語言一致）
 5. 只回覆訊息內容本身，不要加任何解釋或前言
 ${styleRule}
-
 對方名稱：${user.name}
 對方最後一篇對話（${lastLog.date}，${lastLog.type === 'me' ? '我方回覆' : '對方回覆'}）：
 ${lastLog.content}
 ${lastLog.messagePoints ? '\n訊息重點：' + lastLog.messagePoints.map(p => `[${p.tag}] ${p.content}`).join('、') : ''}
 ${lastLog.confirmPoints ? '\n需確認事項：' + lastLog.confirmPoints.map(p => `[${p.tag}] ${p.content}`).join('、') : ''}
 ${styleSection}
-
 使用者的指示：${instruction}`;
-    
     // UI loading
     generateBtn.disabled = true;
     generateBtn.textContent = currentLang === 'ko' ? '생성 중...' : '生成中...';
     resultStep.style.display = 'block';
     resultBox.textContent = currentLang === 'ko' ? '생성 중...' : '生成中...';
     resultBox.style.opacity = '0.5';
-    
     try {
         const response = await fetch(AI_WORKER_URL, {
             method: 'POST',
@@ -5864,9 +5138,7 @@ ${styleSection}
         if (!response.ok) throw new Error('API Error');
         const data = await response.json();
         const result = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        
         if (!result) throw new Error(currentLang === 'ko' ? '응답이 비어 있습니다' : '回應為空');
-        
         resultBox.textContent = result;
         resultBox.style.opacity = '1';
     } catch (err) {
@@ -5878,7 +5150,6 @@ ${styleSection}
         generateBtn.textContent = t.aiComposeGenerate;
     }
 };
-
 window.copyComposeResult = async () => {
     const text = document.getElementById('aiComposeResult').textContent;
     if (!text) return;
