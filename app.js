@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.12.03';
+const APP_VERSION = '2026.05.12.04';
 window.__APP_VERSION__ = APP_VERSION;
 // --- FIREBASE SETUP ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -3693,8 +3693,8 @@ function resolveBibleBookId(bookName, bookLookup) {
 function parseBibleNavigationQuery(input) {
     const bookLookup = buildBookLookup();
     const cleanInput = input.trim().replace(/\s+/g, ' ');
-    const englishPrefix = /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
-    const asianPrefix = /^(?:到|去|가|가자|가세요|가요|가지)\s*/;
+    const englishPrefix = /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|move\s+to|open|to)\s+/i;
+    const asianPrefix = /^(?:移動到|移动到|移動至|移动至|移到|前往|打開|打开|開啟|开启|到|去|이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|가지)\s*/;
     let navText = '';
     if (englishPrefix.test(cleanInput)) {
         navText = cleanInput.replace(englishPrefix, '').trim();
@@ -3720,22 +3720,56 @@ function parseBibleCopyCommand(input) {
     const parsed = parseBibleQuery(match[1].trim());
     return parsed.queries.length > 0 ? parsed : null;
 }
-function parsePrayerCopyCommand(input) {
-    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
-    if (!match) return null;
-    const target = match[1].trim().replace(/[\s'’/／_-]+/g, '').toLowerCase();
+function normalizePrayerTarget(input) {
+    return input.trim().replace(/[\s'’/／_\-.,，。:：]+/g, '').toLowerCase();
+}
+function isPrayerTarget(input) {
+    const target = normalizePrayerTarget(input);
     const aliases = [
         '主禱文', '主祷文', '主祈禱文', '主祈祷文', '天主經', '天主经',
         '주기도문', 'lordsprayer', 'lordprayer', 'thelordsprayer', 'ourfather'
     ];
     return aliases.some((alias) => {
-        const normalizedAlias = alias.replace(/[\s'’/／_-]+/g, '').toLowerCase();
+        const normalizedAlias = normalizePrayerTarget(alias);
         return target === normalizedAlias || target.includes(normalizedAlias);
     });
 }
-function formatPrayerForCopy(data) {
+function parsePrayerNavigationQuery(input) {
+    const cleanInput = input.trim().replace(/\s+/g, ' ');
+    if (!cleanInput) return null;
+    const prefixPatterns = [
+        /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|move\s+to|open|to)\s+/i,
+        /^(?:移動到|移动到|移動至|移动至|移到|前往|打開|打开|開啟|开启|到|去)\s*/i,
+        /^(?:이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|열어줘|열어|열기)\s*/i,
+    ];
+    const suffixPattern = /\s*(?:으로|로)?\s*(?:移動|移动|移動一下|移动一下|打開|打开|開啟|开启|이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|열어줘|열어|열기)\s*$/i;
+    let target = cleanInput;
+    let hasNavigationIntent = false;
+    for (const pattern of prefixPatterns) {
+        if (pattern.test(target)) {
+            target = target.replace(pattern, '').trim();
+            hasNavigationIntent = true;
+            break;
+        }
+    }
+    if (suffixPattern.test(target)) {
+        target = target.replace(suffixPattern, '').trim();
+        hasNavigationIntent = true;
+    }
+    return hasNavigationIntent && isPrayerTarget(target);
+}
+function parsePrayerCopyCommand(input) {
+    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    if (!match) return null;
+    const { language, cleanInput } = detectBibleCopyLanguage(match[1]);
+    return isPrayerTarget(cleanInput) ? { language } : null;
+}
+function formatPrayerForCopy(data, language = null) {
     const koTitle = data.titles?.ko || '주기도문';
     const zhTitle = data.titles?.zh || '主祈禱文';
+    const targetLanguage = language || (currentLang === 'ko' ? 'ko' : 'zh');
+    if (targetLanguage === 'ko') return `${koTitle}\n${(data.ko || []).join('\n')}`;
+    if (targetLanguage === 'zh') return `${zhTitle}\n${(data.zh || []).join('\n')}`;
     return `${koTitle}\n${(data.ko || []).join('\n')}\n\n${zhTitle}\n${(data.zh || []).join('\n')}`;
 }
 function startsBibleReferenceSegment(fragment, bookLookup) {
@@ -3949,12 +3983,20 @@ window.aiPanelSearch = async () => {
             return;
         }
     }
+    // 模式 0-b：移動到主祈禱文，例如 移動到主禱文 / 이동 주기도문 / cd lords prayer
+    if (parsePrayerNavigationQuery(query)) {
+        window.toggleAiPanel();
+        window.switchPage('lords-prayer');
+        input.value = '';
+        return;
+    }
     // 模式 0-b：複製主祈禱文，例如 cp 主禱文 / cp 주기도문 / cp lords prayer
-    if (parsePrayerCopyCommand(query)) {
+    const prayerCopyCommand = parsePrayerCopyCommand(query);
+    if (prayerCopyCommand) {
         sendBtn.disabled = true;
         try {
             const prayer = await fetchLordsPrayer();
-            const text = formatPrayerForCopy(prayer);
+            const text = formatPrayerForCopy(prayer, prayerCopyCommand.language);
             await navigator.clipboard.writeText(text);
             saveAiPanelResult({ query, text, success: true, timestamp: Date.now() });
             input.value = '';
