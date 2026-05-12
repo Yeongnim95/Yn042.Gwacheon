@@ -21,22 +21,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <!-- Self-hosted Noto Sans KR + TC (Variable Font, unicode-range split) -->
-    <link rel="stylesheet" href="/fonts.css">
+    <link rel="stylesheet" href="/fonts.css?v=2026.05.12.05">
     
     <title>비공개의 새싹</title>
-    <link rel="stylesheet" href="/style.css?v=2026.05.12.01">
+    <link rel="stylesheet" href="/style.css?v=2026.05.12.05">
     <style>
-        #homeSection .home-slide-1,
-        #homeSection .home-verse-area {
-            opacity: 1 !important;
-            transform: translateX(0) !important;
-        }
-
         #homeSection .home-hero-title {
             left: 0 !important;
             right: 0 !important;
-            transform: translateY(-50%) !important;
-            opacity: 1 !important;
         }
     </style>
 </head>
@@ -44,7 +36,7 @@
 
 <nav>
     <div class="nav-left">
-        <div class="nav-title"><img src="/logo-20260509.avif" alt="logo" style="width:28px;height:28px;vertical-align:middle;"></div>
+        <div class="nav-title"><img src="/logo-20260509.avif" alt="logo" width="28" height="28" decoding="async" fetchpriority="high" style="width:28px;height:28px;vertical-align:middle;"></div>
         <div class="menu-toggle" onclick="window.toggleMenu()">
             <span class="hamburger-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
             <span id="current-page-title">홈</span>
@@ -75,6 +67,7 @@
                 </div>
                 <div class="menu-submenu" id="submenu-books">
                     <button class="menu-btn" onclick="window.switchPage('bible')" id="btn-bible">성경</button>
+                    <button class="menu-btn" onclick="window.switchPage('lords-prayer')" id="btn-lords-prayer">주기도문</button>
                 </div>
             </div>
             <!-- 果子資訊 子選單 -->
@@ -178,7 +171,7 @@
                 <!-- 選項1：聖經（圖左文右） -->
                 <div class="home-feature" onclick="window.switchPage('bible')">
                     <div class="home-feature-img">
-                        <img src="home-bible.avif" alt="Bible">
+                        <img src="home-bible.avif" alt="Bible" loading="lazy" decoding="async">
                     </div>
                     <div class="home-feature-text">
                         <div class="home-feature-icon">
@@ -193,7 +186,7 @@
                 <!-- 選項2：信仰自動化管理（圖右文左） -->
                 <div class="home-feature reverse" onclick="window.switchPage('faithAuto')">
                     <div class="home-feature-img">
-                        <img src="home-auto.avif" alt="Faith Automation">
+                        <img src="home-auto.avif" alt="Faith Automation" loading="lazy" decoding="async">
                     </div>
                     <div class="home-feature-text">
                         <div class="home-feature-icon">
@@ -208,7 +201,7 @@
                 <!-- 選項3：資料管理（圖左文右） -->
                 <div class="home-feature" onclick="window.switchPage('backend')">
                     <div class="home-feature-img">
-                        <img src="cards-bg.avif" alt="Data Management">
+                        <img src="cards-bg.avif" alt="Data Management" loading="lazy" decoding="async">
                     </div>
                     <div class="home-feature-text">
                         <div class="home-feature-icon">
@@ -354,6 +347,21 @@
                     CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
                     개역한글 © 1961 대한성서공회 (Korean Bible Society)
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主祈禱文頁面 -->
+    <div id="lordsPrayerSection" class="page-section">
+        <div class="prayer-page">
+            <div class="prayer-header">
+                <div>
+                    <div class="prayer-kicker" id="lordsPrayerKicker">기도문 / 祈禱文</div>
+                    <h2 id="lordsPrayerTitle">주기도문 / 主祈禱文</h2>
+                </div>
+            </div>
+            <div class="prayer-content" id="lordsPrayerContent">
+                <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
             </div>
         </div>
     </div>
@@ -805,7 +813,7 @@
     </div>
 </div>
 
-<script type="module" src="/app.js?v=2026.05.12.01"></script>
+<script type="module" src="/app.js?v=2026.05.12.05"></script>
 
 </body>
 </html>

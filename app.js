@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '2026.05.12.01';
+const APP_VERSION = '2026.05.12.05';
 window.__APP_VERSION__ = APP_VERSION;
 
 // --- FIREBASE SETUP ---
@@ -106,7 +106,7 @@ const i18n = {
         homeStatTotal: "총 섭외자", homeStatWeek: "주간 교류",
         copyrightMain: "Yeongnim 개인 소유",
         // 首頁第二頁
-        homeFeatBibleTitle: "성경", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
+        homeFeatBibleTitle: "읽기", homeFeatBibleDesc: "말씀을 읽고, 묵상하고,\n마음에 새기는 시간",
         homeFeatAutoTitle: "신앙 자동화 관리", homeFeatAutoDesc: "신앙 생활을 체계적으로\n관리하고 성장하는 도구",
         homeFeatDataTitle: "교류 관리", homeFeatDataDesc: "기록된 데이터를 확인하고\n열매를 관리하세요",
         // 今日默想
@@ -128,7 +128,7 @@ const i18n = {
         aiComposeHint3: "격려 메시지", aiComposeHint4: "성경 말씀 나누기",
         faithCardAiCompose: "AI 통합 작문", faithCardAiComposeDesc: "AI를 활용하여 섭외자에게 보낼 메시지를 자동으로 생성합니다.",
         // 書籍
-        menuBooks: "서적", btnBible: "성경",
+        menuBooks: "서적", btnBible: "성경", btnLordsPrayer: "주기도문",
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "뒤로",
         // 果子資訊
@@ -195,7 +195,7 @@ const i18n = {
         homeStatTotal: "總涉外者", homeStatWeek: "週間交流",
         copyrightMain: "Yeongnim個人所有",
         // 首頁第二頁
-        homeFeatBibleTitle: "聖經", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
+        homeFeatBibleTitle: "閱讀", homeFeatBibleDesc: "閱讀、默想，\n將話語刻在心中",
         homeFeatAutoTitle: "信仰自動化管理", homeFeatAutoDesc: "系統化管理信仰生活，\n持續成長的工具",
         homeFeatDataTitle: "交流管理", homeFeatDataDesc: "確認記錄的數據，\n管理結出的果子",
         // 今日默想
@@ -217,7 +217,7 @@ const i18n = {
         aiComposeHint3: "鼓勵訊息", aiComposeHint4: "分享聖經話語",
         faithCardAiCompose: "AI 整合作文", faithCardAiComposeDesc: "利用 AI 自動生成要發送給涉外者的訊息。",
         // 書籍
-        menuBooks: "書籍", btnBible: "聖經",
+        menuBooks: "書籍", btnBible: "聖經", btnLordsPrayer: "主祈禱文",
         txtOldTestament: "구약성경 / 舊約聖經", txtNewTestament: "신약성경 / 新約聖經",
         txtBibleBack: "返回",
         // 果子資訊
@@ -371,6 +371,7 @@ function getPageFromPath() {
             'faith-auto': 'faithAuto',
             'faith-chart': 'faith-chart',
             'daily-faith': 'daily-faith',
+            'lords-prayer': 'lords-prayer',
             'ai-compose': 'ai-compose',
             'offline-entry': 'offline-entry',
             'offline-backend': 'offline-backend'
@@ -384,7 +385,7 @@ function getPageFromPath() {
             'home': 'home', 'bible': 'bible', 'entry': 'entry',
             'backend': 'backend', 'profile': 'profile',
             'faith-auto': 'faithAuto', 'faith-chart': 'faith-chart',
-            'daily-faith': 'daily-faith', 'ai-compose': 'ai-compose',
+            'daily-faith': 'daily-faith', 'lords-prayer': 'lords-prayer', 'ai-compose': 'ai-compose',
             'offline-entry': 'offline-entry',
             'offline-backend': 'offline-backend'
         };
@@ -395,7 +396,7 @@ function getPageFromPath() {
                 'home': '/', 'bible': '/bible', 'entry': '/entry',
                 'backend': '/backend', 'profile': '/profile',
                 'faithAuto': '/faith-auto', 'faith-chart': '/faith-chart',
-                'daily-faith': '/daily-faith', 'ai-compose': '/ai-compose',
+                'daily-faith': '/daily-faith', 'lords-prayer': '/lords-prayer', 'ai-compose': '/ai-compose',
                 'offline-entry': '/offline-entry',
                 'offline-backend': '/offline-backend'
             };
@@ -440,7 +441,7 @@ window.onload = function() {
             'bible': '/bible', 'entry': '/entry', 'backend': '/backend',
             'profile': '/profile', 'faith-auto': '/faith-auto',
             'faith-chart': '/faith-chart', 'daily-faith': '/daily-faith',
-            'ai-compose': '/ai-compose',
+            'lords-prayer': '/lords-prayer', 'ai-compose': '/ai-compose',
             'offline-entry': '/offline-entry', 'offline-backend': '/offline-backend',
             'home': '/'
         };
@@ -529,6 +530,7 @@ function applyLanguage() {
         'faith-card-ai-compose': t.faithCardAiCompose, 'faith-card-ai-compose-desc': t.faithCardAiComposeDesc,
         // 書籍
         'btn-bible': t.btnBible,
+        'btn-lords-prayer': t.btnLordsPrayer,
         'txt-old-testament': t.txtOldTestament, 'txt-new-testament': t.txtNewTestament,
         'txt-bible-back': t.txtBibleBack,
         // 果子資訊
@@ -602,6 +604,7 @@ function applyLanguage() {
         else if (sectionId === 'dailyFaithSection') pageTitleEl.textContent = t.btnDailyFaith;
         else if (sectionId === 'faithChartSection') pageTitleEl.textContent = t.btnFaithChart;
         else if (sectionId === 'bibleSection') pageTitleEl.textContent = t.btnBible;
+        else if (sectionId === 'lordsPrayerSection') pageTitleEl.textContent = t.btnLordsPrayer;
         else if (sectionId === 'entrySection') pageTitleEl.textContent = t.btnEntry;
         else if (sectionId === 'offlineEntrySection') pageTitleEl.textContent = t.btnOfflineEntry;
         else if (sectionId === 'profileSection') pageTitleEl.textContent = t.btnProfile;
@@ -633,10 +636,10 @@ function applyLanguage() {
     const aiNote = document.getElementById('aiPanelNote');
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
-    if (aiNote) aiNote.innerHTML = currentLang === 'ko' 
-        ? '경문: <b>창1:1-3 한</b> | 이동: <b>계1장 가</b> | 글꼴: <b>성경 글꼴</b> | 작문: <b>@번호 지시</b>' 
-        : '經文: <b>創1:1-3 中</b> | 跳轉: <b>到 啟1章</b> | 字體: <b>聖經字體</b> | 作文: <b>@編號 指示</b>';
-    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? '창1:1 한 / 계1장 가 / 성경 글꼴 / @0012 지시' : '創1:1 中 / 到 啟1章 / 聖經字體 / @0012 指示';
+    if (aiNote) aiNote.innerHTML = currentLang === 'ko'
+        ? '이동: <b>cd 계1</b> / <b>계1:5 가요</b> | 복사: <b>cp 창1:1</b> / <b>cp 주기도문</b>' 
+        : '跳轉: <b>cd 啟1</b> / <b>到 啟1:5</b> | 複製: <b>cp 創1:1</b> / <b>cp 主祈禱文</b>';
+    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? 'cd 계1 / 계1:5 가요 / cp 창1:1 / cp 주기도문' : 'cd 啟1 / 到 啟1:5 / cp 創1:1 / cp 主祈禱文';
     
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
@@ -1782,6 +1785,7 @@ window.switchPage = (page) => {
     const pathMap = {
         'home': '/',
         'bible': '/bible',
+        'lords-prayer': '/lords-prayer',
         'entry': '/entry',
         'backend': '/backend',
         'profile': '/profile',
@@ -1853,6 +1857,7 @@ window.switchPage = (page) => {
         document.getElementById('menu-category-faith')?.classList.add('open');
         pageTitleEl.textContent = t.btnFaithChart;
     } else if (page === 'bible') {
+        if (getBibleFontMode() === 'serif') loadSerifFontStylesheet();
         document.getElementById('bibleSection').classList.add('active-section');
         document.getElementById('btn-bible').classList.add('active');
         document.getElementById('menu-category-books').classList.add('open');
@@ -1869,6 +1874,12 @@ window.switchPage = (page) => {
                 openBibleChapter(bibleRoute.book, bibleRoute.chapter, { fromRoute: true });
             }, 0);
         }
+    } else if (page === 'lords-prayer') {
+        document.getElementById('lordsPrayerSection').classList.add('active-section');
+        document.getElementById('btn-lords-prayer')?.classList.add('active');
+        document.getElementById('menu-category-books').classList.add('open');
+        pageTitleEl.textContent = t.btnLordsPrayer;
+        renderLordsPrayer();
     } else if (page === 'entry') { 
         document.getElementById('entrySection').classList.add('active-section'); 
         document.getElementById('btn-entry')?.classList.add('active');
@@ -2768,6 +2779,7 @@ const bibleBooks = {
 // ===== 聖經經文：從 /bible/ JSON 動態載入 =====
 // 格式：/bible/{bookId}/{chapter}.json → [{verse:1, zh:'...'}, ...]
 const bibleCache = {}; // { 'gen_1': [...], 'rev_3': [...] }
+let lordsPrayerCache = null;
 
 async function fetchBibleChapter(bookId, chapter) {
     const key = `${bookId}_${chapter}`;
@@ -2781,6 +2793,50 @@ async function fetchBibleChapter(bookId, chapter) {
     } catch(e) {
         bibleCache[key] = null;
         return null;
+    }
+}
+
+async function fetchLordsPrayer() {
+    if (lordsPrayerCache) return lordsPrayerCache;
+    const res = await fetch(`/prayers/lords-prayer.json?v=${encodeURIComponent(APP_VERSION)}`);
+    if (!res.ok) throw new Error(`Failed to load lords-prayer.json: ${res.status}`);
+    lordsPrayerCache = await res.json();
+    return lordsPrayerCache;
+}
+
+async function renderLordsPrayer() {
+    const content = document.getElementById('lordsPrayerContent');
+    const title = document.getElementById('lordsPrayerTitle');
+    const kicker = document.getElementById('lordsPrayerKicker');
+    if (!content) return;
+
+    content.innerHTML = '<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+    try {
+        const data = await fetchLordsPrayer();
+        if (title) title.textContent = `${data.titles?.ko || '주기도문'} / ${data.titles?.zh || '主祈禱文'}`;
+        if (kicker) kicker.textContent = currentLang === 'ko' ? '기도문 / 祈禱文' : '祈禱文 / 기도문';
+
+        const renderLines = (lines = []) => lines
+            .map((line) => `<p>${escapeHtml(line)}</p>`)
+            .join('');
+
+        content.innerHTML = `
+            <section class="prayer-language-card ko">
+                <div class="prayer-language-label">한국어</div>
+                <div class="prayer-lines">${renderLines(data.ko)}</div>
+            </section>
+            <section class="prayer-language-card zh">
+                <div class="prayer-language-label">中文</div>
+                <div class="prayer-lines">${renderLines(data.zh)}</div>
+            </section>
+        `;
+    } catch (error) {
+        content.innerHTML = `
+            <div class="prayer-error">
+                ${currentLang === 'ko' ? '주기도문을 불러오지 못했습니다.' : '無法載入主祈禱文。'}
+                <span>${escapeHtml(error.message || String(error))}</span>
+            </div>
+        `;
     }
 }
 
@@ -3911,9 +3967,11 @@ function copyToClipboard(text) {
 const AI_PANEL_CACHE_KEY = 'ai_panel_results';
 const AI_PANEL_CACHE_DURATION = 60 * 60 * 1000; // 1小時
 const BIBLE_FONT_KEY = 'bible_font_mode';
+const SERIF_FONT_STYLESHEET_ID = 'serifFontStylesheet';
+const SERIF_FONT_STYLESHEET_HREF = `/fonts-serif.css?v=${encodeURIComponent(APP_VERSION)}`;
 
 function getBibleFontMode() {
-    return localStorage.getItem(BIBLE_FONT_KEY) === 'sans' ? 'sans' : 'serif';
+    return localStorage.getItem(BIBLE_FONT_KEY) === 'serif' ? 'serif' : 'sans';
 }
 
 function getBibleFontLabel(mode = getBibleFontMode()) {
@@ -3922,10 +3980,20 @@ function getBibleFontLabel(mode = getBibleFontMode()) {
 }
 
 function applyBibleFontPreference(mode = getBibleFontMode()) {
-    const normalizedMode = mode === 'sans' ? 'sans' : 'serif';
+    const normalizedMode = mode === 'serif' ? 'serif' : 'sans';
     localStorage.setItem(BIBLE_FONT_KEY, normalizedMode);
+    if (normalizedMode === 'serif') loadSerifFontStylesheet();
     if (document.body) document.body.dataset.bibleFont = normalizedMode;
     return normalizedMode;
+}
+
+function loadSerifFontStylesheet() {
+    if (document.getElementById(SERIF_FONT_STYLESHEET_ID)) return;
+    const link = document.createElement('link');
+    link.id = SERIF_FONT_STYLESHEET_ID;
+    link.rel = 'stylesheet';
+    link.href = SERIF_FONT_STYLESHEET_HREF;
+    document.head.appendChild(link);
 }
 
 function isBibleFontCommand(query) {
@@ -4126,9 +4194,9 @@ function resolveBibleBookId(bookName, bookLookup) {
 
 function parseBibleNavigationQuery(input) {
     const bookLookup = buildBookLookup();
-    const cleanInput = input.trim().replace(/\s+/g, ' ');
-    const englishPrefix = /^(?:to\s+get\s+to|go\s+to|get\s+to|to)\s+/i;
-    const asianPrefix = /^(?:到|去|가|가자|가세요|가요|가지)\s*/;
+    const cleanInput = input.trim().replace(/[\/／]+$/g, '').replace(/\s+/g, ' ');
+    const englishPrefix = /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|move\s+to|open|to)\s+/i;
+    const asianPrefix = /^(?:移動到|移动到|移動至|移动至|移動|移动|移到|前往|打開|打开|開啟|开启|到|去|이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|가지)\s*/;
 
     let navText = '';
     if (englishPrefix.test(cleanInput)) {
@@ -4136,9 +4204,9 @@ function parseBibleNavigationQuery(input) {
     } else if (asianPrefix.test(cleanInput)) {
         navText = cleanInput.replace(asianPrefix, '').trim();
     } else {
-        const suffixMatch = cleanInput.match(/^(.+?)\s*(\d+)\s*(?:章|장)\s*(?:가|가자|가세요|가요|가지|세요|요)\s*$/);
+        const suffixMatch = cleanInput.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장)?\s*(?:으로|로)?\s*(?:移動|移动|移動一下|移动一下|가|가자|가세요|가요|가지|세요|요|이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동)\s*$/);
         if (!suffixMatch) return null;
-        navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}`;
+        navText = `${suffixMatch[1].trim()} ${suffixMatch[2]}${suffixMatch[3] ? `:${suffixMatch[3]}` : ''}`;
     }
 
     const match = navText.match(/^(.+?)\s*(\d+)(?:\s*[:：]\s*(\d+))?\s*(?:章|장|chapter|chapters|ch)?\s*$/i);
@@ -4152,11 +4220,78 @@ function parseBibleNavigationQuery(input) {
     return { bookId, chapter, verse };
 }
 
+function hasNavigationIntentCue(input) {
+    return /(?:^|\s)(?:cd|to\s+get\s+to|go\s+to|get\s+to|move\s+to|open|to)(?:\s|$)/i.test(input)
+        || /(?:移動到|移动到|移動至|移动至|移動|移动|移到|前往|打開|打开|開啟|开启|到|去)/.test(input)
+        || /(?:이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동)/.test(input)
+        || /(?:^|\s)(?:가세요|가요|가자|가지|가)(?:\s|$)/.test(input);
+}
+
 function parseBibleCopyCommand(input) {
     const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
     if (!match) return null;
     const parsed = parseBibleQuery(match[1].trim());
     return parsed.queries.length > 0 ? parsed : null;
+}
+
+function normalizePrayerTarget(input) {
+    return input.trim().replace(/[\s'’/／_\-.,，。:：]+/g, '').toLowerCase();
+}
+
+function isPrayerTarget(input) {
+    const target = normalizePrayerTarget(input);
+    const aliases = [
+        '主禱文', '主祷文', '主祈禱文', '主祈祷文', '天主經', '天主经',
+        '주기도문', 'lordsprayer', 'lordprayer', 'thelordsprayer', 'ourfather'
+    ];
+    return aliases.some((alias) => {
+        const normalizedAlias = normalizePrayerTarget(alias);
+        return target === normalizedAlias || target.includes(normalizedAlias);
+    });
+}
+
+function parsePrayerNavigationQuery(input) {
+    const cleanInput = input.trim().replace(/[\/／]+$/g, '').replace(/\s+/g, ' ');
+    if (!cleanInput) return null;
+
+    const prefixPatterns = [
+        /^(?:cd|to\s+get\s+to|go\s+to|get\s+to|move\s+to|open|to)\s+/i,
+        /^(?:移動到|移动到|移動至|移动至|移動|移动|移到|前往|打開|打开|開啟|开启|到|去)\s*/i,
+        /^(?:이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|열어줘|열어|열기)\s*/i,
+    ];
+    const suffixPattern = /\s*(?:으로|로)?\s*(?:移動|移动|移動一下|移动一下|打開|打开|開啟|开启|이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동|가|가자|가세요|가요|열어줘|열어|열기)\s*$/i;
+
+    let target = cleanInput;
+    let hasNavigationIntent = false;
+    for (const pattern of prefixPatterns) {
+        if (pattern.test(target)) {
+            target = target.replace(pattern, '').trim();
+            hasNavigationIntent = true;
+            break;
+        }
+    }
+    if (suffixPattern.test(target)) {
+        target = target.replace(suffixPattern, '').trim();
+        hasNavigationIntent = true;
+    }
+
+    return hasNavigationIntent && isPrayerTarget(target);
+}
+
+function parsePrayerCopyCommand(input) {
+    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    if (!match) return null;
+    const { language, cleanInput } = detectBibleCopyLanguage(match[1]);
+    return isPrayerTarget(cleanInput) ? { language } : null;
+}
+
+function formatPrayerForCopy(data, language = null) {
+    const koTitle = data.titles?.ko || '주기도문';
+    const zhTitle = data.titles?.zh || '主祈禱文';
+    const targetLanguage = language || (currentLang === 'ko' ? 'ko' : 'zh');
+    if (targetLanguage === 'ko') return `${koTitle}\n${(data.ko || []).join('\n')}`;
+    if (targetLanguage === 'zh') return `${zhTitle}\n${(data.zh || []).join('\n')}`;
+    return `${koTitle}\n${(data.ko || []).join('\n')}\n\n${zhTitle}\n${(data.zh || []).join('\n')}`;
 }
 
 function startsBibleReferenceSegment(fragment, bookLookup) {
@@ -4383,6 +4518,50 @@ window.aiPanelSearch = async () => {
         return;
     }
 
+    // 模式 0-a：Linux 風格移動指令，例如 cd gen1 / cd 계 1 / cd 啟1:5
+    const cdNav = parseBibleNavigationQuery(query);
+    if (cdNav && /^cd\s+/i.test(query)) {
+        const { bookId, chapter, verse } = cdNav;
+        const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+        const book = allBooks.find(b => b.id === bookId);
+        if (book && chapter >= 1 && chapter <= book.chapters) {
+            window.toggleAiPanel();
+            window.switchPage('bible');
+            setTimeout(() => {
+                selectBibleBook(book);
+                setTimeout(() => openBibleChapter(book, chapter, { targetVerse: verse }), 300);
+            }, 300);
+            input.value = '';
+            return;
+        }
+    }
+
+    // 模式 0-b：移動到主祈禱文，例如 移動到主禱文 / 이동 주기도문 / cd lords prayer
+    if (parsePrayerNavigationQuery(query)) {
+        window.toggleAiPanel();
+        window.switchPage('lords-prayer');
+        input.value = '';
+        return;
+    }
+
+    // 模式 0-b：複製主祈禱文，例如 cp 主禱文 / cp 주기도문 / cp lords prayer
+    const prayerCopyCommand = parsePrayerCopyCommand(query);
+    if (prayerCopyCommand) {
+        sendBtn.disabled = true;
+        try {
+            const prayer = await fetchLordsPrayer();
+            const text = formatPrayerForCopy(prayer, prayerCopyCommand.language);
+            await navigator.clipboard.writeText(text);
+            saveAiPanelResult({ query, text, success: true, timestamp: Date.now() });
+            input.value = '';
+        } catch (err) {
+            saveAiPanelResult({ query, text: '❌ ' + err.message, success: false, timestamp: Date.now() });
+        } finally {
+            sendBtn.disabled = false;
+        }
+        return;
+    }
+
     // 模式 0：明確複製指令，例如 copy gen1:1 / cp gen1:1
     const copyCommand = parseBibleCopyCommand(query);
     if (copyCommand) {
@@ -4436,6 +4615,20 @@ window.aiPanelSearch = async () => {
     sendBtn.disabled = true;
     let loadingEl = null;
     try {
+        if (hasNavigationIntentCue(query)) {
+            loadingEl = document.createElement('div');
+            loadingEl.className = 'ai-panel-loading';
+            loadingEl.textContent = currentLang === 'ko' ? 'AI 의도 분석 중...' : 'AI 意圖判斷中...';
+            resultContainer.prepend(loadingEl);
+
+            const aiIntent = await parseAiAssistantIntentWithAI(query);
+            if (await runAiAssistantIntent(aiIntent, query, input)) return;
+
+            throw new Error(currentLang === 'ko'
+                ? '이동할 위치를 인식할 수 없습니다.\n예: 이동 창5장 / 이동해주세요 계1:5 / cd gen5'
+                : '無法辨識要移動的位置。\n例：移動 創5章 / 移動到 啟1:5 / cd gen5');
+        }
+
         // 1. 本地 regex 解析
         let parsed = parseBibleQuery(query);
         let formatted = parsed.queries.length > 0 ? await formatBibleResult(parsed) : { text: '', foundCount: 0 };
@@ -4448,6 +4641,9 @@ window.aiPanelSearch = async () => {
             resultContainer.prepend(loadingEl);
             
             try {
+                const aiIntent = await parseAiAssistantIntentWithAI(query);
+                if (await runAiAssistantIntent(aiIntent, query, input)) return;
+
                 const aiResult = await parseBibleWithAI(query);
                 if (aiResult && aiResult.queries && aiResult.queries.length > 0) {
                     parsed = aiResult;
@@ -4524,6 +4720,105 @@ async function parseBibleWithAI(query) {
     const aiText = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const cleaned = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     return JSON.parse(cleaned);
+}
+
+async function parseAiAssistantIntentWithAI(query) {
+    const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+    const bookRef = allBooks.map(b => {
+        const abbr = bookAbbreviations[b.id] || {};
+        return `${b.id}:${abbr.ko || b.ko}/${abbr.zh || b.zh}/${b.ko}/${b.zh}`;
+    }).join(',');
+
+    const prompt = `你是網站 AI 助手的指令意圖分類器。請只回傳純 JSON，不要 markdown。
+
+書卷ID: ${bookRef}
+
+可回傳格式：
+{"action":"navigate_bible","bookId":"gen","chapter":1,"verse":null}
+{"action":"copy_bible","queries":[{"bookId":"gen","chapter":1,"verses":[1]}],"language":"zh"}
+{"action":"open_prayer"}
+{"action":"copy_prayer","language":"ko"}
+{"action":"unknown"}
+
+規則：
+- 判斷使用者真正意圖，不要只看是否有聖經章節。
+- 有「移動、移动、到、去、前往、打開、打开、開啟、이동、이동해주세요、이동해、이동해요、가、가요、가세요、go to、move to、open、cd」等語氣時，優先判斷為 navigate_bible 或 open_prayer。
+- 有「複製、复制、복사、copy、cp」才判斷為 copy_bible 或 copy_prayer。
+- 主禱文/主祈禱文/주기도문/lord's prayer 是 prayer，不是 bible。
+- copy_prayer 的 language: 中文語氣→zh；韓文語氣→ko；中韓/雙語/全部/all/both/한중/중한→both；未指定則依輸入語言。
+- copy_bible 的 language 同上。
+- verses 是數字陣列；整章用 "all"。
+- 無法判斷才回 unknown。
+
+例：
+移動 創5章 → {"action":"navigate_bible","bookId":"gen","chapter":5,"verse":null}
+이동해주세요 창5장 → {"action":"navigate_bible","bookId":"gen","chapter":5,"verse":null}
+啟5章 → {"action":"copy_bible","queries":[{"bookId":"rev","chapter":5,"verses":"all"}],"language":"zh"}
+cp 주기도문 → {"action":"copy_prayer","language":"ko"}
+移動到主禱文 → {"action":"open_prayer"}
+
+輸入：${query}`;
+
+    const response = await fetch(AI_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+    });
+    if (!response.ok) throw new Error('API Error');
+    const data = await response.json();
+    const aiText = data.text || data.response || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = aiText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    return JSON.parse(cleaned);
+}
+
+async function runAiAssistantIntent(intent, query, input) {
+    if (!intent || intent.action === 'unknown') return false;
+
+    if (intent.action === 'open_prayer') {
+        window.toggleAiPanel();
+        window.switchPage('lords-prayer');
+        input.value = '';
+        return true;
+    }
+
+    if (intent.action === 'copy_prayer') {
+        const prayer = await fetchLordsPrayer();
+        const text = formatPrayerForCopy(prayer, intent.language);
+        await navigator.clipboard.writeText(text);
+        saveAiPanelResult({ query, text, success: true, timestamp: Date.now() });
+        input.value = '';
+        return true;
+    }
+
+    if (intent.action === 'navigate_bible') {
+        const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
+        const book = allBooks.find(b => b.id === intent.bookId);
+        const chapter = parseInt(intent.chapter, 10);
+        const verse = intent.verse ? parseInt(intent.verse, 10) : null;
+        if (!book || !Number.isFinite(chapter) || chapter < 1 || chapter > book.chapters) return false;
+        window.toggleAiPanel();
+        window.switchPage('bible');
+        setTimeout(() => {
+            selectBibleBook(book);
+            setTimeout(() => openBibleChapter(book, chapter, { targetVerse: verse }), 300);
+        }, 300);
+        input.value = '';
+        return true;
+    }
+
+    if (intent.action === 'copy_bible' && Array.isArray(intent.queries)) {
+        const formatted = await formatBibleResult({
+            queries: intent.queries,
+            language: intent.language || (currentLang === 'ko' ? 'ko' : 'zh')
+        });
+        if (formatted.foundCount === 0) return false;
+        await navigator.clipboard.writeText(formatted.text);
+        saveAiPanelResult({ query, text: formatted.text, success: true, timestamp: Date.now() });
+        input.value = '';
+        return true;
+    }
+
+    return false;
 }
 
 // --- AI 面板：回覆生成模式 ---

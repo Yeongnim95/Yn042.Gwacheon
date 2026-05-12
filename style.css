@@ -27,7 +27,7 @@
                        "Apple SD Gothic Neo", "Malgun Gothic", "Microsoft JhengHei", sans-serif;
     --font-bible-serif: "Noto Serif KR", "Noto Serif TC", "Source Han Serif KR", "Source Han Serif TC",
                         "Songti TC", "PMingLiU", "MingLiU", serif;
-    --font-bible-current: var(--font-bible-serif);
+    --font-bible-current: var(--font-bible-sans);
 }
 
 * { box-sizing: border-box; }
@@ -704,8 +704,8 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    opacity: 1;
-    transition: opacity 1s ease;
+    opacity: 0;
+    transition: opacity 0.9s ease;
 }
 
 .home-slide-1.loaded { opacity: 1; }
@@ -726,6 +726,14 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
     background-image: url('bible-bg.avif');
     background-size: cover;
     background-position: center;
+    opacity: 0;
+    transform: scale(1.015);
+    transition: opacity 1.1s ease, transform 1.4s ease;
+}
+
+.home-slide-1.loaded .home-hero-image .daily-verse-bg {
+    opacity: 1;
+    transform: scale(1);
 }
 
 .home-hero-image .daily-verse-overlay {
@@ -756,12 +764,14 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
     justify-content: center;
     align-items: center;
     padding-left: clamp(6px, 2vw, 20px);
-    opacity: 1;
-    transition: opacity 1.2s ease 0.3s;
+    opacity: 0;
+    transform: translateY(calc(-50% + 8px));
+    transition: opacity 1s ease 0.25s, transform 1s ease 0.25s;
 }
 
 .home-slide-1.loaded .home-hero-title {
     opacity: 1;
+    transform: translateY(-50%);
 }
 
 /* 波浪過渡區 */
@@ -791,14 +801,14 @@ body.home-active .menu-weather-section * { color: rgba(255,255,255,0.9) !importa
     justify-content: center;
     align-items: center;
     padding: clamp(20px, 3vh, 40px) clamp(20px, 5vw, 40px);
-    opacity: 1;
-    transform: translateX(0);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.85s ease, transform 0.85s ease;
 }
 
 .home-slide-1.verse-show .home-verse-area {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
 }
 
 /* 迴紋針夾卡片 */
@@ -4008,6 +4018,107 @@ body.home-active .ai-panel {
 }
 .ai-panel-compose-link:hover {
     background: linear-gradient(135deg, #7c4dff33, #448aff33);
+}
+
+/* ===== 主祈禱文 ===== */
+.prayer-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px 0 36px;
+}
+
+.prayer-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.prayer-kicker {
+    color: var(--primary-green);
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.prayer-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    line-height: 1.25;
+}
+
+.prayer-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.prayer-language-card {
+    border: 1px solid rgba(67, 160, 71, 0.14);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.48);
+    box-shadow: 0 10px 28px rgba(67, 160, 71, 0.08);
+    padding: 18px;
+}
+
+.prayer-language-label {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 10px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: rgba(76, 175, 80, 0.12);
+    color: var(--dark-green);
+    font-weight: 800;
+    font-size: 0.82rem;
+}
+
+.prayer-lines {
+    display: grid;
+    gap: 9px;
+    color: var(--text-primary);
+    line-height: 1.9;
+    font-size: 1.02rem;
+    font-family: var(--font-bible-current);
+}
+
+.prayer-lines p {
+    margin: 0;
+}
+
+.prayer-error {
+    grid-column: 1 / -1;
+    padding: 22px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.55);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.prayer-error span {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+@media (max-width: 760px) {
+    .prayer-content {
+        grid-template-columns: 1fr;
+    }
+
+    .prayer-page {
+        padding-top: 10px;
+    }
+
+    .prayer-header h2 {
+        font-size: 1.42rem;
+    }
 }
 
 /* ===== 載入中三個點動畫 ===== */
