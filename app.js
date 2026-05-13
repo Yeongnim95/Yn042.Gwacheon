@@ -2043,7 +2043,7 @@ let homeScrollHandler = null;
 let homeScrollContainer = null;
 let homeRevealRunId = 0;
 
-// --- Loading Screen 已移除（測試模式：直接顯示）---
+// --- Loading Screen 已移除，自然載入 ---
 function markAppReady() {
     document.documentElement.classList.remove('app-booting');
     document.documentElement.classList.add('app-ready');
@@ -2072,7 +2072,6 @@ function initDailyVerse() {
     if (homeContainer) homeContainer.scrollTo(0, 0);
 
     const runId = ++homeRevealRunId;
-    // 測試模式：直接顯示，不等待動畫
     slide1.classList.add('loaded', 'verse-ui-show', 'verse-text-show');
     markAppReady();
     
@@ -2093,7 +2092,6 @@ function cleanupDailyVerse() {
 }
 
 function initHomeFeatureAnimations() {
-    // 測試模式：直接顯示，不做 stagger 動畫
     document.querySelectorAll('.home-feature').forEach(f => f.classList.add('visible'));
 }
 
@@ -4072,7 +4070,6 @@ window.setBibleFontMode = (mode) => {
     const mode = getBibleFontMode();
     if (document.body) document.body.dataset.bibleFont = mode;
     if (mode === 'serif') {
-        // 等 DOM ready 後閒置時才偷偷載入，不阻塞首屏
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', loadSerifFontStylesheetIdle, { once: true });
         } else {
