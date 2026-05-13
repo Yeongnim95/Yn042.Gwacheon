@@ -440,6 +440,7 @@ function closeTransientBiblePanels() {
 }
 
 window.onload = function() {
+    startLoadingProgress();
     document.querySelector('.lang-select').value = currentLang;
     
     // 處理 404.html SPA 路由轉址（?p=bible → /bible）
@@ -2050,14 +2051,54 @@ let homeScrollHandler = null;
 let homeScrollContainer = null;
 let homeRevealRunId = 0;
 
+// Loading 進度條控制
+let _loadingTimer = null;
+let _loadingProgress = 0;
+
+function startLoadingProgress() {
+    const fill = document.getElementById('loading-bar-fill');
+    if (!fill) return;
+    _loadingProgress = 0;
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+
+    // 用 JS 動態推進進度，模擬真實載入感
+    const steps = [
+        { target: 30, duration: 300 },
+        { target: 60, duration: 500 },
+        { target: 80, duration: 600 },
+        { target: 92, duration: 400 },
+    ];
+    let i = 0;
+    function next() {
+        if (i >= steps.length) return;
+        const { target, duration } = steps[i++];
+        fill.style.transition = `width ${duration}ms ease`;
+        fill.style.width = target + '%';
+        _loadingTimer = setTimeout(next, duration + 80);
+    }
+    setTimeout(next, 50);
+}
+
+function completeLoadingProgress(cb) {
+    clearTimeout(_loadingTimer);
+    const fill = document.getElementById('loading-bar-fill');
+    if (fill) {
+        fill.style.transition = 'width 250ms ease';
+        fill.style.width = '100%';
+    }
+    setTimeout(cb, 260);
+}
+
 function markAppReady() {
     document.documentElement.classList.remove('app-booting');
     document.documentElement.classList.add('app-ready');
-    // 隱藏 Loading 畫面
     const loader = document.getElementById('app-loading');
     if (loader && !loader.classList.contains('hidden')) {
-        loader.classList.add('fade-out');
-        setTimeout(() => loader.classList.add('hidden'), 420);
+        completeLoadingProgress(() => {
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.classList.add('hidden'), 420);
+        });
     }
 }
 
@@ -2085,12 +2126,18 @@ function waitForImageDecode(src, timeout = 2600) {
 
 async function waitForHomeFirstPaintAssets() {
     const fontReady = document.fonts?.ready?.catch?.(() => null) || Promise.resolve();
+    // 強制觸發圖片載入（Loading 畫面可能遮住導致圖片不觸發）
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = '/bible-bg.avif';
+    document.head.appendChild(link);
     await Promise.race([
         Promise.all([
             waitForImageDecode('/bible-bg.avif'),
             fontReady
         ]),
-        new Promise(resolve => setTimeout(resolve, 2800))
+        new Promise(resolve => setTimeout(resolve, 1800)) // 縮短保底時間
     ]);
 }
 
