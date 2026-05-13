@@ -33,48 +33,10 @@
             left: 0 !important;
             right: 0 !important;
         }
-        /* Loading Screen - inline 確保最早渲染 */
-        #app-loading {
-            position: fixed; inset: 0;
-            background: #f5f0e8;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.35s ease;
-        }
-        #app-loading.fade-out { opacity: 0; pointer-events: none; }
-        #app-loading.hidden { display: none; }
-        .loading-logo {
-            width: 68px; height: 68px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            animation: ld-pulse 1.6s ease-in-out infinite;
-        }
-        @keyframes ld-pulse {
-            0%,100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(0.93); opacity: 0.75; }
-        }
-        .loading-bar-track {
-            width: 100px; height: 3px;
-            background: rgba(67,160,71,0.18);
-            border-radius: 99px; overflow: hidden;
-        }
-        #loading-bar-fill {
-            height: 100%; width: 0%;
-            background: #43a047;
-            border-radius: 99px;
-            transition: width 0.3s ease;
-        }
+
     </style>
 </head>
 <body>
-
-<div id="app-loading">
-    <img src="/logo-20260509.avif" alt="logo" class="loading-logo" width="68" height="68">
-    <div class="loading-bar-track">
-        <div id="loading-bar-fill"></div>
-    </div>
-</div>
 
 <nav>
     <div class="nav-left">

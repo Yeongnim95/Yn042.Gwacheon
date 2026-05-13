@@ -2043,69 +2043,10 @@ let homeScrollHandler = null;
 let homeScrollContainer = null;
 let homeRevealRunId = 0;
 
-// --- Loading Screen 控制 ---
-const _loader = document.getElementById('app-loading');
-const _barFill = document.getElementById('loading-bar-fill');
-let _barTimer = null;
-
-function setLoadingBar(pct, duration = 300) {
-    if (!_barFill) return;
-    _barFill.style.transition = `width ${duration}ms ease`;
-    _barFill.style.width = pct + '%';
-}
-
-function hideLoadingScreen() {
-    if (!_loader || _loader.classList.contains('hidden')) return;
-    setLoadingBar(100, 200);
-    setTimeout(() => {
-        _loader.classList.add('fade-out');
-        setTimeout(() => _loader.classList.add('hidden'), 370);
-    }, 220);
-}
-
+// --- Loading Screen 已移除（測試模式：直接顯示）---
 function markAppReady() {
     document.documentElement.classList.remove('app-booting');
     document.documentElement.classList.add('app-ready');
-    hideLoadingScreen();
-}
-
-function waitForImageDecode(src, timeout = 2600) {
-    return new Promise((resolve) => {
-        let done = false;
-        const finish = () => {
-            if (done) return;
-            done = true;
-            resolve();
-        };
-        const img = new Image();
-        img.onload = () => {
-            if (img.decode) {
-                img.decode().then(finish).catch(finish);
-            } else {
-                finish();
-            }
-        };
-        img.onerror = finish;
-        setTimeout(finish, timeout);
-        img.src = src;
-    });
-}
-
-async function waitForHomeFirstPaintAssets() {
-    // 進度條：開始
-    setLoadingBar(20, 200);
-    const fontReady = document.fonts?.ready?.catch?.(() => null) || Promise.resolve();
-    // 進度條：字體載入中
-    setTimeout(() => setLoadingBar(55, 400), 250);
-    await Promise.race([
-        Promise.all([
-            waitForImageDecode('/bible-bg.avif'),
-            fontReady
-        ]),
-        new Promise(resolve => setTimeout(resolve, 2800))
-    ]);
-    // 進度條：接近完成，交給 markAppReady 推到 100%
-    setLoadingBar(88, 200);
 }
 
 function initDailyVerse() {
@@ -2131,29 +2072,9 @@ function initDailyVerse() {
     if (homeContainer) homeContainer.scrollTo(0, 0);
 
     const runId = ++homeRevealRunId;
-    const shouldAnimate = !slide1.classList.contains('loaded') || document.documentElement.classList.contains('app-booting');
-
-    if (!shouldAnimate) {
-        slide1.classList.add('loaded', 'verse-ui-show', 'verse-text-show');
-        markAppReady();
-    } else {
-        slide1.classList.remove('loaded', 'verse-ui-show', 'verse-text-show', 'verse-show');
-        waitForHomeFirstPaintAssets().then(() => {
-            if (runId !== homeRevealRunId) return;
-            requestAnimationFrame(() => {
-                slide1.classList.add('loaded');
-                markAppReady();
-                setTimeout(() => {
-                    if (runId !== homeRevealRunId) return;
-                    slide1.classList.add('verse-ui-show');
-                    setTimeout(() => {
-                        if (runId !== homeRevealRunId) return;
-                        slide1.classList.add('verse-text-show');
-                    }, 220);
-                }, 220);
-            });
-        });
-    }
+    // 測試模式：直接顯示，不等待動畫
+    slide1.classList.add('loaded', 'verse-ui-show', 'verse-text-show');
+    markAppReady();
     
     window.refreshBackToTop?.();
     initHomeFeatureAnimations();
@@ -2172,18 +2093,8 @@ function cleanupDailyVerse() {
 }
 
 function initHomeFeatureAnimations() {
-    const features = document.querySelectorAll('.home-feature');
-    if (!features.length) return;
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                const delay = Array.from(features).indexOf(entry.target) * 200;
-                setTimeout(() => { entry.target.classList.add('visible'); }, delay);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-    features.forEach(f => observer.observe(f));
+    // 測試模式：直接顯示，不做 stagger 動畫
+    document.querySelectorAll('.home-feature').forEach(f => f.classList.add('visible'));
 }
 
 // (版本檢查已移除)

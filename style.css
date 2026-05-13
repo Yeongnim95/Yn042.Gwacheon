@@ -53,21 +53,6 @@ body {
     transition: color 0.3s;
 }
 
-html.app-booting body > nav,
-html.app-booting body > .container {
-    opacity: 0;
-}
-
-html.app-booting,
-html.app-booting body {
-    background: #f5f0e8 !important;
-}
-
-html.app-ready body > nav,
-html.app-ready body > .container {
-    opacity: 1;
-    transition: opacity 0.32s ease;
-}
 
 body[data-bible-font="serif"] {
     --font-bible-current: var(--font-bible-serif);
