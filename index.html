@@ -25,13 +25,11 @@
     <link rel="preload" as="image" href="/bible-bg.avif" fetchpriority="high">
     <link rel="modulepreload" href="/app.js?v=2026.05.13.01">
 
-    <!-- 字體與樣式非同步載入，消除渲染阻塞 -->
-    <link rel="preload" href="/fonts.css?v=2026.05.13.01" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="/style.css?v=2026.05.13.01" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link rel="stylesheet" href="/fonts.css?v=2026.05.13.01">
-        <link rel="stylesheet" href="/style.css?v=2026.05.13.01">
-    </noscript>
+    <!-- preload 提早下載，同步載入確保無閃爍 -->
+    <link rel="preload" href="/fonts.css?v=2026.05.13.01" as="style">
+    <link rel="preload" href="/style.css?v=2026.05.13.01" as="style">
+    <link rel="stylesheet" href="/fonts.css?v=2026.05.13.01">
+    <link rel="stylesheet" href="/style.css?v=2026.05.13.01">
 
     <title>비공개의 새싹</title>
     <style>
