@@ -35,6 +35,12 @@
 
     <title>비공개의 새싹</title>
     <style>
+        /* Critical CSS - 防止 CSS 非同步載入時頁面閃爍 */
+        html { background: #f5f0e8; }
+        html.app-booting, html.app-booting body { background: #f5f0e8 !important; }
+        html.app-booting body > nav,
+        html.app-booting body > .container { opacity: 0; }
+
         #homeSection .home-hero-title {
             left: 0 !important;
             right: 0 !important;
