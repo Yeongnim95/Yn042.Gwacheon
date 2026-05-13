@@ -4092,6 +4092,17 @@ function loadSerifFontStylesheet() {
     document.head.appendChild(link);
 }
 
+function loadSerifFontStylesheetIdle() {
+    // 非阻塞：等瀏覽器閒置時才載入宋體字體，不影響首屏渲染
+    if (document.getElementById(SERIF_FONT_STYLESHEET_ID)) return;
+    const load = () => loadSerifFontStylesheet();
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(load, { timeout: 3000 });
+    } else {
+        setTimeout(load, 2000);
+    }
+}
+
 function isBibleFontCommand(query) {
     const normalized = query.trim();
     if (!normalized || normalized.startsWith('@')) return false;
@@ -4145,7 +4156,19 @@ window.setBibleFontMode = (mode) => {
     if (picker) picker.textContent = message;
 };
 
-applyBibleFontPreference();
+// 啟動時只套用 data attribute，宋體 CSS 延遲到閒置時背景載入
+(function initBibleFont() {
+    const mode = getBibleFontMode();
+    if (document.body) document.body.dataset.bibleFont = mode;
+    if (mode === 'serif') {
+        // 等 DOM ready 後閒置時才偷偷載入，不阻塞首屏
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSerifFontStylesheetIdle, { once: true });
+        } else {
+            loadSerifFontStylesheetIdle();
+        }
+    }
+})();
 
 window.toggleAiPanel = () => {
     const panel = document.getElementById('aiPanel');
