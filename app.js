@@ -2125,19 +2125,11 @@ function waitForImageDecode(src, timeout = 2600) {
 }
 
 async function waitForHomeFirstPaintAssets() {
+    // 只等字體，不等圖片（圖片已在 index.html preload，背景自己載入）
     const fontReady = document.fonts?.ready?.catch?.(() => null) || Promise.resolve();
-    // 強制觸發圖片載入（Loading 畫面可能遮住導致圖片不觸發）
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = '/bible-bg.avif';
-    document.head.appendChild(link);
     await Promise.race([
-        Promise.all([
-            waitForImageDecode('/bible-bg.avif'),
-            fontReady
-        ]),
-        new Promise(resolve => setTimeout(resolve, 1800)) // 縮短保底時間
+        fontReady,
+        new Promise(resolve => setTimeout(resolve, 800))
     ]);
 }
 
