@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260517031345">
-<link rel="stylesheet" href="/fonts.css?v=20260517031345">
+<link rel="modulepreload" href="/app.js?v=20260517043456">
+<link rel="stylesheet" href="/fonts.css?v=20260517043456">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260517031345">
+<link rel="stylesheet" href="/style.css?v=20260517043456">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260517031345';
+link.href = '/fonts-serif.css?v=20260517043456';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -40,19 +40,19 @@ right: 0 !important;
 <div class="nav-left">
 <div class="nav-title"><img src="/logo-20260509.avif" alt="logo" width="28" height="28" decoding="async" fetchpriority="high" style="width:28px;height:28px;vertical-align:middle;"></div>
 <div class="menu-toggle" onclick="window.toggleMenu()">
-<span class="hamburger-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+<span id="current-page-icon" class="nav-current-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg></span>
 <span id="current-page-title">홈</span>
 <span class="dropdown-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
 </div>
 <div class="menu-dropdown" id="menuDropdown">
 <div class="menu-category" id="menu-category-home">
 <div class="menu-category-title home-link" onclick="window.switchPage('home')">
-<span id="menu-home-title">🏠 홈</span>
+<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg></span><span id="menu-home-title">홈</span></span>
 </div>
 </div>
 <div class="menu-category" id="menu-category-faith-auto">
 <div class="menu-category-title" onclick="window.toggleSubMenu('faith-auto')">
-<span id="menu-faith-auto-title">에이전트 관리</span>
+<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="8" rx="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.6 2.6M16.4 16.4 19 19M19 5l-2.6 2.6M7.6 16.4 5 19"/></svg></span><span id="menu-faith-auto-title">에이전트 관리</span></span>
 <span class="submenu-arrow">▶</span>
 </div>
 <div class="menu-submenu" id="submenu-faith-auto">
@@ -60,7 +60,7 @@ right: 0 !important;
 </div>
 <div class="menu-category" id="menu-category-books">
 <div class="menu-category-title" onclick="window.toggleSubMenu('books')">
-<span id="menu-books-title">서적</span>
+<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5c2.2-.9 4.6-.6 7.5 1.1v12.2c-2.7-1.6-5.1-2-7.5-1.1z"/><path d="M19.5 5.5c-2.2-.9-4.6-.6-7.5 1.1v12.2c2.7-1.6 5.1-2 7.5-1.1z"/><path d="M12 6.6v12.2"/></svg></span><span id="menu-books-title">서적</span></span>
 <span class="submenu-arrow">▶</span>
 </div>
 <div class="menu-submenu" id="submenu-books">
@@ -70,7 +70,7 @@ right: 0 !important;
 </div>
 <div class="menu-category" id="menu-category-fruit">
 <div class="menu-category-title" onclick="window.toggleSubMenu('fruit')">
-<span id="menu-fruit-title">열매 정보</span>
+<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h13"/><path d="M14.8 4.2 19.8 9.2"/><path d="M17.9 6.1 8.2 15.8 4.8 17l1.2-3.4 9.7-9.7z"/></svg></span><span id="menu-fruit-title">열매 정보</span></span>
 <span class="submenu-arrow">▶</span>
 </div>
 <div class="menu-submenu" id="submenu-fruit">
@@ -80,7 +80,7 @@ right: 0 !important;
 </div>
 <div class="menu-category" id="menu-category-settings">
 <div class="menu-category-title settings-link" onclick="window.switchPage('settings')">
-<span id="menu-settings-title">설정</span>
+<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M2.8 12h2.4M18.8 12h2.4M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><path d="M8.8 3.7 7.7 6.1M16.3 17.9l-1.1 2.4M3.7 15.2l2.4 1.1M17.9 7.7l2.4 1.1M3.7 8.8l2.4-1.1M17.9 16.3l2.4-1.1M8.8 20.3l-1.1-2.4M16.3 6.1l-1.1-2.4"/></svg></span><span id="menu-settings-title">설정</span></span>
 </div>
 </div>
 </div>
@@ -791,6 +791,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260517031345"></script>
+<script type="module" src="/app.js?v=20260517043456"></script>
 </body>
 </html>
