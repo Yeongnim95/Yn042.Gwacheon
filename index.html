@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260517191416">
-<link rel="stylesheet" href="/fonts.css?v=20260517191416">
+<link rel="modulepreload" href="/app.js?v=20260519000341">
+<link rel="stylesheet" href="/fonts.css?v=20260519000341">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260517191416">
+<link rel="stylesheet" href="/style.css?v=20260519000341">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260517191416';
+link.href = '/fonts-serif.css?v=20260519000341';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -588,35 +588,41 @@ onkeydown="window.handleSearchKeydown(event)">
 </div>
 <div id="backendSection" class="page-section">
 <h2 id="txt-backend-header">교류 관리</h2>
-<div class="backend-toolbar">
-<div class="toolbar-left">
-<span class="stat-item" id="txt-total-count">섭외자: 0명</span>
-<span class="stat-divider">|</span>
-<span class="stat-item highlight-stat" id="txt-interaction-count">주간 교류: 0명</span>
+<div class="exchange-overview-bar">
+<div class="exchange-stat">
+<span class="exchange-stat-label" id="txt-today-active-label">今日活躍</span>
+<strong id="txt-today-active-count">0人</strong>
+</div>
+<div class="exchange-stat">
+<span class="exchange-stat-label" id="txt-week-active-label">本週活躍</span>
+<strong id="txt-interaction-count">0人</strong>
+</div>
+<div class="exchange-stat">
+<span class="exchange-stat-label" id="txt-high-active-label">高活躍</span>
+<strong id="txt-high-active-count">0人</strong>
+</div>
+<div class="exchange-stat">
+<span class="exchange-stat-label" id="txt-contact-exchanged-label">交換聯絡</span>
+<strong id="txt-contact-exchanged-count">0人</strong>
+</div>
+<div class="exchange-overview-total" id="txt-total-count">涉外者 0人</div>
+</div>
+<div class="exchange-list-tools">
+<div class="exchange-sort">
+<button class="exchange-sort-btn" id="exchangeSortBtn" onclick="window.toggleExchangeSortMenu()">排序：最近日期 ▾</button>
+<div class="exchange-sort-menu" id="exchangeSortMenu">
+<button onclick="window.setExchangeSort('date')" id="exchangeSortDate">最近日期</button>
+<button onclick="window.setExchangeSort('activity')" id="exchangeSortActivity">活躍度</button>
+<button onclick="window.setExchangeSort('id')" id="exchangeSortId">編號</button>
+</div>
 </div>
 </div>
 <div class="list-container" id="dataListContainer">
-<div class="list-header-row grid-row">
-<div class="check-cell"></div>
-<div></div>
-<div class="sortable" onclick="window.toggleSortBy('id')">
-<span id="col-id">번호</span> <span id="sortIconId"></span>
-</div>
-<div class="sortable" onclick="window.toggleSortBy('activity')">
-<span id="col-activity">활동</span> <span id="sortIconActivity"></span>
-</div>
-<div class="sortable" onclick="window.toggleSortBy('name')">
-<span id="col-name">이름</span> <span id="sortIconName"></span>
-</div>
-<div class="sortable" onclick="window.toggleSortBy('date')">
-<span id="col-date">최근 날짜</span> <span id="sortIconDate">▼</span>
-</div>
-<div class="action-cell"></div>
-</div>
 <div id="dataList">
 <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
 </div>
 </div>
+<div class="exchange-detail-view" id="exchangeDetailView"></div>
 </div>
 <div id="offlineBackendSection" class="page-section">
 <h2 id="txt-offline-backend-header">오프라인 데이터 관리</h2>
@@ -791,6 +797,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260517191416"></script>
+<script type="module" src="/app.js?v=20260519000341"></script>
 </body>
 </html>
