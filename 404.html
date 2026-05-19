@@ -10,7 +10,7 @@ var l = window.location;
 // 已知的 SPA 路由頁面
 var validPages = ['bible','lords-prayer','entry','backend','profile','faith-auto','faith-chart','daily-faith','offline-entry','offline-backend','settings','home'];
 var path = l.pathname.replace(/^\//, '').replace(/\/$/, '');
-if (validPages.indexOf(path) !== -1 || /^bible\/[a-z0-9]+\d+$/i.test(path)) {
+if (validPages.indexOf(path) !== -1 || /^bible\/[a-z0-9]+\d+$/i.test(path) || /^backend\/[^/]+$/i.test(path)) {
 // 是 SPA 頁面，轉回首頁讓 JS 處理
 l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/' + '?p=' + encodeURIComponent(path));
 }
@@ -45,24 +45,12 @@ font-size: 1.1rem;
 color: #888;
 margin-bottom: 25px;
 }
-.back-btn {
-display: inline-block;
-padding: 12px 30px;
-background: #43a047;
-color: white;
-border-radius: 8px;
-text-decoration: none;
-font-weight: 600;
-transition: filter 0.2s;
-}
-.back-btn:hover { filter: brightness(1.1); }
 </style>
 </head>
 <body>
 <div class="error-box">
 <div class="error-code">404</div>
 <div class="error-msg">페이지를 찾을 수 없습니다</div>
-<a href="/" class="back-btn">🌱 홈으로 돌아가기</a>
 </div>
 </body>
 </html>
