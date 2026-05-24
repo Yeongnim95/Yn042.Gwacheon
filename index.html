@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260524195654">
-<link rel="stylesheet" href="/fonts.css?v=20260524195654">
+<link rel="modulepreload" href="/app.js?v=20260525023856">
+<link rel="stylesheet" href="/fonts.css?v=20260525023856">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260524195654">
+<link rel="stylesheet" href="/style.css?v=20260525023856">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260524195654';
+link.href = '/fonts-serif.css?v=20260525023856';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -86,16 +86,22 @@ right: 0 !important;
 </div>
 </div>
 <div class="settings-group">
+<button class="nav-bible-search-btn" id="navBibleSearchBtn" onclick="window.openBibleSearch()" title="搜尋經文" aria-label="搜尋經文">
+<svg viewBox="0 0 512 512" aria-hidden="true">
+<rect x="62" y="62" width="388" height="388" rx="38"/>
+<path d="M132 142h248"/>
+<path d="M132 234h248"/>
+<path d="M132 342h84"/>
+<circle cx="323" cy="342" r="74"/>
+<path d="m377 396 72 72"/>
+</svg>
+</button>
 <button class="nav-ai-btn" onclick="window.toggleAiPanel()" title="AI Assistant">
 <span class="nav-ai-text">AI</span>
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
 </svg>
 </button>
-<select class="lang-select" onchange="window.setLanguage(this.value)">
-<option value="ko">한국어</option>
-<option value="zh">中文</option>
-</select>
 </div>
 </nav>
 <div class="ai-panel-overlay" id="aiPanelOverlay" onclick="window.toggleAiPanel()"></div>
@@ -340,16 +346,6 @@ CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
 <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
 </div>
 </div>
-</div>
-<div class="bible-fab-container" id="bibleFabContainer">
-<button class="bible-fab-main" id="bibleFabMain" onclick="window.openBibleSearch()" title="搜尋">
-<span id="bibleFabIcon" class="bible-fab-icon">
-<svg viewBox="0 0 24 24" aria-hidden="true">
-<circle cx="11" cy="11" r="7"/>
-<path d="M20 20l-4.2-4.2"/>
-</svg>
-</span>
-</button>
 </div>
 <div class="copy-mode-panel" id="copyModePanel">
 <div class="copy-mode-header">
@@ -760,6 +756,33 @@ AI
 </div>
 </div>
 <div class="settings-block">
+<div class="settings-block-title" id="txt-settings-language-section">언어</div>
+<div class="settings-card" id="settingsLanguageCard">
+<div class="settings-card-header">
+<div class="settings-card-main">
+<div class="settings-card-title" id="txt-settings-language-title">표시 언어</div>
+<div class="settings-card-desc" id="txt-settings-language-desc">웹사이트에 표시할 언어를 선택하세요</div>
+</div>
+</div>
+<div class="settings-font-options settings-language-options" id="settingsLanguageOptions">
+<label class="settings-font-option">
+<input type="radio" name="settingsLanguageMode" value="ko" id="settingsLanguageKo" onchange="window.setLanguage(this.value)">
+<span class="settings-font-option-content">
+<span class="settings-font-option-title" id="txt-settings-language-ko">한국어</span>
+<span class="settings-font-option-preview" id="txt-settings-language-ko-preview">한국어로 보기</span>
+</span>
+</label>
+<label class="settings-font-option">
+<input type="radio" name="settingsLanguageMode" value="zh" id="settingsLanguageZh" onchange="window.setLanguage(this.value)">
+<span class="settings-font-option-content">
+<span class="settings-font-option-title" id="txt-settings-language-zh">中文</span>
+<span class="settings-font-option-preview" id="txt-settings-language-zh-preview">以繁體中文顯示</span>
+</span>
+</label>
+</div>
+</div>
+</div>
+<div class="settings-block">
 <div class="settings-block-title" id="txt-settings-about-section">정보</div>
 <div class="settings-card">
 <div class="settings-meta-row">
@@ -831,6 +854,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260524195654"></script>
+<script type="module" src="/app.js?v=20260525023856"></script>
 </body>
 </html>
