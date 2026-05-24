@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260522014801">
-<link rel="stylesheet" href="/fonts.css?v=20260522014801">
+<link rel="modulepreload" href="/app.js?v=20260524195654">
+<link rel="stylesheet" href="/fonts.css?v=20260524195654">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260522014801">
+<link rel="stylesheet" href="/style.css?v=20260524195654">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260522014801';
+link.href = '/fonts-serif.css?v=20260524195654';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -270,29 +270,6 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div class="bible-collection-section" id="bibleCollectionSection">
 <div class="bible-collection-title-row">
 <div class="bible-section-title bible-collection-title" id="txt-bible-collection-title">收藏</div>
-</div>
-<div class="bible-collection-sync">
-<span class="bible-collection-sync-status local" id="bibleCollectionSyncStatus">
-<svg class="bible-collection-storage-icon local-icon" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v13A2.5 2.5 0 0 1 16.5 21h-9A2.5 2.5 0 0 1 5 18.5v-13Z"/>
-<path d="M8 7h8M8 11h8M8 15h5"/>
-</svg>
-<svg class="bible-collection-storage-icon cloud-icon" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M7.5 18.5h9.2a4.3 4.3 0 0 0 .7-8.55A6 6 0 0 0 6.2 8.8 4.9 4.9 0 0 0 7.5 18.5Z"/>
-</svg>
-<span id="bibleCollectionSyncStatusText">本地儲存</span>
-</span>
-<button type="button" class="bible-collection-cloud-btn" onclick="window.toggleBibleCloudMenu(event)">
-<svg viewBox="0 0 24 24" aria-hidden="true">
-<path d="M7.5 18.5h9.2a4.3 4.3 0 0 0 .7-8.55A6 6 0 0 0 6.2 8.8 4.9 4.9 0 0 0 7.5 18.5Z"/>
-<path d="M12 12v5M9.8 14.2 12 12l2.2 2.2"/>
-</svg>
-<span id="txt-bible-cloud-login">雲端登入儲存</span>
-</button>
-<div class="bible-cloud-menu" id="bibleCloudMenu">
-<button type="button" id="txt-bible-cloud-google" onclick="window.connectBibleCollection('google')">Google Drive</button>
-<button type="button" id="txt-bible-cloud-onedrive" onclick="window.connectBibleCollection('onedrive')">OneDrive</button>
-</div>
 </div>
 <div class="bible-collection-grid">
 <section class="bible-collection-card">
@@ -854,6 +831,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260522014801"></script>
+<script type="module" src="/app.js?v=20260524195654"></script>
 </body>
 </html>
