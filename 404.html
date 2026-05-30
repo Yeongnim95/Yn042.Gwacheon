@@ -1,1 +1,56 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><script>var pathSegmentsToKeep=0,l=window.location,validPages=["bible","lords-prayer","entry","backend","profile","faith-auto","faith-chart","daily-faith","offline-entry","offline-backend","settings","home"],path=l.pathname.replace(/^\//,"").replace(/\/$/,"");(-1!==validPages.indexOf(path)||/^bible\/[a-z0-9]+\d+$/i.test(path)||/^backend\/[^/]+$/i.test(path))&&l.replace(l.protocol+"//"+l.hostname+(l.port?":"+l.port:"")+"/?p="+encodeURIComponent(path))</script><meta name="theme-color" content="#f5f0e8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>404 - Page Not Found</title><style>body{font-family:"Noto Sans KR","Noto Sans TC",-apple-system,sans-serif;background:#f5f0e8;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;color:#333}.error-box{text-align:center;padding:40px}.error-code{font-size:4rem;font-weight:900;color:#43a047;margin-bottom:10px}.error-msg{font-size:1.1rem;color:#888;margin-bottom:25px}</style></head><body><div class="error-box"><div class="error-code">404</div><div class="error-msg">페이지를 찾을 수 없습니다</div></div></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+// GitHub Pages SPA 路由：將 clean URL 導回 index.html
+// 例如 /bible、/bible/gen1 → 載入 index.html 並由 JS 處理路由
+var pathSegmentsToKeep = 0; // 根目錄部署，設為 0
+var l = window.location;
+// 已知的 SPA 路由頁面
+var validPages = ['bible','lords-prayer','entry','backend','profile','faith-auto','faith-chart','daily-faith','offline-entry','offline-backend','settings','home'];
+var path = l.pathname.replace(/^\//, '').replace(/\/$/, '');
+if (validPages.indexOf(path) !== -1 || /^bible\/[a-z0-9]+\d+$/i.test(path) || /^backend\/[^/]+$/i.test(path)) {
+// 是 SPA 頁面，轉回首頁讓 JS 處理
+l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/' + '?p=' + encodeURIComponent(path));
+}
+// 不是已知頁面，顯示 404
+</script>
+<meta name="theme-color" content="#f5f0e8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 - Page Not Found</title>
+<style>
+body {
+font-family: "Noto Sans KR", "Noto Sans TC", -apple-system, sans-serif;
+background: #f5f0e8;
+display: flex;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+margin: 0;
+color: #333;
+}
+.error-box {
+text-align: center;
+padding: 40px;
+}
+.error-code {
+font-size: 4rem;
+font-weight: 900;
+color: #43a047;
+margin-bottom: 10px;
+}
+.error-msg {
+font-size: 1.1rem;
+color: #888;
+margin-bottom: 25px;
+}
+</style>
+</head>
+<body>
+<div class="error-box">
+<div class="error-code">404</div>
+<div class="error-msg">페이지를 찾을 수 없습니다</div>
+</div>
+</body>
+</html>
