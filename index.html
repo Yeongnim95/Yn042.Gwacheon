@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260531011933">
-<link rel="stylesheet" href="/fonts.css?v=20260531011933">
+<link rel="modulepreload" href="/app.js?v=20260531193727">
+<link rel="stylesheet" href="/fonts.css?v=20260531193727">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260531011933">
+<link rel="stylesheet" href="/style.css?v=20260531193727">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260531011933';
+link.href = '/fonts-serif.css?v=20260531193727';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -243,6 +243,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <span class="hint-tag" onclick="window.appendHint(this)">격려 메시지</span>
 <span class="hint-tag" onclick="window.appendHint(this)">성경 말씀 나누기</span>
 </div>
+<button type="button" class="inline-home-link ai-compose-home-link" onclick="window.switchPage('home')">← 홈 / 回首頁</button>
 <button class="submit-btn ai-compose-btn" onclick="window.generateCompose()" id="btn-ai-compose-generate">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>AI 메시지 생성
 </button>
@@ -844,16 +845,21 @@ AI
 </div>
 <div class="auth-gate-overlay" id="authGateModal">
 <div class="auth-gate-box">
-<div class="auth-gate-icon">🔒</div>
-<div class="auth-gate-title" id="authGateTitle">비밀번호 입력 / 請輸入密碼</div>
+<div class="auth-gate-icon" aria-hidden="true">
+<svg viewBox="0 0 512 512">
+<path d="M76 210h36v-44C112 74.6 176.6 8 256 8s144 66.6 144 158v44h36v294H76V210Zm72 0h216v-44c0-71.6-47.6-122-108-122S148 94.4 148 166v44Zm-36 36v222h288V246H112Zm144 56c33.1 0 60 26.9 60 60 0 21-10.8 39.5-27.1 50.2L306 452H206l17.1-39.8C206.8 401.5 196 383 196 362c0-33.1 26.9-60 60-60Zm0 36c-13.3 0-24 10.7-24 24 0 10.4 6.7 19.3 16 22.6l8 2.8 8-2.8c9.3-3.3 16-12.2 16-22.6 0-13.3-10.7-24-24-24Z"/>
+</svg>
+</div>
+<div class="auth-gate-title" id="authGateTitle">비밀번호 입력</div>
 <input type="password" class="auth-gate-input" id="authGateInput"
 placeholder="••••••" autocomplete="off" inputmode="numeric">
 <div class="auth-gate-error" id="authGateError"></div>
+<button type="button" class="inline-home-link auth-gate-home-link" id="authGateHome">← 홈</button>
 <button class="auth-gate-submit" id="authGateSubmit" type="button">
-<span id="authGateSubmitText">확인 / 確認</span>
+<span id="authGateSubmitText">확인</span>
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260531011933"></script>
+<script type="module" src="/app.js?v=20260531193727"></script>
 </body>
 </html>
