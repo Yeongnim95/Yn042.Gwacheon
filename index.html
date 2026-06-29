@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260608013455">
-<link rel="stylesheet" href="/fonts.css?v=20260608013455">
+<link rel="modulepreload" href="/app.js?v=20260609151351">
+<link rel="stylesheet" href="/fonts.css?v=20260609151351">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260608013455">
+<link rel="stylesheet" href="/style.css?v=20260609151351">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260608013455';
+link.href = '/fonts-serif.css?v=20260609151351';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -296,6 +296,21 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 </svg>
 <span id="txt-bible-cloud-login">雲端登入儲存</span>
 </button>
+<div class="bible-cloud-manage-wrap" id="bibleCloudManageWrap">
+<button type="button" class="bible-collection-manage-btn" id="bibleCollectionManageBtn" onclick="window.toggleBibleCollectionDataMenu(event)">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M4 7h16M4 12h16M4 17h16"></path>
+<circle cx="8" cy="7" r="1.8"></circle>
+<circle cx="14" cy="12" r="1.8"></circle>
+<circle cx="10" cy="17" r="1.8"></circle>
+</svg>
+<span id="txt-bible-data-manage">資料管理</span>
+</button>
+<div class="bible-cloud-menu bible-cloud-manage-menu" id="bibleCloudManageMenu">
+<div class="bible-cloud-sync-time" id="bibleCloudSyncTime">同步時間：尚未同步</div>
+<button type="button" class="bible-cloud-logout-btn" id="txt-bible-cloud-logout" onclick="window.logoutBibleCollectionCloud(event)">登出</button>
+</div>
+</div>
 </div>
 <div class="bible-collection-grid">
 <section class="bible-collection-card">
@@ -878,6 +893,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260608013455"></script>
+<script type="module" src="/app.js?v=20260609151351"></script>
 </body>
 </html>
