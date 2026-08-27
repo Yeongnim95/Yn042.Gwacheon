@@ -11,10 +11,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260827100202">
-<link rel="stylesheet" href="/fonts.css?v=20260827100202">
+<link rel="modulepreload" href="/app.js?v=20260827143053">
+<link rel="stylesheet" href="/fonts.css?v=20260827143053">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260827100202">
+<link rel="stylesheet" href="/style.css?v=20260827143053">
 <script>
 (function() {
 try {
@@ -22,7 +22,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260827100202';
+link.href = '/fonts-serif.css?v=20260827143053';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -96,6 +96,11 @@ right: 0 !important;
 <path d="m377 396 72 72"/>
 </svg>
 </button>
+<button class="nav-bible-display-btn" id="navBibleDisplayBtn" onclick="window.toggleBibleDisplayPanel()" title="經文顯示" aria-label="經文顯示" aria-expanded="false" aria-controls="bibleDisplayPanel">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<text x="12" y="16.6" text-anchor="middle">文</text>
+</svg>
+</button>
 <button class="nav-ai-btn" onclick="window.toggleAiPanel()" title="AI Assistant" aria-expanded="false" aria-controls="aiPanel">
 <span class="nav-ai-text">AI</span>
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -104,6 +109,42 @@ right: 0 !important;
 </button>
 </div>
 </nav>
+<div class="bible-display-overlay" id="bibleDisplayOverlay" onclick="window.closeBibleDisplayPanel()"></div>
+<section class="bible-display-panel" id="bibleDisplayPanel" role="dialog" aria-modal="true" aria-labelledby="bibleDisplayPanelTitle">
+<header class="bible-display-header">
+<h2 id="bibleDisplayPanelTitle">經文顯示</h2>
+<button type="button" class="bible-display-close" onclick="window.closeBibleDisplayPanel()" aria-label="關閉">✕</button>
+</header>
+<div class="bible-display-body">
+<div class="bible-display-control">
+<span class="bible-display-label" id="bibleDisplayLanguageLabel">經文語言</span>
+<div class="bible-display-segmented" role="group" aria-label="經文語言">
+<button type="button" data-bible-display-mode="both" onclick="window.setBibleDisplayMode('both')">中韓雙語</button>
+<button type="button" data-bible-display-mode="ko" onclick="window.setBibleDisplayMode('ko')">韓文</button>
+<button type="button" data-bible-display-mode="zh" onclick="window.setBibleDisplayMode('zh')">中文</button>
+</div>
+</div>
+<div class="bible-display-control">
+<span class="bible-display-label" id="bibleDisplaySizeLabel">文字大小</span>
+<div class="bible-display-size" role="group" aria-label="文字大小">
+<button type="button" data-bible-text-step="-2" onclick="window.setBibleTextStep(-2)">−2</button>
+<button type="button" data-bible-text-step="-1" onclick="window.setBibleTextStep(-1)">−1</button>
+<button type="button" data-bible-text-step="0" onclick="window.setBibleTextStep(0)">0</button>
+<button type="button" data-bible-text-step="1" onclick="window.setBibleTextStep(1)">+1</button>
+<button type="button" data-bible-text-step="2" onclick="window.setBibleTextStep(2)">+2</button>
+</div>
+</div>
+<div class="bible-display-divider"></div>
+<section class="bible-display-chapters">
+<header>
+<h3 id="bibleDisplayChaptersTitle">選擇章節</h3>
+<span id="bibleDisplayBookName"></span>
+</header>
+<div class="bible-display-chapter-grid" id="bibleDisplayChaptersGrid"></div>
+<p class="bible-display-empty" id="bibleDisplayEmpty">請先開啟一章經文</p>
+</section>
+</div>
+</section>
 <div class="ai-panel-overlay" id="aiPanelOverlay" onclick="window.toggleAiPanel()"></div>
 <div class="ai-panel" id="aiPanel">
 <div class="ai-panel-header">
@@ -893,6 +934,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260827100202"></script>
+<script type="module" src="/app.js?v=20260827143053"></script>
 </body>
 </html>
