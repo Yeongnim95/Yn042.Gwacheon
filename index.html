@@ -6,15 +6,17 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#f5f0e8" id="themeColorMeta">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="비공개의 새싹">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32-2.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16-2.png">
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260827143053">
-<link rel="stylesheet" href="/fonts.css?v=20260827143053">
+<link rel="modulepreload" href="/app.js?v=20260828015637">
+<link rel="stylesheet" href="/fonts.css?v=20260828015637">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260827143053">
+<link rel="stylesheet" href="/style.css?v=20260828015637">
 <script>
 (function() {
 try {
@@ -22,7 +24,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260827143053';
+link.href = '/fonts-serif.css?v=20260828015637';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -107,6 +109,13 @@ right: 0 !important;
 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
 </svg>
 </button>
+<button class="nav-notification-btn" id="navNotificationBtn" onclick="window.toggleNotificationPanel()" title="通知" aria-label="通知" aria-expanded="false" aria-controls="notificationPanel">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+<path d="M10 21h4"/>
+</svg>
+<span class="nav-notification-badge" id="navNotificationBadge" hidden>0</span>
+</button>
 </div>
 </nav>
 <div class="bible-display-overlay" id="bibleDisplayOverlay" onclick="window.closeBibleDisplayPanel()"></div>
@@ -173,6 +182,22 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div class="ai-panel-result" id="aiPanelResult"></div>
 </div>
 </div>
+<div class="notification-panel-overlay" id="notificationPanelOverlay" onclick="window.closeNotificationPanel()"></div>
+<section class="notification-panel" id="notificationPanel" role="dialog" aria-modal="true" aria-labelledby="notificationPanelTitle">
+<header class="notification-panel-header">
+<span class="notification-panel-title">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+<span id="notificationPanelTitle">通知</span>
+</span>
+<button type="button" class="notification-panel-close" onclick="window.closeNotificationPanel()" aria-label="關閉">✕</button>
+</header>
+<div class="notification-panel-body">
+<div class="notification-app-status" id="notificationAppStatus"></div>
+<button type="button" class="notification-permission-btn" id="notificationPermissionBtn" onclick="window.requestAppNotificationPermission()" hidden></button>
+<div class="notification-list" id="notificationList"></div>
+<p class="notification-empty" id="notificationEmpty" hidden></p>
+</div>
+</section>
 <div class="container">
 <div id="homeSection" class="page-section active-section">
 <div class="home-container">
@@ -934,6 +959,6 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260827143053"></script>
+<script type="module" src="/app.js?v=20260828015637"></script>
 </body>
 </html>
