@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<script src="/feature-flags.js"></script>
+<script>
+if (!window.APP_FEATURE_FLAGS || window.APP_FEATURE_FLAGS.fruitFeatures !== true) {
+window.location.replace('/');
+}
+</script>
 <meta name="theme-color" content="#f5f0e8" id="themeColorMeta">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32-2.png">
@@ -1206,4 +1212,4 @@ setInterval(checkForUpdates, 5 * 60 * 1000);
 };
 </script>
 </body>
-</html> 
+</html>
