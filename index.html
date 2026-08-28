@@ -13,10 +13,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260828103852">
-<link rel="stylesheet" href="/fonts.css?v=20260828103852">
+<link rel="modulepreload" href="/app.js?v=20260828142742">
+<link rel="stylesheet" href="/fonts.css?v=20260828142742">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260828103852">
+<link rel="stylesheet" href="/style.css?v=20260828142742">
 <script>
 (function() {
 try {
@@ -24,7 +24,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260828103852';
+link.href = '/fonts-serif.css?v=20260828142742';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -70,7 +70,7 @@ right: 0 !important;
 <button class="menu-btn" onclick="window.switchPage('lords-prayer')" id="btn-lords-prayer">주기도문</button>
 </div>
 </div>
-<div class="menu-category" id="menu-category-fruit">
+<div class="menu-category fruit-feature-entry is-feature-disabled" id="menu-category-fruit" aria-hidden="true">
 <div class="menu-category-title" onclick="window.toggleSubMenu('fruit')">
 <span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h13"/><path d="M14.8 4.2 19.8 9.2"/><path d="M17.9 6.1 8.2 15.8 4.8 17l1.2-3.4 9.7-9.7z"/></svg></span><span id="menu-fruit-title">열매 정보</span></span>
 <span class="submenu-arrow">▶</span>
@@ -252,7 +252,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div class="home-feature-desc" id="home-feat-auto-desc">신앙 생활을 체계적으로<br>관리하고 성장하는 도구</div>
 </div>
 </div>
-<div class="home-feature" onclick="window.switchPage('backend')">
+<div class="home-feature fruit-feature-entry is-feature-disabled" id="homeFeatureBackend" onclick="window.switchPage('backend')" aria-hidden="true">
 <div class="home-feature-img">
 <img src="cards-bg.avif" alt="Data Management" loading="lazy" decoding="async">
 </div>
@@ -277,7 +277,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div class="faith-content">
 <p id="txt-faith-auto-desc">신앙 생활을 체계적으로 관리하고 성장할 수 있는 자동화 도구입니다.</p>
 <div class="faith-auto-cards">
-<div class="faith-auto-card" onclick="window.switchPage('ai-compose')">
+<div class="faith-auto-card fruit-feature-entry is-feature-disabled" id="faithAutoComposeCard" onclick="window.switchPage('ai-compose')" aria-hidden="true">
 <div class="faith-auto-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
 <div class="faith-auto-card-title" id="faith-card-ai-compose">AI 통합 작문</div>
 <div class="faith-auto-card-desc" id="faith-card-ai-compose-desc">AI를 활용하여 섭외자에게 보낼 메시지를 자동으로 생성합니다.</div>
@@ -959,6 +959,7 @@ placeholder="••••••" autocomplete="off" inputmode="numeric">
 </button>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260828103852"></script>
+<script src="/feature-flags.js?v=20260828142742"></script>
+<script type="module" src="/app.js?v=20260828142742"></script>
 </body>
 </html>

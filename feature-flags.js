@@ -1,0 +1,1 @@
+window.APP_FEATURE_FLAGS=Object.freeze({fruitFeatures:!1});
