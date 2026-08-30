@@ -13,10 +13,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260828142742">
-<link rel="stylesheet" href="/fonts.css?v=20260828142742">
+<link rel="modulepreload" href="/app.js?v=20260829204228">
+<link rel="stylesheet" href="/fonts.css?v=20260829204228">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260828142742">
+<link rel="stylesheet" href="/style.css?v=20260829204228">
 <script>
 (function() {
 try {
@@ -24,7 +24,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260828142742';
+link.href = '/fonts-serif.css?v=20260829204228';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -68,16 +68,6 @@ right: 0 !important;
 <div class="menu-submenu" id="submenu-books">
 <button class="menu-btn" onclick="window.switchPage('bible')" id="btn-bible">성경</button>
 <button class="menu-btn" onclick="window.switchPage('lords-prayer')" id="btn-lords-prayer">주기도문</button>
-</div>
-</div>
-<div class="menu-category fruit-feature-entry is-feature-disabled" id="menu-category-fruit" aria-hidden="true">
-<div class="menu-category-title" onclick="window.toggleSubMenu('fruit')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20h13"/><path d="M14.8 4.2 19.8 9.2"/><path d="M17.9 6.1 8.2 15.8 4.8 17l1.2-3.4 9.7-9.7z"/></svg></span><span id="menu-fruit-title">열매 정보</span></span>
-<span class="submenu-arrow">▶</span>
-</div>
-<div class="menu-submenu" id="submenu-fruit">
-<button class="menu-btn" onclick="window.switchPage('backend')" id="btn-backend">교류 관리</button>
-<button class="menu-btn" onclick="window.switchPage('ai-compose')" id="btn-ai-compose">AI 통합 작문</button>
 </div>
 </div>
 <div class="menu-category" id="menu-category-settings">
@@ -168,7 +158,7 @@ right: 0 !important;
 <div class="ai-panel-body">
 <div class="ai-panel-input-wrap">
 <input type="text" class="ai-panel-input" id="aiPanelInput"
-placeholder="創1:1 中 / 到 啟1章 / 聖經字體 / @0012 指示"
+placeholder="創1:1 中 / 到 啟1章 / 聖經字體"
 onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <button class="ai-panel-send" onclick="window.aiPanelSearch()">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
@@ -177,7 +167,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 </button>
 </div>
 <div class="ai-panel-note">
-<span style="color: var(--text-secondary); font-size: 11px;" id="aiPanelNote">經文: 創1:1 中 | 跳轉: 到 啟1章 | 字體: 聖經字體 | 作文: @編號 指示</span>
+<span style="color: var(--text-secondary); font-size: 11px;" id="aiPanelNote">經文: 創1:1 中 | 跳轉: 到 啟1章 | 字體: 聖經字體</span>
 </div>
 <div class="ai-panel-result" id="aiPanelResult"></div>
 </div>
@@ -252,18 +242,6 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div class="home-feature-desc" id="home-feat-auto-desc">신앙 생활을 체계적으로<br>관리하고 성장하는 도구</div>
 </div>
 </div>
-<div class="home-feature fruit-feature-entry is-feature-disabled" id="homeFeatureBackend" onclick="window.switchPage('backend')" aria-hidden="true">
-<div class="home-feature-img">
-<img src="cards-bg.avif" alt="Data Management" loading="lazy" decoding="async">
-</div>
-<div class="home-feature-text">
-<div class="home-feature-icon">
-<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="12" width="32" height="28" rx="2"/><path d="M8 12l4-6h24l4 6M14 22h20M14 30h16M14 38h10"/></svg>
-</div>
-<div class="home-feature-title" id="home-feat-data-title">데이터 관리</div>
-<div class="home-feature-desc" id="home-feat-data-desc">기록된 데이터를 확인하고<br>열매를 관리하세요</div>
-</div>
-</div>
 </div>
 <div class="home-copyright-section">
 <div class="home-copyright-main" id="copyrightMain">Yeongnim 개인 소유</div>
@@ -276,52 +254,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <h2 id="txt-faith-auto-header">에이전트 관리</h2>
 <div class="faith-content">
 <p id="txt-faith-auto-desc">신앙 생활을 체계적으로 관리하고 성장할 수 있는 자동화 도구입니다.</p>
-<div class="faith-auto-cards">
-<div class="faith-auto-card fruit-feature-entry is-feature-disabled" id="faithAutoComposeCard" onclick="window.switchPage('ai-compose')" aria-hidden="true">
-<div class="faith-auto-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-<div class="faith-auto-card-title" id="faith-card-ai-compose">AI 통합 작문</div>
-<div class="faith-auto-card-desc" id="faith-card-ai-compose-desc">AI를 활용하여 섭외자에게 보낼 메시지를 자동으로 생성합니다.</div>
-</div>
-</div>
-</div>
-</div>
-<div id="aiComposeSection" class="page-section">
-<h2 id="txt-ai-compose-header">AI 통합 작문</h2>
-<div class="ai-compose-container">
-<p id="txt-ai-compose-desc" class="ai-compose-desc">섭외자의 번호를 입력하면 최신 대화 기록을 불러와, AI가 맞춤형 메시지를 생성합니다.</p>
-<div class="ai-compose-step">
-<div class="ai-compose-step-label" id="ai-compose-step1-label">① 섭외자 번호 입력</div>
-<div class="ai-compose-input-row">
-<input type="text" id="aiComposeIdInput" placeholder="0000" maxlength="4" inputmode="numeric" oninput="window.loadComposeTarget(this.value)">
-<span class="ai-compose-name" id="aiComposeTargetName"></span>
-</div>
-</div>
-<div class="ai-compose-step" id="aiComposePreviewStep" style="display:none;">
-<div class="ai-compose-step-label" id="ai-compose-step2-label">② 최근 대화 내용</div>
-<div class="ai-compose-preview-box" id="aiComposePreview"></div>
-</div>
-<div class="ai-compose-step" id="aiComposeInstructionStep" style="display:none;">
-<div class="ai-compose-step-label" id="ai-compose-step3-label">③ AI에게 지시하기</div>
-<textarea id="aiComposeInstruction" rows="4" placeholder=""></textarea>
-<div class="ai-compose-instruction-hints" id="aiComposeHints">
-<span class="hint-tag" onclick="window.appendHint(this)">상대방의 관심사 물어보기</span>
-<span class="hint-tag" onclick="window.appendHint(this)">다음 만남 약속잡기</span>
-<span class="hint-tag" onclick="window.appendHint(this)">격려 메시지</span>
-<span class="hint-tag" onclick="window.appendHint(this)">성경 말씀 나누기</span>
-</div>
-<button type="button" class="inline-home-link ai-compose-home-link" onclick="window.switchPage('home')">← 홈 / 回首頁</button>
-<button class="submit-btn ai-compose-btn" onclick="window.generateCompose()" id="btn-ai-compose-generate">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="vertical-align:middle;margin-right:4px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>AI 메시지 생성
-</button>
-</div>
-<div class="ai-compose-step" id="aiComposeResultStep" style="display:none;">
-<div class="ai-compose-step-label" id="ai-compose-step4-label">④ 생성 결과</div>
-<div class="ai-compose-result-box" id="aiComposeResult"></div>
-<div class="ai-compose-actions">
-<button class="ai-compose-action-btn copy" onclick="window.copyComposeResult()" id="btn-compose-copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:3px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>복사</button>
-<button class="ai-compose-action-btn retry" onclick="window.generateCompose()" id="btn-compose-retry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle;margin-right:3px"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg>다시 생성</button>
-</div>
-</div>
+<div class="faith-auto-cards"></div>
 </div>
 </div>
 <div id="faithChartSection" class="page-section">
@@ -572,225 +505,6 @@ AI
 <button class="bible-partial-copy-btn" id="partialCopyBtn" onclick="window.copySelectedText()">複製選取的文字</button>
 </div>
 </div>
-<div id="entrySection" class="page-section">
-<h2 id="txt-entry-header">전도 섭외자 등록</h2>
-<div id="statusMsg" class="status-bar"></div>
-<div class="form-grid">
-<div class="form-group">
-<label id="lbl-id">번호</label>
-<input type="text" id="idInput" placeholder="9999" oninput="window.handleIdInput()">
-</div>
-<div class="form-group">
-<label id="lbl-name">이름</label>
-<input type="text" id="nameInput" placeholder="이름 입력" oninput="window.handleNameInput()">
-</div>
-<div class="form-group">
-<label id="lbl-date">날짜</label>
-<input type="date" id="recordDate">
-</div>
-<div class="form-group">
-<label id="lbl-type">회신 유형</label>
-<select id="replyType">
-<option value="me" id="opt-me">내가 회신</option>
-<option value="other" id="opt-other">상대방 회신</option>
-</select>
-</div>
-<div class="form-group form-full-width">
-<label id="lbl-content">내용</label>
-<textarea id="content" rows="5" placeholder="내용을 입력하세요..."></textarea>
-</div>
-<div class="form-group form-full-width">
-<div class="message-points-section" id="messagePointsSection">
-<div class="message-points-header">
-<span class="message-points-title" id="messagePointsTitle">📌 訊息重點</span>
-<button class="message-points-add-btn" onclick="window.addMessagePoint()" title="新增重點">+</button>
-</div>
-<div class="message-points-list" id="messagePointsList">
-<div class="message-points-empty" id="messagePointsEmpty">點擊 + 新增訊息重點</div>
-</div>
-</div>
-</div>
-<div class="form-group form-full-width">
-<div class="message-points-section" id="confirmPointsSection">
-<div class="message-points-header">
-<span class="message-points-title" id="confirmPointsTitle">❓ 需確認的訊息</span>
-<button class="message-points-add-btn" onclick="window.addConfirmPoint()" title="新增確認項目">+</button>
-</div>
-<div class="message-points-list" id="confirmPointsList">
-<div class="message-points-empty" id="confirmPointsEmpty">點擊 + 新增需確認的訊息</div>
-</div>
-</div>
-</div>
-</div>
-<button class="submit-btn" onclick="window.submitData()" id="btn-submit">등록하기 (Cloud Sync)</button>
-</div>
-<div id="profileSection" class="page-section">
-<h2 id="txt-profile-header">개인정보 등록</h2>
-<div id="profileStatusMsg" class="status-bar"></div>
-<div class="form-grid">
-<div class="form-group">
-<label id="lbl-profile-id">번호</label>
-<input type="text" id="profileIdInput" placeholder="9999" oninput="window.handleProfileIdInput()">
-</div>
-<div class="form-group">
-<label id="lbl-profile-name">이름</label>
-<input type="text" id="profileNameInput" placeholder="이름 입력" oninput="window.handleProfileNameInput()">
-</div>
-<div class="form-group">
-<label id="lbl-profile-location">거주지</label>
-<input type="text" id="profileLocation" placeholder="">
-</div>
-<div class="form-group">
-<label id="lbl-profile-phone">휴대폰</label>
-<input type="tel" id="profilePhone" placeholder="">
-</div>
-<div class="form-group">
-<label id="lbl-profile-contact">연락 방법</label>
-<select id="profileContact">
-<option value="" id="opt-contact-none">선택하세요</option>
-<option value="FACEBOOK">FACEBOOK</option>
-<option value="IG">IG</option>
-<option value="SLOWLY">SLOWLY</option>
-<option value="LINE">LINE</option>
-</select>
-</div>
-<div class="form-group">
-<label id="lbl-profile-contact-id">연락처 ID</label>
-<input type="text" id="profileContactId" placeholder="">
-</div>
-<div class="form-group form-full-width">
-<label id="lbl-profile-birthday">생일 / 나이</label>
-<div class="birthday-input-wrapper">
-<input type="text" id="profileBirthYear" placeholder="YYYY" maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthYearInput(this)">
-<span class="birthday-separator">/</span>
-<input type="text" id="profileBirthMonth" placeholder="MM" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthMonthInput(this)">
-<span class="birthday-separator">/</span>
-<input type="text" id="profileBirthDay" placeholder="DD" maxlength="2" inputmode="numeric" pattern="[0-9]*" oninput="window.handleBirthDayInput(this)">
-<span class="birthday-separator">,</span>
-<input type="text" id="profileAge" placeholder="나이" maxlength="3" inputmode="numeric" pattern="[0-9]*" class="age-input">
-<span class="age-unit" id="age-unit">세</span>
-</div>
-</div>
-<div class="form-group">
-<label id="lbl-profile-mbti">MBTI</label>
-<input type="text" id="profileMbti" placeholder="MBTI" maxlength="4" style="text-transform: uppercase;">
-</div>
-<div class="form-group">
-<label id="lbl-profile-job">직업</label>
-<input type="text" id="profileJob" placeholder="">
-</div>
-</div>
-<button class="submit-btn" onclick="window.saveProfile()" id="btn-profile-save">저장하기</button>
-</div>
-<div id="offlineEntrySection" class="page-section">
-<h2 id="txt-offline-entry-header">오프라인 전도 등록</h2>
-<div id="offlineStatusMsg" class="status-bar"></div>
-<div class="form-grid">
-<div class="form-group">
-<label id="lbl-offline-id">번호</label>
-<input type="text" id="offlineIdInput" placeholder="5000" oninput="window.handleOfflineIdInput()">
-</div>
-<div class="form-group">
-<label id="lbl-offline-name">이름</label>
-<input type="text" id="offlineNameInput" placeholder="이름 입력" oninput="window.handleOfflineNameInput()">
-</div>
-<div class="form-group">
-<label id="lbl-offline-date">날짜</label>
-<input type="date" id="offlineRecordDate">
-</div>
-<div class="form-group">
-<label id="lbl-offline-location">장소</label>
-<div class="location-input-wrapper">
-<input type="text" id="offlineLocation" placeholder="">
-<button type="button" class="maps-btn" onclick="window.openGoogleMaps()" title="Google Maps에서 검색">📍</button>
-</div>
-</div>
-<div class="form-group">
-<label id="lbl-offline-activity">활동</label>
-<input type="text" id="offlineActivity" placeholder="">
-</div>
-<div class="form-group form-full-width">
-<label id="lbl-offline-content">섭외 내용</label>
-<textarea id="offlineContent" rows="5" placeholder="섭외 내용을 입력하세요..."></textarea>
-</div>
-</div>
-<button class="submit-btn" onclick="window.submitOfflineData()" id="btn-offline-submit">등록하기</button>
-</div>
-<div id="backendSection" class="page-section">
-<h2 id="txt-backend-header">교류 관리</h2>
-<div class="exchange-overview-bar">
-<div class="exchange-stat">
-<span class="exchange-stat-label" id="txt-today-active-label">今日活躍</span>
-<strong id="txt-today-active-count">0人</strong>
-</div>
-<div class="exchange-stat">
-<span class="exchange-stat-label" id="txt-week-active-label">本週活躍</span>
-<strong id="txt-interaction-count">0人</strong>
-</div>
-<div class="exchange-stat">
-<span class="exchange-stat-label" id="txt-high-active-label">高活躍</span>
-<strong id="txt-high-active-count">0人</strong>
-</div>
-<div class="exchange-stat">
-<span class="exchange-stat-label" id="txt-contact-exchanged-label">交換聯絡</span>
-<strong id="txt-contact-exchanged-count">0人</strong>
-</div>
-<div class="exchange-overview-total" id="txt-total-count">涉外者 0人</div>
-</div>
-<div class="exchange-list-tools">
-<div class="exchange-sort">
-<button class="exchange-sort-btn" id="exchangeSortBtn" onclick="window.toggleExchangeSortMenu()">排序：最近日期 ▾</button>
-<div class="exchange-sort-menu" id="exchangeSortMenu">
-<button onclick="window.setExchangeSort('date')" id="exchangeSortDate">最近日期</button>
-<button onclick="window.setExchangeSort('activity')" id="exchangeSortActivity">活躍度</button>
-<button onclick="window.setExchangeSort('id')" id="exchangeSortId">編號</button>
-</div>
-</div>
-</div>
-<div class="list-container" id="dataListContainer">
-<div id="dataList">
-<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
-</div>
-</div>
-<div class="exchange-detail-view" id="exchangeDetailView"></div>
-</div>
-<div id="offlineBackendSection" class="page-section">
-<h2 id="txt-offline-backend-header">오프라인 데이터 관리</h2>
-<div class="backend-toolbar">
-<div class="toolbar-left">
-<span class="stat-item" id="txt-offline-total-count">섭외자: 0명</span>
-<span class="stat-divider">|</span>
-<span class="stat-item highlight-stat" id="txt-offline-interaction-count">주간 교류: 0명</span>
-<div class="edit-controls" id="offlineEditControls">
-<span class="stat-divider">|</span>
-<label style="display:flex; align-items:center; cursor:pointer;">
-<input type="checkbox" id="offlineSelectAll" onclick="window.toggleOfflineSelectAll()" style="width:18px; height:18px; margin-right:5px;">
-<span id="txt-offline-select-all">전체 선택</span>
-</label>
-<button class="delete-btn" onclick="window.deleteOfflineSelected()" id="btn-offline-delete">선택 삭제</button>
-</div>
-</div>
-<button class="toggle-edit-btn" onclick="window.toggleOfflineEditMode()" id="btn-offline-toggle-edit">편집</button>
-</div>
-<div class="list-container" id="offlineDataListContainer">
-<div class="list-header-row offline-grid-row">
-<div class="check-cell"></div>
-<div></div>
-<div id="col-offline-id">번호</div>
-<div id="col-offline-activity">활동</div>
-<div id="col-offline-name">이름</div>
-<div class="sortable" onclick="window.toggleOfflineSort()">
-<span id="col-offline-date">최근 날짜</span> <span id="offlineSortIcon">▼</span>
-</div>
-<div id="col-offline-location">장소</div>
-<div id="col-offline-event">활동</div>
-<div class="action-cell"></div>
-</div>
-<div id="offlineDataList">
-<div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
-</div>
-</div>
-</div>
 <div id="settingsSection" class="page-section">
 <h2 id="txt-settings-header">설정</h2>
 <div class="settings-block">
@@ -893,73 +607,6 @@ AI
 </div>
 </div>
 </div>
-<div class="ai-modal-overlay" id="aiModalOverlay" onclick="window.closeAiModal(event)">
-<div class="ai-modal" onclick="event.stopPropagation()">
-<div class="ai-modal-header">
-<span class="ai-modal-title">✦ <span id="aiModalTitle">AI 整理重點</span></span>
-<button class="ai-modal-close" onclick="window.closeAiModal()">✕</button>
-</div>
-<div class="ai-modal-body" id="aiModalBody">
-<div class="ai-modal-loading" id="aiModalLoading">
-<div class="ai-modal-loading-spinner"></div>
-<div id="aiLoadingText">正在分析內容...</div>
-</div>
-<div class="ai-modal-content" id="aiModalContent" style="display:none;"></div>
-</div>
-<div class="ai-modal-footer" id="aiModalFooter" style="display:none;">
-<button class="ai-modal-btn secondary" onclick="window.closeAiModal()" id="aiCancelBtn">取消</button>
-<button class="ai-modal-btn primary" onclick="window.saveAiSummary()" id="aiSaveBtn">儲存摘要</button>
-</div>
-</div>
-</div>
-<div class="delete-options-overlay" id="deleteOptionsOverlay" onclick="window.closeDeleteOptions(event)">
-<div class="delete-options-modal" onclick="event.stopPropagation()">
-<div class="delete-options-header">
-<span class="delete-options-title" id="deleteOptionsTitle">🗑️ 選擇刪除項目</span>
-<button class="delete-options-close" onclick="window.closeDeleteOptions()">×</button>
-</div>
-<div class="delete-options-body">
-<div class="delete-option-item" id="deleteOptionContent">
-<input type="checkbox" id="deleteContent" checked>
-<label class="delete-option-label" for="deleteContent" id="deleteContentLabel">📝 回覆內文</label>
-</div>
-<div class="delete-option-item" id="deleteOptionAi">
-<input type="checkbox" id="deleteAi">
-<label class="delete-option-label" for="deleteAi" id="deleteAiLabel">✦ AI 分析結果</label>
-</div>
-<div class="delete-option-item" id="deleteOptionPoints">
-<input type="checkbox" id="deletePoints">
-<label class="delete-option-label" for="deletePoints" id="deletePointsLabel">📌 訊息重點</label>
-</div>
-<div class="delete-option-item" id="deleteOptionConfirm">
-<input type="checkbox" id="deleteConfirm">
-<label class="delete-option-label" for="deleteConfirm" id="deleteConfirmLabel">❓ 需確認訊息</label>
-</div>
-</div>
-<div class="delete-options-footer">
-<button class="delete-options-btn cancel" onclick="window.closeDeleteOptions()" id="deleteOptionsCancelBtn">取消</button>
-<button class="delete-options-btn confirm" onclick="window.confirmDeleteOptions()" id="deleteOptionsConfirmBtn">確認刪除</button>
-</div>
-</div>
-</div>
-<div class="auth-gate-overlay" id="authGateModal">
-<div class="auth-gate-box">
-<div class="auth-gate-icon" aria-hidden="true">
-<svg viewBox="0 0 512 512">
-<path d="M76 210h36v-44C112 74.6 176.6 8 256 8s144 66.6 144 158v44h36v294H76V210Zm72 0h216v-44c0-71.6-47.6-122-108-122S148 94.4 148 166v44Zm-36 36v222h288V246H112Zm144 56c33.1 0 60 26.9 60 60 0 21-10.8 39.5-27.1 50.2L306 452H206l17.1-39.8C206.8 401.5 196 383 196 362c0-33.1 26.9-60 60-60Zm0 36c-13.3 0-24 10.7-24 24 0 10.4 6.7 19.3 16 22.6l8 2.8 8-2.8c9.3-3.3 16-12.2 16-22.6 0-13.3-10.7-24-24-24Z"/>
-</svg>
-</div>
-<div class="auth-gate-title" id="authGateTitle">비밀번호 입력</div>
-<input type="password" class="auth-gate-input" id="authGateInput"
-placeholder="••••••" autocomplete="off" inputmode="numeric">
-<div class="auth-gate-error" id="authGateError"></div>
-<button type="button" class="inline-home-link auth-gate-home-link" id="authGateHome">← 홈</button>
-<button class="auth-gate-submit" id="authGateSubmit" type="button">
-<span id="authGateSubmitText">확인</span>
-</button>
-</div>
-</div>
-<script src="/feature-flags.js?v=20260828142742"></script>
-<script type="module" src="/app.js?v=20260828142742"></script>
+<script type="module" src="/app.js?v=20260829204228"></script>
 </body>
 </html>
