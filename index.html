@@ -13,10 +13,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260903100855">
-<link rel="stylesheet" href="/fonts.css?v=20260903100855">
+<link rel="modulepreload" href="/app.js?v=20260903181050">
+<link rel="stylesheet" href="/fonts.css?v=20260903181050">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=20260903100855">
+<link rel="stylesheet" href="/style.css?v=20260903181050">
 <script>
 (function() {
 try {
@@ -24,7 +24,7 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=20260903100855';
+link.href = '/fonts-serif.css?v=20260903181050';
 document.head.appendChild(link);
 }
 } catch(e) {}
@@ -118,7 +118,7 @@ right: 0 !important;
 <section class="bible-display-panel" id="bibleDisplayPanel" role="dialog" aria-modal="true" aria-labelledby="bibleDisplayPanelTitle">
 <header class="bible-display-header">
 <h2 id="bibleDisplayPanelTitle">經文顯示</h2>
-<button type="button" class="bible-display-close" onclick="window.closeBibleDisplayPanel()" aria-label="關閉">✕</button>
+<button type="button" class="bible-display-close" onclick="window.closeBibleDisplayPanel()" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
 </header>
 <div class="bible-display-body">
 <div class="bible-display-control">
@@ -159,7 +159,7 @@ right: 0 !important;
 </svg>
 <span id="aiPanelTitle">AI 助手</span>
 </span>
-<button class="ai-panel-close" onclick="window.toggleAiPanel()">✕</button>
+<button class="ai-panel-close" onclick="window.toggleAiPanel()" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
 </div>
 <div class="ai-panel-body">
 <div class="ai-panel-input-wrap">
@@ -185,7 +185,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
 <span id="notificationPanelTitle">通知</span>
 </span>
-<button type="button" class="notification-panel-close" onclick="window.closeNotificationPanel()" aria-label="關閉">✕</button>
+<button type="button" class="notification-panel-close" onclick="window.closeNotificationPanel()" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
 </header>
 <div class="notification-panel-body">
 <div class="notification-app-status" id="notificationAppStatus"></div>
@@ -634,6 +634,6 @@ AI
 </div>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260903100855"></script>
+<script type="module" src="/app.js?v=20260903181050"></script>
 </body>
 </html>
