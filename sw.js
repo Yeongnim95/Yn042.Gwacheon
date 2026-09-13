@@ -1,1 +1,85 @@
-const CACHE_VERSION="scoynim-shell-20260905c",NOTIFICATION_DB_NAME="scoynim-notifications",NOTIFICATION_DB_VERSION=1,NOTIFICATION_STORE_NAME="messages",NOTIFICATION_RETENTION_MS=2592e6;function savePushNotification(e){return self.indexedDB?new Promise(t=>{const n=indexedDB.open(NOTIFICATION_DB_NAME,1);n.onupgradeneeded=()=>{const e=n.result,t=e.objectStoreNames.contains("messages")?n.transaction.objectStore("messages"):e.createObjectStore("messages",{keyPath:"id"});t.indexNames.contains("createdAt")||t.createIndex("createdAt","createdAt")},n.onerror=()=>t(),n.onsuccess=()=>{const i=n.result,s=Number(e.createdAt)||Date.now(),o=e.id||e.tag||`push-${s}`,a=i.transaction("messages","readwrite"),c=a.objectStore("messages"),r=c.get(o);r.onsuccess=()=>{const t=r.result;c.put({...t,id:o,type:e.type||"push",title:e.title||"오늘의 묵상",titleKo:e.titleKo,titleZh:e.titleZh,reference:e.reference||"",referenceKo:e.referenceKo,referenceZh:e.referenceZh,text:e.text||e.body||"",textKo:e.textKo,textZh:e.textZh,createdAt:s,expiresAt:s+2592e6,readAt:t?.readAt||null})},a.oncomplete=()=>t(),a.onerror=()=>t()}}):Promise.resolve()}self.addEventListener("install",()=>self.skipWaiting()),self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(e=>Promise.all(e.filter(e=>e!==CACHE_VERSION).map(e=>caches.delete(e)))).then(()=>self.clients.claim()))}),self.addEventListener("push",e=>{let t={};try{t=e.data?.json()||{}}catch(n){t={body:e.data?.text()||""}}e.waitUntil(Promise.all([savePushNotification(t),self.registration.showNotification(t.title||"오늘의 묵상",{body:t.body||t.text||"",icon:"/android-chrome-192x192.png",badge:"/favicon-32x32-2.png",tag:t.tag||t.id||"daily-meditation",data:{url:t.url||"/notifications"}})]))}),self.addEventListener("notificationclick",e=>{e.notification.close();const t=new URL(e.notification.data?.url||"/notifications",self.location.origin).href;e.waitUntil(self.clients.matchAll({type:"window",includeUncontrolled:!0}).then(e=>{const n=e.find(e=>e.url.startsWith(self.location.origin));return n?(n.navigate(t),n.focus()):self.clients.openWindow(t)}))});
+const CACHE_VERSION = 'scoynim-shell-20260914a';
+const NOTIFICATION_DB_NAME = 'scoynim-notifications';
+const NOTIFICATION_DB_VERSION = 1;
+const NOTIFICATION_STORE_NAME = 'messages';
+const NOTIFICATION_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+function savePushNotification(payload) {
+  if (!self.indexedDB) return Promise.resolve();
+  return new Promise((resolve) => {
+    const request = indexedDB.open(NOTIFICATION_DB_NAME, NOTIFICATION_DB_VERSION);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      const store = db.objectStoreNames.contains(NOTIFICATION_STORE_NAME)
+        ? request.transaction.objectStore(NOTIFICATION_STORE_NAME)
+        : db.createObjectStore(NOTIFICATION_STORE_NAME, { keyPath: 'id' });
+      if (!store.indexNames.contains('createdAt')) store.createIndex('createdAt', 'createdAt');
+    };
+    request.onerror = () => resolve();
+    request.onsuccess = () => {
+      const db = request.result;
+      const createdAt = Number(payload.createdAt) || Date.now();
+      const id = payload.id || payload.tag || `push-${createdAt}`;
+      const transaction = db.transaction(NOTIFICATION_STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(NOTIFICATION_STORE_NAME);
+      const existingRequest = store.get(id);
+      existingRequest.onsuccess = () => {
+        const existing = existingRequest.result;
+        store.put({
+          ...existing,
+          id,
+          type: payload.type || 'push',
+          title: payload.title || '오늘의 묵상',
+          titleKo: payload.titleKo,
+          titleZh: payload.titleZh,
+          reference: payload.reference || '',
+          referenceKo: payload.referenceKo,
+          referenceZh: payload.referenceZh,
+          text: payload.text || payload.body || '',
+          textKo: payload.textKo,
+          textZh: payload.textZh,
+          createdAt,
+          expiresAt: createdAt + NOTIFICATION_RETENTION_MS,
+          readAt: existing?.readAt || null
+        });
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+    };
+  });
+}
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try { payload = event.data?.json() || {}; } catch (error) { payload = { body: event.data?.text() || '' }; }
+  event.waitUntil(Promise.all([
+    savePushNotification(payload),
+    self.registration.showNotification(payload.title || '오늘의 묵상', {
+      body: payload.body || payload.text || '',
+      icon: '/android-chrome-192x192.png',
+      badge: '/favicon-32x32-2.png',
+      tag: payload.tag || payload.id || 'daily-meditation',
+      data: { url: payload.url || '/notifications' }
+    })
+  ]));
+});
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = new URL(event.notification.data?.url || '/notifications', self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((client) => client.url.startsWith(self.location.origin));
+      if (existing) {
+        existing.navigate(targetUrl);
+        return existing.focus();
+      }
+      return self.clients.openWindow(targetUrl);
+    })
+  );
+});
