@@ -3,10 +3,14 @@ const COPY_ICON = `
         <rect x="8" y="8" width="11" height="11" rx="2"></rect>
         <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
     </svg>`;
+const LOCK_ICON = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+    </svg>`;
 const INSTALL_COMMANDS = {
-    mac: 'curl -fsSL https://raw.githubusercontent.com/scoynim/bible/main/install.sh | sh',
-    windows: 'irm https://raw.githubusercontent.com/scoynim/bible/main/install.ps1 | iex',
-    linux: 'curl -fsSL https://raw.githubusercontent.com/scoynim/bible/main/install.sh | sh'
+    unix: 'curl -fsSL https://raw.githubusercontent.com/scoynim/bible/main/install.sh | sh',
+    windows: 'irm https://raw.githubusercontent.com/scoynim/bible/main/install.ps1 | iex'
 };
 const COPY_COMMANDS = [
     { command: 'v "太1:1"', title: ['中文經文', '중문 성경 구절'], description: ['複製單節中文經文', '중문 성경 한 절을 복사합니다'] },
@@ -31,10 +35,11 @@ const TEXT = {
         support: '支援 macOS、Windows PowerShell 與 Linux',
         installTitle: '安裝',
         installDesc: '請先安裝 Node.js 20 以上版本，再選擇你的作業系統。',
-        mac: 'macOS', windows: 'Windows PowerShell', linux: 'Linux',
+        unix: 'macOS / Linux', windows: 'Windows PowerShell',
         copy: '複製指令', copied: '已複製',
-        npmLabel: '也可直接使用 npm',
-        releaseNote: '發布提醒：一行安裝網址會在 scoynim/bible GitHub 儲存庫與 @scoynim/bible npm 套件正式發布後生效。',
+        npmLabel: 'npm 安裝（尚未開放）',
+        npmLocked: 'npm 套件尚未發布',
+        releaseNote: '發布提醒：上方一行安裝指令已備妥，需等待 @scoynim/bible npm 套件正式發布後才能完成安裝。',
         copySection: '複製經文',
         readSection: '查看整章',
         otherSection: '查詢與說明',
@@ -51,10 +56,11 @@ const TEXT = {
         support: 'macOS, Windows PowerShell, Linux 지원',
         installTitle: '설치',
         installDesc: 'Node.js 20 이상을 먼저 설치한 뒤 운영체제를 선택하세요.',
-        mac: 'macOS', windows: 'Windows PowerShell', linux: 'Linux',
+        unix: 'macOS / Linux', windows: 'Windows PowerShell',
         copy: '명령어 복사', copied: '복사됨',
-        npmLabel: 'npm으로 직접 설치',
-        releaseNote: '배포 안내: 한 줄 설치 주소는 scoynim/bible GitHub 저장소와 @scoynim/bible npm 패키지가 정식 배포된 뒤 사용할 수 있습니다.',
+        npmLabel: 'npm 설치 (준비 중)',
+        npmLocked: 'npm 패키지가 아직 배포되지 않았습니다',
+        releaseNote: '배포 안내: 위의 한 줄 설치 명령어는 준비되어 있으며 @scoynim/bible npm 패키지가 정식 배포된 뒤 설치를 완료할 수 있습니다.',
         copySection: '성경 구절 복사',
         readSection: '한 장 보기',
         otherSection: '조회와 도움말',
@@ -66,7 +72,7 @@ const TEXT = {
     }
 };
 let activeLanguage = 'zh';
-let activePlatform = 'mac';
+let activePlatform = 'unix';
 let mountedRoot = null;
 function escapeHtml(value) {
     return String(value)
@@ -120,7 +126,7 @@ function render() {
                     </div>
                 </div>
                 <div class="terminal-bible-platforms" role="tablist" aria-label="${escapeHtml(t.support)}">
-                    ${['mac', 'windows', 'linux'].map(platform => `
+                    ${['unix', 'windows'].map(platform => `
                         <button type="button" role="tab" data-platform="${platform}" aria-selected="${activePlatform === platform}" class="${activePlatform === platform ? 'active' : ''}">${escapeHtml(t[platform])}</button>`).join('')}
                 </div>
                 <div class="terminal-bible-install-command">
@@ -128,10 +134,10 @@ function render() {
                     <code>${escapeHtml(installCommand)}</code>
                     <button type="button" class="terminal-bible-copy-button" data-copy="${escapeHtml(installCommand)}">${COPY_ICON}<span>${escapeHtml(t.copy)}</span></button>
                 </div>
-                <div class="terminal-bible-npm-row">
+                <div class="terminal-bible-npm-row is-disabled" aria-disabled="true">
                     <span>${escapeHtml(t.npmLabel)}</span>
                     <code>npm install --global @scoynim/bible</code>
-                    <button type="button" class="terminal-bible-copy-icon" data-copy="npm install --global @scoynim/bible" aria-label="${escapeHtml(t.copy)}" title="${escapeHtml(t.copy)}">${COPY_ICON}</button>
+                    <button type="button" class="terminal-bible-copy-icon terminal-bible-lock-icon" disabled aria-label="${escapeHtml(t.npmLocked)}" title="${escapeHtml(t.npmLocked)}">${LOCK_ICON}</button>
                 </div>
                 <p class="terminal-bible-release-note">${escapeHtml(t.releaseNote)}</p>
             </section>
