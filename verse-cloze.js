@@ -272,7 +272,7 @@ async function openVerseSelection(chapter) {
         setLoading(false);
     }
 }
-function renderVerses() {
+function renderVerses(scrollToProgress = false) {
     state.view = 'verses';
     const saved = loadSavedProgress();
     const savedStartVerse = Number(saved?.startVerse);
@@ -338,6 +338,9 @@ function renderVerses() {
         subtitle: '選擇單節或連續範圍',
         backAction: 'back-to-chapters'
     });
+    if (scrollToProgress) {
+        state.root.querySelector('.verse-cloze-verse-progress')?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
 }
 function selectVerse(verseNumber) {
     const number = Number(verseNumber);
@@ -660,7 +663,7 @@ function handleClick(event) {
         renderChapters();
     } else if (action === 'back-to-verses' || action === 'change-passage') {
         clearTimeout(state.autoAdvanceTimer);
-        renderVerses();
+        renderVerses(true);
     }
 }
 function handleInput(event) {
