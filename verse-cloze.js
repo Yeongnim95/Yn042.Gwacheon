@@ -1,1 +1,686 @@
-const e="verse_cloze_progress_v1",t=new Set(["，","；","。"]),n=new Set(["」","』","）","】","》","〉","”","’"]),s=/[\p{L}\p{N}\p{M}]/u,o='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5c2.2-.9 4.6-.6 7.5 1.1v12.2c-2.7-1.6-5.1-2-7.5-1.1z"/><path d="M19.5 5.5c-2.2-.9-4.6-.6-7.5 1.1v12.2c2.7-1.6 5.1-2 7.5-1.1z"/><path d="M12 6.6v12.2"/></svg>',a='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',r='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>',l='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>',c='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></svg>',i='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',d={root:null,books:null,fetchChapter:null,allBooks:[],view:"books",selectedBook:null,chapter:null,verses:[],selectionMode:"single",selectionStart:null,selectionEnd:null,session:null,autoAdvanceTimer:null,activeHintInput:null,loading:!1};function u(e){return String(e??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;")}function v(e){return s.test(e)}function p(e){return Array.from(e).some(v)}function h(e){return"裏"===e?"裡":e}function b(e){return Array.from(String(e??""),h).join("")}export function splitVerseSegments(e){const s=Array.from(String(e??"")),o=[];let a="";for(let e=0;e<s.length;e+=1){const r=s[e];if(a+=r,t.has(r)){for(;e+1<s.length&&n.has(s[e+1]);)a+=s[e+1],e+=1;p(a)?o.push(a):o.length&&(o[o.length-1]+=a),a=""}}return a&&(p(a)?o.push(a):o.length&&(o[o.length-1]+=a)),o}export function createVerseLevels(e){const t=splitVerseSegments(e);if(!t.length)return[];if(1===t.length)return[{activeSegments:[0],isFinal:!0}];const n=t.map((e,t)=>({activeSegments:[t],isFinal:!1}));return n.push({activeSegments:t.map((e,t)=>t),isFinal:!0}),n}export function diffVerseCharacters(e,t){const n=Array.from(String(e??"")),s=Array.from(String(t??"")),o=s.length+1,a=n.length+1,r=Array.from({length:o},()=>Array(a).fill(0));for(let e=0;e<o;e+=1)r[e][0]=e;for(let e=0;e<a;e+=1)r[0][e]=e;for(let e=1;e<o;e+=1)for(let t=1;t<a;t+=1){const o=h(s[e-1])===h(n[t-1])?0:1;r[e][t]=Math.min(r[e-1][t]+1,r[e][t-1]+1,r[e-1][t-1]+o)}const l=[];let c=s.length,i=n.length;for(;c>0||i>0;)c>0&&i>0&&h(s[c-1])===h(n[i-1])&&r[c][i]===r[c-1][i-1]?(l.push({character:n[i-1],status:"correct"}),c-=1,i-=1):c>0&&i>0&&r[c][i]===r[c-1][i-1]+1?(l.push({character:n[i-1],status:"wrong"}),c-=1,i-=1):i>0&&r[c][i]===r[c][i-1]+1?(l.push({character:n[i-1],status:"extra"}),i-=1):(l.push({character:"□",status:"missing"}),c-=1);return l.reverse()}function m(){try{const t=JSON.parse(localStorage.getItem(e)||"null");return t&&1===t.version&&d.allBooks.some(e=>e.id===t.bookId)?t:null}catch(e){return null}}function g(){if(!d.session)return;const{book:t,chapter:n,selectedVerses:s,verseIndex:o,levelIndex:a}=d.session;localStorage.setItem(e,JSON.stringify({version:1,bookId:t.id,chapter:n,startVerse:s[0].verse,endVerse:s[s.length-1].verse,verseIndex:o,levelIndex:a,savedAt:Date.now()}))}function f(){localStorage.removeItem(e)}function z(e,t,n,s=n){const o=Number(n)===Number(s)?n:`${n}-${s}`;return`${e.zh} ${t}:${o}`}function $(e){d.loading=e,d.root?.classList.toggle("is-loading",e),d.root?.setAttribute("aria-busy",String(e))}function y(e,t={}){const{title:n="經文填空遊戲",subtitle:s="中文經文",backAction:r=""}=t;d.activeHintInput=null,d.root.innerHTML=`\n        <div class="verse-cloze-app">\n            <header class="verse-cloze-header">\n                <div class="verse-cloze-heading">\n                    ${r?`<button type="button" class="verse-cloze-icon-button" data-action="${r}" aria-label="返回">${a}</button>`:`<span class="verse-cloze-heading-icon">${o}</span>`}\n                    <div>\n                        <h1>${u(n)}</h1>\n                        <p>${u(s)}</p>\n                    </div>\n                </div>\n            </header>\n            ${e}\n        </div>`}function S(e=!1){const t=m(),n=t?d.allBooks.find(e=>e.id===t.bookId):null;return t&&n?`\n        <section class="verse-cloze-resume ${e?"is-compact":""}" aria-label="未完成練習">\n            <div>\n                <span class="verse-cloze-eyebrow">上次練習</span>\n                <strong>${u(z(n,t.chapter,t.startVerse,t.endVerse))}</strong>\n                <small>${u(function(e){try{return new Intl.DateTimeFormat("zh-TW",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(e))}catch(e){return""}}(t.savedAt))}</small>\n            </div>\n            <div class="verse-cloze-resume-actions">\n                <button type="button" class="verse-cloze-secondary-button" data-action="restart-saved">${c}<span>重新開始</span></button>\n                <button type="button" class="verse-cloze-primary-button" data-action="continue-saved">${r}<span>繼續</span></button>\n            </div>\n        </section>`:""}function k(){d.view="books";const e=(e,t)=>`\n        <section class="verse-cloze-book-section">\n            <h2>${u(e)}</h2>\n            <div class="verse-cloze-book-grid">\n                ${t.map(e=>{const t=Math.max(Array.from(e.zh||"").length,Array.from(e.ko||"").length);return`\n                    <button type="button" class="verse-cloze-book-button${t>=7?" is-very-long-name":t>=6?" is-long-name":""}" data-action="select-book" data-book-id="${u(e.id)}">\n                        <span>${u(e.zh)}</span>\n                        ${i}\n                    </button>`}).join("")}\n            </div>\n        </section>`;y(`\n        <div class="verse-cloze-body">\n            ${S()}\n            <div class="verse-cloze-step" aria-label="步驟"><b>1</b><span>選擇書卷</span><i></i><b>2</b><span>選擇章節</span><i></i><b>3</b><span>選擇經文</span></div>\n            ${e("舊約聖經",d.books.oldTestament)}\n            ${e("新約聖經",d.books.newTestament)}\n        </div>`)}function x(){d.view="chapters";const e=d.selectedBook,t=Array.from({length:e.chapters},(e,t)=>t+1);y(`\n        <div class="verse-cloze-body">\n            ${S(!0)}\n            <div class="verse-cloze-step" aria-label="步驟"><b class="done">✓</b><span>${u(e.zh)}</span><i></i><b>2</b><span>選擇章節</span><i></i><b>3</b><span>選擇經文</span></div>\n            <div class="verse-cloze-chapter-grid">\n                ${t.map(e=>`<button type="button" data-action="select-chapter" data-chapter="${e}">第 ${e} 章</button>`).join("")}\n            </div>\n        </div>`,{title:e.zh,subtitle:"選擇章節",backAction:"back-to-books"})}function w(){d.view="verses";const e=Number(d.selectionStart),t=Number(d.selectionEnd||d.selectionStart),n=null==d.selectionStart?0:d.verses.filter(n=>{const s=Number(n.verse);return s>=Math.min(e,t)&&s<=Math.max(e,t)}).length,s="single"===d.selectionMode?null!=d.selectionStart:null!=d.selectionStart&&null!=d.selectionEnd;y(`\n        <div class="verse-cloze-body verse-cloze-selection-body">\n            ${S(!0)}\n            <div class="verse-cloze-step" aria-label="步驟"><b class="done">✓</b><span>${u(d.selectedBook.zh)}</span><i></i><b class="done">✓</b><span>第 ${d.chapter} 章</span><i></i><b>3</b><span>選擇經文</span></div>\n            <div class="verse-cloze-mode" role="group" aria-label="選取方式">\n                <button type="button" data-action="set-mode" data-mode="single" class="${"single"===d.selectionMode?"active":""}">單節</button>\n                <button type="button" data-action="set-mode" data-mode="range" class="${"range"===d.selectionMode?"active":""}">連續範圍</button>\n            </div>\n            <div class="verse-cloze-selection-help">${"single"===d.selectionMode?"選擇一節經文":"依序選擇開始與結束經節"}</div>\n            <div class="verse-cloze-verse-list">\n                ${d.verses.map(n=>{const s=Number(n.verse);return`<button type="button" data-action="select-verse" data-verse="${s}" class="${null!=d.selectionStart&&s>=Math.min(e,t)&&s<=Math.max(e,t)?"selected":""}">\n                        <strong>${u(n.verse)}</strong><span>${u(n.zh)}</span>\n                    </button>`}).join("")}\n            </div>\n            <div class="verse-cloze-selection-bar">\n                <span>${n?`已選 ${n} 節`:"尚未選擇經文"}</span>\n                <button type="button" class="verse-cloze-primary-button" data-action="start-game" ${s?"":"disabled"}>${r}<span>開始練習</span></button>\n            </div>\n        </div>`,{title:`${d.selectedBook.zh} 第 ${d.chapter} 章`,subtitle:"選擇單節或連續範圍",backAction:"back-to-chapters"})}function I(e,t=0,n=0){const s=e.map(e=>({...e,text:String(e.zh||"").trim(),segments:splitVerseSegments(e.zh),levels:createVerseLevels(e.zh)})).filter(e=>e.levels.length);if(!s.length)return;d.session={book:d.selectedBook,chapter:d.chapter,selectedVerses:s,verseIndex:Math.min(Math.max(Number(t)||0,0),s.length-1),levelIndex:Math.max(Number(n)||0,0),completedRounds:0,correct:!1};const o=d.session.selectedVerses[d.session.verseIndex];d.session.levelIndex=Math.min(d.session.levelIndex,o.levels.length-1),g(),V()}async function A(e=!1){const t=m();if(!t||d.loading)return;const n=d.allBooks.find(e=>e.id===t.bookId);if(n){$(!0);try{const s=await d.fetchChapter(n.id,t.chapter),o=(s||[]).filter(e=>null!=e?.verse&&e.zh&&Number(e.verse)>=t.startVerse&&Number(e.verse)<=t.endVerse);if(!o.length)throw new Error("Saved verses unavailable");d.selectedBook=n,d.chapter=Number(t.chapter),d.verses=(s||[]).filter(e=>null!=e?.verse&&e.zh),d.selectionStart=Number(t.startVerse),d.selectionEnd=Number(t.endVerse),I(o,e?0:t.verseIndex,e?0:t.levelIndex)}catch(e){f(),M("上次的進度已無法讀取，請重新選擇經文。","back-to-books")}finally{$(!1)}}}function M(e,t){y(`\n        <div class="verse-cloze-message" role="alert">\n            <p>${u(e)}</p>\n            <button type="button" class="verse-cloze-secondary-button" data-action="${t}">${a}<span>返回</span></button>\n        </div>`)}function V(){clearTimeout(d.autoAdvanceTimer),d.view="game";const e=d.session,t=e.selectedVerses[e.verseIndex],n=t.levels[e.levelIndex],s=new Set(n.activeSegments),o={value:0},a=t.segments.map((e,t)=>function(e,t,n,s){if(!n.has(t))return u(e);const o=Array.from(e);let a="",r="";const l=()=>{if(!r)return;const e=s.value;s.value+=1;const t=Array.from(r).length;a+=`<span class="verse-cloze-input-group">\n            <input type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-cloze-input data-input-index="${e}" data-answer="${u(r)}" aria-label="填入第 ${e+1} 個空格" style="--answer-length:${Math.min(Math.max(t,2),18)}" maxlength="${Math.max(t+8,12)}">\n        </span>`,r=""};return o.forEach(e=>{v(e)?r+=e:(l(),a+=`<span class="verse-cloze-punctuation">${u(e)}</span>`)}),l(),a}(e,t,s,o)).join(""),r=function(){const e=d.session;let t=0,n=0;return e.selectedVerses.forEach((s,o)=>{s.levels.forEach((s,a)=>{t+=1,(o<e.verseIndex||o===e.verseIndex&&a<=e.levelIndex)&&(n+=1)})}),{total:t,current:n}}(),c=z(e.book,e.chapter,e.selectedVerses[0].verse,e.selectedVerses[e.selectedVerses.length-1].verse),p=Math.round((r.current-1)/r.total*100);y(`\n        <div class="verse-cloze-game">\n            <div class="verse-cloze-progress-row">\n                <span>總進度 ${r.current} / ${r.total}</span>\n                <button type="button" data-action="change-passage">更換經文</button>\n            </div>\n            <div class="verse-cloze-progress" aria-label="總進度"><span style="width:${p}%"></span></div>\n            <section class="verse-cloze-question">\n                <div class="verse-cloze-question-meta">\n                    <span>${u(`${e.book.zh} ${e.chapter}:${t.verse}`)}</span>\n                    <strong>${n.isFinal?"完整驗收":`第 ${e.levelIndex+1} 關`}</strong>\n                </div>\n                <div class="verse-cloze-prompt">${a}</div>\n                <div class="verse-cloze-diff-list" aria-live="polite"></div>\n                <div class="verse-cloze-status" aria-live="polite"></div>\n            </section>\n            <div class="verse-cloze-game-actions">\n                <button type="button" class="verse-cloze-hint-button" data-action="show-hint" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.3 14.7A7 7 0 1 1 15.7 14.7C14.7 15.5 14 16.2 14 18h-4c0-1.8-.7-2.5-1.7-3.3z"/></svg><span>提示</span></button>\n                <div class="verse-cloze-answer-actions">\n                    <button type="button" class="verse-cloze-primary-button" data-action="check-answer">${l}<span>確認答案</span></button>\n                    <button type="button" class="verse-cloze-primary-button verse-cloze-next-button" data-action="next-round" hidden>${i}<span>下一關</span></button>\n                </div>\n            </div>\n        </div>`,{title:c,subtitle:"逐段填入經文內容",backAction:"back-to-verses"}),N(d.root.querySelector("[data-cloze-input]"))}function E(){const e=d.root?.querySelector('[data-action="show-hint"]');if(!e)return;const t=d.activeHintInput,n=Boolean(t&&t.isConnected&&!t.readOnly&&!String(t.value||"").trim());e.hidden=!n}function N(e){e&&e.isConnected&&!e.readOnly&&(d.activeHintInput=e,e.focus({preventScroll:!0}),E())}function B(){if(!d.session||d.session.correct)return;d.activeHintInput=null,E();const e=[...d.root.querySelectorAll("[data-cloze-input]")];if(!e.length)return;let t=!0;const n=[];e.forEach((e,s)=>{const o=e.dataset.answer||"",a=e.value.trim(),r=b(a)===b(o);e.classList.toggle("correct",r),e.classList.toggle("incorrect",!r),e.setAttribute("aria-invalid",String(!r)),r||(t=!1,n.push(function(e,t){return`<div class="verse-cloze-diff"><small>第 ${t+1} 格</small><div>${e.map(e=>`<span class="${e.status}" aria-label="${"missing"===e.status?"缺少一字":""}">${u(e.character)}</span>`).join("")}</div></div>`}(diffVerseCharacters(a,o),s)))});const s=d.root.querySelector(".verse-cloze-status");if(d.root.querySelector(".verse-cloze-diff-list").innerHTML=n.join(""),!t)return s.className="verse-cloze-status error",s.textContent="還有不一致的地方，修改紅框內容後再試一次。",void d.root.querySelector("[data-cloze-input].incorrect")?.focus();d.session.correct=!0,e.forEach(e=>{e.readOnly=!0}),s.className="verse-cloze-status success",s.textContent="正確",d.root.querySelector('[data-action="check-answer"]').hidden=!0,d.root.querySelector('[data-action="next-round"]').hidden=!1,d.autoAdvanceTimer=setTimeout(T,600)}function T(){clearTimeout(d.autoAdvanceTimer);const e=d.session;if(!e||!e.correct)return;e.completedRounds+=1;const t=e.selectedVerses[e.verseIndex];if(e.levelIndex+1<t.levels.length)e.levelIndex+=1;else{if(!(e.verseIndex+1<e.selectedVerses.length))return f(),void function(){d.view="complete";const e=d.session,t=e.selectedVerses.reduce((e,t)=>e+t.levels.length,0),n=z(e.book,e.chapter,e.selectedVerses[0].verse,e.selectedVerses[e.selectedVerses.length-1].verse);y(`\n        <div class="verse-cloze-complete">\n            <span class="verse-cloze-complete-icon">${l}</span>\n            <h2>完成練習</h2>\n            <strong>${u(n)}</strong>\n            <p>已完成 ${t} 關</p>\n            <div>\n                <button type="button" class="verse-cloze-secondary-button" data-action="choose-another">${o}<span>選擇其他經文</span></button>\n                <button type="button" class="verse-cloze-primary-button" data-action="repeat-game">${c}<span>再練一次</span></button>\n            </div>\n        </div>`)}();e.verseIndex+=1,e.levelIndex=0}e.correct=!1,g(),V()}function C(e){const t=e.target.closest?.("[data-cloze-input]");if(t)return void N(t);const n=e.target.closest("[data-action]");if(!n||!d.root.contains(n)||n.disabled)return d.activeHintInput=null,void E();const s=n.dataset.action;"show-hint"!==s&&(d.activeHintInput=null,E()),"select-book"===s?(d.selectedBook=d.allBooks.find(e=>e.id===n.dataset.bookId),d.selectedBook&&x()):"select-chapter"===s?async function(e){if(!d.loading){$(!0);try{const t=await d.fetchChapter(d.selectedBook.id,e),n=Array.isArray(t)?t.filter(e=>e&&null!=e.verse&&String(e.zh||"").trim()):[];if(!n.length)throw new Error("No Chinese verses found");d.chapter=Number(e),d.verses=n,d.selectionStart=null,d.selectionEnd=null,w()}catch(e){M("這一章暫時無法載入，請稍後再試。","back-to-chapters")}finally{$(!1)}}}(Number(n.dataset.chapter)):"select-verse"===s?function(e){const t=Number(e);"single"===d.selectionMode?(d.selectionStart=t,d.selectionEnd=t):null==d.selectionStart||null!=d.selectionEnd?(d.selectionStart=t,d.selectionEnd=null):(d.selectionEnd=t,d.selectionEnd<d.selectionStart&&([d.selectionStart,d.selectionEnd]=[d.selectionEnd,d.selectionStart])),w()}(Number(n.dataset.verse)):"set-mode"===s?(d.selectionMode="range"===n.dataset.mode?"range":"single",d.selectionStart=null,d.selectionEnd=null,w()):"start-game"===s?function(){if(null==d.selectionStart)return;const e=Math.min(d.selectionStart,d.selectionEnd??d.selectionStart),t=Math.max(d.selectionStart,d.selectionEnd??d.selectionStart);I(d.verses.filter(n=>Number(n.verse)>=e&&Number(n.verse)<=t))}():"check-answer"===s?B():"next-round"===s?T():"show-hint"===s?function(){const e=d.activeHintInput;if(!e||!e.isConnected||e.readOnly||String(e.value||"").trim())return void E();const t=Array.from(e.dataset.answer||"")[0];t&&(e.value=t,e.dispatchEvent(new Event("input",{bubbles:!0})),e.focus({preventScroll:!0}),E())}():"continue-saved"===s?A(!1):"restart-saved"===s?A(!0):"repeat-game"===s?I(d.session.selectedVerses):"choose-another"===s?(d.selectionStart=null,d.selectionEnd=null,w()):"back-to-books"===s?k():"back-to-chapters"===s?x():"back-to-verses"!==s&&"change-passage"!==s||(clearTimeout(d.autoAdvanceTimer),w())}function q(e){const t=e.target.closest("[data-cloze-input]");if(!t)return;t.classList.remove("correct","incorrect"),t.removeAttribute("aria-invalid"),d.session.correct=!1;const n=d.root.querySelector(".verse-cloze-status"),s=d.root.querySelector(".verse-cloze-diff-list");n&&(n.className="verse-cloze-status",n.textContent=""),s&&(s.innerHTML=""),d.activeHintInput===t&&E()}function L(e){if("Enter"!==e.key||e.isComposing||!e.target.matches("[data-cloze-input]"))return;e.preventDefault();const t=[...d.root.querySelectorAll("[data-cloze-input]")],n=t.indexOf(e.target);n>=0&&n<t.length-1?N(t[n+1]):B()}export function mountVerseCloze({root:e,books:t,fetchChapter:n}){if(!e||!t||"function"!=typeof n)throw new Error("Verse cloze configuration is incomplete");d.root=e,d.books=t,d.fetchChapter=n,d.allBooks=[...t.oldTestament,...t.newTestament],"true"!==e.dataset.eventsBound&&(e.addEventListener("click",C),e.addEventListener("input",q),e.addEventListener("keydown",L),e.dataset.eventsBound="true"),k()}
+const STORAGE_KEY = 'verse_cloze_progress_v1';
+const SPLIT_PUNCTUATION = new Set(['，', '；', '。']);
+const TRAILING_PUNCTUATION = new Set(['」', '』', '）', '】', '》', '〉', '”', '’']);
+const ANSWER_CHARACTER = /[\p{L}\p{N}\p{M}]/u;
+const icons = {
+    book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5c2.2-.9 4.6-.6 7.5 1.1v12.2c-2.7-1.6-5.1-2-7.5-1.1z"/><path d="M19.5 5.5c-2.2-.9-4.6-.6-7.5 1.1v12.2c2.7-1.6 5.1-2 7.5-1.1z"/><path d="M12 6.6v12.2"/></svg>',
+    arrowLeft: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
+    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4 10-10"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></svg>',
+    bookmark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+    hint: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8.3 14.7A7 7 0 1 1 15.7 14.7C14.7 15.5 14 16.2 14 18h-4c0-1.8-.7-2.5-1.7-3.3z"/></svg>',
+    chevronRight: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'
+};
+const state = {
+    root: null,
+    books: null,
+    fetchChapter: null,
+    allBooks: [],
+    view: 'books',
+    selectedBook: null,
+    chapter: null,
+    verses: [],
+    selectionMode: 'single',
+    selectionStart: null,
+    selectionEnd: null,
+    session: null,
+    autoAdvanceTimer: null,
+    activeHintInput: null,
+    loading: false
+};
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+function isAnswerCharacter(character) {
+    return ANSWER_CHARACTER.test(character);
+}
+function hasAnswerCharacters(value) {
+    return Array.from(value).some(isAnswerCharacter);
+}
+function normalizeAnswerCharacter(character) {
+    return character === '裏' ? '裡' : character;
+}
+function normalizeAnswerText(value) {
+    return Array.from(String(value ?? ''), normalizeAnswerCharacter).join('');
+}
+export function splitVerseSegments(text) {
+    const characters = Array.from(String(text ?? ''));
+    const segments = [];
+    let current = '';
+    for (let index = 0; index < characters.length; index += 1) {
+        const character = characters[index];
+        current += character;
+        if (!SPLIT_PUNCTUATION.has(character)) continue;
+        while (index + 1 < characters.length && TRAILING_PUNCTUATION.has(characters[index + 1])) {
+            current += characters[index + 1];
+            index += 1;
+        }
+        if (hasAnswerCharacters(current)) segments.push(current);
+        else if (segments.length) segments[segments.length - 1] += current;
+        current = '';
+    }
+    if (current) {
+        if (hasAnswerCharacters(current)) segments.push(current);
+        else if (segments.length) segments[segments.length - 1] += current;
+    }
+    return segments;
+}
+export function createVerseLevels(text) {
+    const segments = splitVerseSegments(text);
+    if (!segments.length) return [];
+    if (segments.length === 1) {
+        return [{ activeSegments: [0], isFinal: true }];
+    }
+    const levels = segments.map((_, index) => ({ activeSegments: [index], isFinal: false }));
+    levels.push({ activeSegments: segments.map((_, index) => index), isFinal: true });
+    return levels;
+}
+export function diffVerseCharacters(actualValue, expectedValue) {
+    const actual = Array.from(String(actualValue ?? ''));
+    const expected = Array.from(String(expectedValue ?? ''));
+    const rows = expected.length + 1;
+    const columns = actual.length + 1;
+    const table = Array.from({ length: rows }, () => Array(columns).fill(0));
+    for (let row = 0; row < rows; row += 1) table[row][0] = row;
+    for (let column = 0; column < columns; column += 1) table[0][column] = column;
+    for (let row = 1; row < rows; row += 1) {
+        for (let column = 1; column < columns; column += 1) {
+            const substitutionCost = normalizeAnswerCharacter(expected[row - 1]) === normalizeAnswerCharacter(actual[column - 1]) ? 0 : 1;
+            table[row][column] = Math.min(
+                table[row - 1][column] + 1,
+                table[row][column - 1] + 1,
+                table[row - 1][column - 1] + substitutionCost
+            );
+        }
+    }
+    const result = [];
+    let row = expected.length;
+    let column = actual.length;
+    while (row > 0 || column > 0) {
+        if (
+            row > 0 && column > 0 &&
+            normalizeAnswerCharacter(expected[row - 1]) === normalizeAnswerCharacter(actual[column - 1]) &&
+            table[row][column] === table[row - 1][column - 1]
+        ) {
+            result.push({ character: actual[column - 1], status: 'correct' });
+            row -= 1;
+            column -= 1;
+        } else if (
+            row > 0 && column > 0 &&
+            table[row][column] === table[row - 1][column - 1] + 1
+        ) {
+            result.push({ character: actual[column - 1], status: 'wrong' });
+            row -= 1;
+            column -= 1;
+        } else if (column > 0 && table[row][column] === table[row][column - 1] + 1) {
+            result.push({ character: actual[column - 1], status: 'extra' });
+            column -= 1;
+        } else {
+            result.push({ character: '□', status: 'missing' });
+            row -= 1;
+        }
+    }
+    return result.reverse();
+}
+function loadSavedProgress() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!saved || saved.version !== 1) return null;
+        if (!state.allBooks.some(book => book.id === saved.bookId)) return null;
+        return saved;
+    } catch (error) {
+        return null;
+    }
+}
+function saveProgress() {
+    if (!state.session) return;
+    const { book, chapter, selectedVerses, verseIndex, levelIndex } = state.session;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: 1,
+        bookId: book.id,
+        chapter,
+        startVerse: selectedVerses[0].verse,
+        endVerse: selectedVerses[selectedVerses.length - 1].verse,
+        verseIndex,
+        levelIndex,
+        savedAt: Date.now()
+    }));
+}
+function clearSavedProgress() {
+    localStorage.removeItem(STORAGE_KEY);
+}
+function formatReference(book, chapter, startVerse, endVerse = startVerse) {
+    const range = Number(startVerse) === Number(endVerse) ? startVerse : `${startVerse}-${endVerse}`;
+    return `${book.zh} ${chapter}:${range}`;
+}
+function formatSavedTime(timestamp) {
+    try {
+        return new Intl.DateTimeFormat('zh-TW', {
+            month: 'numeric',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).format(new Date(timestamp));
+    } catch (error) {
+        return '';
+    }
+}
+function setLoading(isLoading) {
+    state.loading = isLoading;
+    state.root?.classList.toggle('is-loading', isLoading);
+    state.root?.setAttribute('aria-busy', String(isLoading));
+}
+function renderShell(content, options = {}) {
+    const { title = '經文填空遊戲', subtitle = '中文經文', backAction = '' } = options;
+    state.activeHintInput = null;
+    state.root.innerHTML = `
+        <div class="verse-cloze-app">
+            <header class="verse-cloze-header">
+                <div class="verse-cloze-heading">
+                    ${backAction ? `<button type="button" class="verse-cloze-icon-button" data-action="${backAction}" aria-label="返回">${icons.arrowLeft}</button>` : `<span class="verse-cloze-heading-icon">${icons.book}</span>`}
+                    <div>
+                        <h1>${escapeHtml(title)}</h1>
+                        <p>${escapeHtml(subtitle)}</p>
+                    </div>
+                </div>
+            </header>
+            ${content}
+        </div>`;
+}
+function renderResumeCard(compact = false) {
+    const saved = loadSavedProgress();
+    const savedBook = saved ? state.allBooks.find(book => book.id === saved.bookId) : null;
+    if (!saved || !savedBook) return '';
+    return `
+        <section class="verse-cloze-resume ${compact ? 'is-compact' : ''}" aria-label="未完成練習">
+            <div>
+                <span class="verse-cloze-eyebrow">上次練習</span>
+                <strong>${escapeHtml(formatReference(savedBook, saved.chapter, saved.startVerse, saved.endVerse))}</strong>
+                <small>${escapeHtml(formatSavedTime(saved.savedAt))}</small>
+            </div>
+            <div class="verse-cloze-resume-actions">
+                <button type="button" class="verse-cloze-secondary-button" data-action="restart-saved">${icons.refresh}<span>重新開始</span></button>
+                <button type="button" class="verse-cloze-primary-button" data-action="continue-saved">${icons.play}<span>繼續</span></button>
+            </div>
+        </section>`;
+}
+function renderBooks() {
+    state.view = 'books';
+    const renderGroup = (title, books) => `
+        <section class="verse-cloze-book-section">
+            <h2>${escapeHtml(title)}</h2>
+            <div class="verse-cloze-book-grid">
+                ${books.map(book => {
+                    const longestNameLength = Math.max(Array.from(book.zh || '').length, Array.from(book.ko || '').length);
+                    const nameSizeClass = longestNameLength >= 7 ? ' is-very-long-name' : (longestNameLength >= 6 ? ' is-long-name' : '');
+                    return `
+                    <button type="button" class="verse-cloze-book-button${nameSizeClass}" data-action="select-book" data-book-id="${escapeHtml(book.id)}">
+                        <span>${escapeHtml(book.zh)}</span>
+                        ${icons.chevronRight}
+                    </button>`;
+                }).join('')}
+            </div>
+        </section>`;
+    renderShell(`
+        <div class="verse-cloze-body">
+            ${renderResumeCard()}
+            <div class="verse-cloze-step" aria-label="步驟"><b>1</b><span>選擇書卷</span><i></i><b>2</b><span>選擇章節</span><i></i><b>3</b><span>選擇經文</span></div>
+            ${renderGroup('舊約聖經', state.books.oldTestament)}
+            ${renderGroup('新約聖經', state.books.newTestament)}
+        </div>`);
+}
+function renderChapters() {
+    state.view = 'chapters';
+    const book = state.selectedBook;
+    const chapters = Array.from({ length: book.chapters }, (_, index) => index + 1);
+    renderShell(`
+        <div class="verse-cloze-body">
+            ${renderResumeCard(true)}
+            <div class="verse-cloze-step" aria-label="步驟"><b class="done">✓</b><span>${escapeHtml(book.zh)}</span><i></i><b>2</b><span>選擇章節</span><i></i><b>3</b><span>選擇經文</span></div>
+            <div class="verse-cloze-chapter-grid">
+                ${chapters.map(chapter => `<button type="button" data-action="select-chapter" data-chapter="${chapter}">第 ${chapter} 章</button>`).join('')}
+            </div>
+        </div>`, {
+        title: book.zh,
+        subtitle: '選擇章節',
+        backAction: 'back-to-books'
+    });
+}
+async function openVerseSelection(chapter) {
+    if (state.loading) return;
+    setLoading(true);
+    try {
+        const chapterData = await state.fetchChapter(state.selectedBook.id, chapter);
+        const verses = Array.isArray(chapterData)
+            ? chapterData.filter(item => item && item.verse != null && String(item.zh || '').trim())
+            : [];
+        if (!verses.length) throw new Error('No Chinese verses found');
+        state.chapter = Number(chapter);
+        state.verses = verses;
+        state.selectionStart = null;
+        state.selectionEnd = null;
+        renderVerses();
+    } catch (error) {
+        renderLoadMessage('這一章暫時無法載入，請稍後再試。', 'back-to-chapters');
+    } finally {
+        setLoading(false);
+    }
+}
+function renderVerses() {
+    state.view = 'verses';
+    const saved = loadSavedProgress();
+    const savedEndVerse = saved?.bookId === state.selectedBook.id &&
+        Number(saved.chapter) === state.chapter &&
+        state.verses.some(verse => Number(verse.verse) === Number(saved.endVerse))
+        ? Number(saved.endVerse)
+        : null;
+    const resumeCard = renderResumeCard(true);
+    const start = Number(state.selectionStart);
+    const end = Number(state.selectionEnd || state.selectionStart);
+    const selectedCount = state.selectionStart == null ? 0 : state.verses.filter(verse => {
+        const value = Number(verse.verse);
+        return value >= Math.min(start, end) && value <= Math.max(start, end);
+    }).length;
+    const isReady = state.selectionMode === 'single'
+        ? state.selectionStart != null
+        : state.selectionStart != null && state.selectionEnd != null;
+    renderShell(`
+        <div class="verse-cloze-body verse-cloze-selection-body">
+            ${savedEndVerse === null ? resumeCard : ''}
+            <div class="verse-cloze-step" aria-label="步驟"><b class="done">✓</b><span>${escapeHtml(state.selectedBook.zh)}</span><i></i><b class="done">✓</b><span>第 ${state.chapter} 章</span><i></i><b>3</b><span>選擇經文</span></div>
+            <div class="verse-cloze-mode" role="group" aria-label="選取方式">
+                <button type="button" data-action="set-mode" data-mode="single" class="${state.selectionMode === 'single' ? 'active' : ''}">單節</button>
+                <button type="button" data-action="set-mode" data-mode="range" class="${state.selectionMode === 'range' ? 'active' : ''}">連續範圍</button>
+            </div>
+            <div class="verse-cloze-selection-help">${state.selectionMode === 'single' ? '選擇一節經文' : '依序選擇開始與結束經節'}</div>
+            <div class="verse-cloze-verse-list">
+                ${state.verses.map(verse => {
+                    const number = Number(verse.verse);
+                    const selected = state.selectionStart != null && number >= Math.min(start, end) && number <= Math.max(start, end);
+                    return `<button type="button" data-action="select-verse" data-verse="${number}" class="${selected ? 'selected' : ''}">
+                        <strong>${escapeHtml(verse.verse)}</strong><span>${escapeHtml(verse.zh)}</span>
+                    </button>${number === savedEndVerse ? resumeCard : ''}`;
+                }).join('')}
+            </div>
+            <div class="verse-cloze-selection-bar">
+                <span>${selectedCount ? `已選 ${selectedCount} 節` : '尚未選擇經文'}</span>
+                <button type="button" class="verse-cloze-primary-button" data-action="start-game" ${isReady ? '' : 'disabled'}>${icons.play}<span>開始練習</span></button>
+            </div>
+        </div>`, {
+        title: `${state.selectedBook.zh} 第 ${state.chapter} 章`,
+        subtitle: '選擇單節或連續範圍',
+        backAction: 'back-to-chapters'
+    });
+}
+function selectVerse(verseNumber) {
+    const number = Number(verseNumber);
+    if (state.selectionMode === 'single') {
+        state.selectionStart = number;
+        state.selectionEnd = number;
+    } else if (state.selectionStart == null || state.selectionEnd != null) {
+        state.selectionStart = number;
+        state.selectionEnd = null;
+    } else {
+        state.selectionEnd = number;
+        if (state.selectionEnd < state.selectionStart) {
+            [state.selectionStart, state.selectionEnd] = [state.selectionEnd, state.selectionStart];
+        }
+    }
+    renderVerses();
+}
+function beginSession(selectedVerses, verseIndex = 0, levelIndex = 0) {
+    const preparedVerses = selectedVerses.map(verse => ({
+        ...verse,
+        text: String(verse.zh || '').trim(),
+        segments: splitVerseSegments(verse.zh),
+        levels: createVerseLevels(verse.zh)
+    })).filter(verse => verse.levels.length);
+    if (!preparedVerses.length) return;
+    state.session = {
+        book: state.selectedBook,
+        chapter: state.chapter,
+        selectedVerses: preparedVerses,
+        verseIndex: Math.min(Math.max(Number(verseIndex) || 0, 0), preparedVerses.length - 1),
+        levelIndex: Math.max(Number(levelIndex) || 0, 0),
+        completedRounds: 0,
+        correct: false
+    };
+    const currentVerse = state.session.selectedVerses[state.session.verseIndex];
+    state.session.levelIndex = Math.min(state.session.levelIndex, currentVerse.levels.length - 1);
+    saveProgress();
+    renderGame();
+}
+function startSelectedGame() {
+    if (state.selectionStart == null) return;
+    const start = Math.min(state.selectionStart, state.selectionEnd ?? state.selectionStart);
+    const end = Math.max(state.selectionStart, state.selectionEnd ?? state.selectionStart);
+    const selected = state.verses.filter(verse => Number(verse.verse) >= start && Number(verse.verse) <= end);
+    beginSession(selected);
+}
+async function restoreSavedProgress(restart = false) {
+    const saved = loadSavedProgress();
+    if (!saved || state.loading) return;
+    const book = state.allBooks.find(item => item.id === saved.bookId);
+    if (!book) return;
+    setLoading(true);
+    try {
+        const chapterData = await state.fetchChapter(book.id, saved.chapter);
+        const selected = (chapterData || []).filter(item => item?.verse != null && item.zh && Number(item.verse) >= saved.startVerse && Number(item.verse) <= saved.endVerse);
+        if (!selected.length) throw new Error('Saved verses unavailable');
+        state.selectedBook = book;
+        state.chapter = Number(saved.chapter);
+        state.verses = (chapterData || []).filter(item => item?.verse != null && item.zh);
+        state.selectionStart = Number(saved.startVerse);
+        state.selectionEnd = Number(saved.endVerse);
+        beginSession(selected, restart ? 0 : saved.verseIndex, restart ? 0 : saved.levelIndex);
+    } catch (error) {
+        clearSavedProgress();
+        renderLoadMessage('上次的進度已無法讀取，請重新選擇經文。', 'back-to-books');
+    } finally {
+        setLoading(false);
+    }
+}
+function renderLoadMessage(message, backAction) {
+    renderShell(`
+        <div class="verse-cloze-message" role="alert">
+            <p>${escapeHtml(message)}</p>
+            <button type="button" class="verse-cloze-secondary-button" data-action="${backAction}">${icons.arrowLeft}<span>返回</span></button>
+        </div>`);
+}
+function renderActiveSegment(segment, segmentIndex, activeSegments, inputCounter) {
+    if (!activeSegments.has(segmentIndex)) return escapeHtml(segment);
+    const characters = Array.from(segment);
+    let html = '';
+    let run = '';
+    const flushRun = () => {
+        if (!run) return;
+        const index = inputCounter.value;
+        inputCounter.value += 1;
+        const length = Array.from(run).length;
+        html += `<span class="verse-cloze-input-group">
+            <input type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" data-cloze-input data-input-index="${index}" data-answer="${escapeHtml(run)}" aria-label="填入第 ${index + 1} 個空格" style="--answer-length:${Math.min(Math.max(length, 2), 18)}" maxlength="${Math.max(length + 8, 12)}">
+        </span>`;
+        run = '';
+    };
+    characters.forEach(character => {
+        if (isAnswerCharacter(character)) run += character;
+        else {
+            flushRun();
+            html += `<span class="verse-cloze-punctuation">${escapeHtml(character)}</span>`;
+        }
+    });
+    flushRun();
+    return html;
+}
+function getRoundCounts() {
+    const session = state.session;
+    let total = 0;
+    let current = 0;
+    session.selectedVerses.forEach((verse, verseIndex) => {
+        verse.levels.forEach((_, levelIndex) => {
+            total += 1;
+            if (verseIndex < session.verseIndex || (verseIndex === session.verseIndex && levelIndex <= session.levelIndex)) current += 1;
+        });
+    });
+    return { total, current };
+}
+function renderGame() {
+    clearTimeout(state.autoAdvanceTimer);
+    state.view = 'game';
+    const session = state.session;
+    const verse = session.selectedVerses[session.verseIndex];
+    const level = verse.levels[session.levelIndex];
+    const activeSegments = new Set(level.activeSegments);
+    const inputCounter = { value: 0 };
+    const prompt = verse.segments.map((segment, index) => renderActiveSegment(segment, index, activeSegments, inputCounter)).join('');
+    const rounds = getRoundCounts();
+    const passageRef = formatReference(
+        session.book,
+        session.chapter,
+        session.selectedVerses[0].verse,
+        session.selectedVerses[session.selectedVerses.length - 1].verse
+    );
+    const percent = Math.round(((rounds.current - 1) / rounds.total) * 100);
+    renderShell(`
+        <div class="verse-cloze-game">
+            <div class="verse-cloze-progress-row">
+                <span>總進度 ${rounds.current} / ${rounds.total}</span>
+                <button type="button" data-action="change-passage">更換經文</button>
+            </div>
+            <div class="verse-cloze-progress" aria-label="總進度"><span style="width:${percent}%"></span></div>
+            <section class="verse-cloze-question">
+                <div class="verse-cloze-question-meta">
+                    <span>${escapeHtml(`${session.book.zh} ${session.chapter}:${verse.verse}`)}</span>
+                    <strong>${level.isFinal ? '完整驗收' : `第 ${session.levelIndex + 1} 關`}</strong>
+                </div>
+                <div class="verse-cloze-prompt">${prompt}</div>
+                <div class="verse-cloze-diff-list" aria-live="polite"></div>
+                <div class="verse-cloze-status" aria-live="polite"></div>
+            </section>
+            <div class="verse-cloze-game-actions">
+                <button type="button" class="verse-cloze-hint-button" data-action="show-hint" hidden>${icons.hint}<span>提示</span></button>
+                <div class="verse-cloze-answer-actions">
+                    <button type="button" class="verse-cloze-primary-button" data-action="check-answer">${icons.check}<span>確認答案</span></button>
+                    <button type="button" class="verse-cloze-primary-button verse-cloze-next-button" data-action="next-round" hidden>${icons.chevronRight}<span>下一關</span></button>
+                </div>
+            </div>
+        </div>`, {
+        title: passageRef,
+        subtitle: '逐段填入經文內容',
+        backAction: 'back-to-verses'
+    });
+    activateClozeInput(state.root.querySelector('[data-cloze-input]'));
+}
+function updateHintButton() {
+    const button = state.root?.querySelector('[data-action="show-hint"]');
+    if (!button) return;
+    const input = state.activeHintInput;
+    const canShow = Boolean(
+        input &&
+        input.isConnected &&
+        !input.readOnly &&
+        !String(input.value || '').trim()
+    );
+    button.hidden = !canShow;
+}
+function activateClozeInput(input) {
+    if (!input || !input.isConnected || input.readOnly) return;
+    state.activeHintInput = input;
+    input.focus({ preventScroll: true });
+    updateHintButton();
+}
+function applyHint() {
+    const input = state.activeHintInput;
+    if (!input || !input.isConnected || input.readOnly || String(input.value || '').trim()) {
+        updateHintButton();
+        return;
+    }
+    const firstCharacter = Array.from(input.dataset.answer || '')[0];
+    if (!firstCharacter) return;
+    input.value = firstCharacter;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus({ preventScroll: true });
+    updateHintButton();
+}
+function renderDiff(diff, index) {
+    const chars = diff.map(item => `<span class="${item.status}" aria-label="${item.status === 'missing' ? '缺少一字' : ''}">${escapeHtml(item.character)}</span>`).join('');
+    return `<div class="verse-cloze-diff"><small>第 ${index + 1} 格</small><div>${chars}</div></div>`;
+}
+function checkAnswer() {
+    if (!state.session || state.session.correct) return;
+    state.activeHintInput = null;
+    updateHintButton();
+    const inputs = [...state.root.querySelectorAll('[data-cloze-input]')];
+    if (!inputs.length) return;
+    let allCorrect = true;
+    const diffRows = [];
+    inputs.forEach((input, index) => {
+        const expected = input.dataset.answer || '';
+        const actual = input.value.trim();
+        const correct = normalizeAnswerText(actual) === normalizeAnswerText(expected);
+        input.classList.toggle('correct', correct);
+        input.classList.toggle('incorrect', !correct);
+        input.setAttribute('aria-invalid', String(!correct));
+        if (!correct) {
+            allCorrect = false;
+            diffRows.push(renderDiff(diffVerseCharacters(actual, expected), index));
+        }
+    });
+    const status = state.root.querySelector('.verse-cloze-status');
+    const diffList = state.root.querySelector('.verse-cloze-diff-list');
+    diffList.innerHTML = diffRows.join('');
+    if (!allCorrect) {
+        status.className = 'verse-cloze-status error';
+        status.textContent = '還有不一致的地方，修改紅框內容後再試一次。';
+        state.root.querySelector('[data-cloze-input].incorrect')?.focus();
+        return;
+    }
+    state.session.correct = true;
+    inputs.forEach(input => { input.readOnly = true; });
+    status.className = 'verse-cloze-status success';
+    status.textContent = '正確';
+    state.root.querySelector('[data-action="check-answer"]').hidden = true;
+    state.root.querySelector('[data-action="next-round"]').hidden = false;
+    state.autoAdvanceTimer = setTimeout(advanceRound, 600);
+}
+function advanceRound() {
+    clearTimeout(state.autoAdvanceTimer);
+    const session = state.session;
+    if (!session || !session.correct) return;
+    session.completedRounds += 1;
+    const verse = session.selectedVerses[session.verseIndex];
+    if (session.levelIndex + 1 < verse.levels.length) {
+        session.levelIndex += 1;
+    } else if (session.verseIndex + 1 < session.selectedVerses.length) {
+        session.verseIndex += 1;
+        session.levelIndex = 0;
+    } else {
+        clearSavedProgress();
+        renderComplete();
+        return;
+    }
+    session.correct = false;
+    saveProgress();
+    renderGame();
+}
+function renderComplete() {
+    state.view = 'complete';
+    const session = state.session;
+    const rounds = session.selectedVerses.reduce((total, verse) => total + verse.levels.length, 0);
+    const reference = formatReference(session.book, session.chapter, session.selectedVerses[0].verse, session.selectedVerses[session.selectedVerses.length - 1].verse);
+    renderShell(`
+        <div class="verse-cloze-complete">
+            <span class="verse-cloze-complete-icon">${icons.check}</span>
+            <h2>完成練習</h2>
+            <strong>${escapeHtml(reference)}</strong>
+            <p>已完成 ${rounds} 關</p>
+            <div>
+                <button type="button" class="verse-cloze-secondary-button" data-action="choose-another">${icons.book}<span>選擇其他經文</span></button>
+                <button type="button" class="verse-cloze-primary-button" data-action="repeat-game">${icons.refresh}<span>再練一次</span></button>
+            </div>
+        </div>`);
+}
+function handleClick(event) {
+    const input = event.target.closest?.('[data-cloze-input]');
+    if (input) {
+        activateClozeInput(input);
+        return;
+    }
+    const button = event.target.closest('[data-action]');
+    if (!button || !state.root.contains(button) || button.disabled) {
+        state.activeHintInput = null;
+        updateHintButton();
+        return;
+    }
+    const action = button.dataset.action;
+    if (action !== 'show-hint') {
+        state.activeHintInput = null;
+        updateHintButton();
+    }
+    if (action === 'select-book') {
+        state.selectedBook = state.allBooks.find(book => book.id === button.dataset.bookId);
+        if (state.selectedBook) renderChapters();
+    } else if (action === 'select-chapter') {
+        void openVerseSelection(Number(button.dataset.chapter));
+    } else if (action === 'select-verse') {
+        selectVerse(Number(button.dataset.verse));
+    } else if (action === 'set-mode') {
+        state.selectionMode = button.dataset.mode === 'range' ? 'range' : 'single';
+        state.selectionStart = null;
+        state.selectionEnd = null;
+        renderVerses();
+    } else if (action === 'start-game') {
+        startSelectedGame();
+    } else if (action === 'check-answer') {
+        checkAnswer();
+    } else if (action === 'next-round') {
+        advanceRound();
+    } else if (action === 'show-hint') {
+        applyHint();
+    } else if (action === 'continue-saved') {
+        void restoreSavedProgress(false);
+    } else if (action === 'restart-saved') {
+        void restoreSavedProgress(true);
+    } else if (action === 'repeat-game') {
+        beginSession(state.session.selectedVerses);
+    } else if (action === 'choose-another') {
+        state.selectionStart = null;
+        state.selectionEnd = null;
+        renderVerses();
+    } else if (action === 'back-to-books') {
+        renderBooks();
+    } else if (action === 'back-to-chapters') {
+        renderChapters();
+    } else if (action === 'back-to-verses' || action === 'change-passage') {
+        clearTimeout(state.autoAdvanceTimer);
+        renderVerses();
+    }
+}
+function handleInput(event) {
+    const input = event.target.closest('[data-cloze-input]');
+    if (!input) return;
+    input.classList.remove('correct', 'incorrect');
+    input.removeAttribute('aria-invalid');
+    state.session.correct = false;
+    const status = state.root.querySelector('.verse-cloze-status');
+    const diffList = state.root.querySelector('.verse-cloze-diff-list');
+    if (status) {
+        status.className = 'verse-cloze-status';
+        status.textContent = '';
+    }
+    if (diffList) diffList.innerHTML = '';
+    if (state.activeHintInput === input) updateHintButton();
+}
+function handleKeydown(event) {
+    if (event.key !== 'Enter' || event.isComposing || !event.target.matches('[data-cloze-input]')) return;
+    event.preventDefault();
+    const inputs = [...state.root.querySelectorAll('[data-cloze-input]')];
+    const index = inputs.indexOf(event.target);
+    if (index >= 0 && index < inputs.length - 1) {
+        activateClozeInput(inputs[index + 1]);
+    } else {
+        checkAnswer();
+    }
+}
+export function mountVerseCloze({ root, books, fetchChapter }) {
+    if (!root || !books || typeof fetchChapter !== 'function') {
+        throw new Error('Verse cloze configuration is incomplete');
+    }
+    state.root = root;
+    state.books = books;
+    state.fetchChapter = fetchChapter;
+    state.allBooks = [...books.oldTestament, ...books.newTestament];
+    if (root.dataset.eventsBound !== 'true') {
+        root.addEventListener('click', handleClick);
+        root.addEventListener('input', handleInput);
+        root.addEventListener('keydown', handleKeydown);
+        root.dataset.eventsBound = 'true';
+    }
+    renderBooks();
+}
