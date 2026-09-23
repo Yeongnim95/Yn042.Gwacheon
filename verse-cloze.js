@@ -275,12 +275,21 @@ async function openVerseSelection(chapter) {
 function renderVerses() {
     state.view = 'verses';
     const saved = loadSavedProgress();
+    const savedStartVerse = Number(saved?.startVerse);
     const savedEndVerse = saved?.bookId === state.selectedBook.id &&
         Number(saved.chapter) === state.chapter &&
+        Number.isInteger(savedStartVerse) &&
+        savedStartVerse <= Number(saved.endVerse) &&
+        state.verses.some(verse => Number(verse.verse) === savedStartVerse) &&
         state.verses.some(verse => Number(verse.verse) === Number(saved.endVerse))
         ? Number(saved.endVerse)
         : null;
-    const resumeCard = renderResumeCard(true);
+    const savedVerses = savedEndVerse === null ? [] : state.verses.filter(verse => {
+        const number = Number(verse.verse);
+        return number >= savedStartVerse && number <= savedEndVerse && createVerseLevels(verse.zh).length;
+    });
+    const savedIndex = Math.min(Math.max(Math.trunc(Number(saved?.verseIndex) || 0), 0), savedVerses.length - 1);
+    const savedCurrentVerse = savedVerses.length ? Number(savedVerses[savedIndex].verse) : null;
     const start = Number(state.selectionStart);
     const end = Number(state.selectionEnd || state.selectionStart);
     const selectedCount = state.selectionStart == null ? 0 : state.verses.filter(verse => {
@@ -292,7 +301,7 @@ function renderVerses() {
         : state.selectionStart != null && state.selectionEnd != null;
     renderShell(`
         <div class="verse-cloze-body verse-cloze-selection-body">
-            ${savedEndVerse === null ? resumeCard : ''}
+            ${savedCurrentVerse === null ? renderResumeCard(true) : ''}
             <div class="verse-cloze-step" aria-label="步驟"><b class="done">✓</b><span>${escapeHtml(state.selectedBook.zh)}</span><i></i><b class="done">✓</b><span>第 ${state.chapter} 章</span><i></i><b>3</b><span>選擇經文</span></div>
             <div class="verse-cloze-mode" role="group" aria-label="選取方式">
                 <button type="button" data-action="set-mode" data-mode="single" class="${state.selectionMode === 'single' ? 'active' : ''}">單節</button>
@@ -303,9 +312,21 @@ function renderVerses() {
                 ${state.verses.map(verse => {
                     const number = Number(verse.verse);
                     const selected = state.selectionStart != null && number >= Math.min(start, end) && number <= Math.max(start, end);
-                    return `<button type="button" data-action="select-verse" data-verse="${number}" class="${selected ? 'selected' : ''}">
+                    const savedRange = savedCurrentVerse !== null && state.selectionStart == null && number >= savedStartVerse && number <= savedEndVerse;
+                    const verseButton = `<button type="button" data-action="select-verse" data-verse="${number}" class="verse-cloze-verse-button${selected ? ' selected' : ''}${savedRange ? ' is-saved-range' : ''}">
                         <strong>${escapeHtml(verse.verse)}</strong><span>${escapeHtml(verse.zh)}</span>
-                    </button>${number === savedEndVerse ? resumeCard : ''}`;
+                    </button>`;
+                    if (number !== savedCurrentVerse) return verseButton;
+                    const savedRangeLabel = savedStartVerse === savedEndVerse
+                        ? `第 ${savedStartVerse} 節`
+                        : `${savedStartVerse}–${savedEndVerse} 節`;
+                    return `<div class="verse-cloze-verse-progress">
+                        ${verseButton}
+                        <div class="verse-cloze-verse-resume" aria-label="上次練習">
+                            <span>上次練習 <strong>${escapeHtml(savedRangeLabel)}</strong></span>
+                            <button type="button" data-action="continue-saved">${icons.play}<span>繼續</span></button>
+                        </div>
+                    </div>`;
                 }).join('')}
             </div>
             <div class="verse-cloze-selection-bar">

@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '20260923113702';
+const APP_VERSION = '20260923131410';
 window.__APP_VERSION__ = APP_VERSION;
 function getInitialLanguage() {
     const saved = localStorage.getItem('app_lang');
