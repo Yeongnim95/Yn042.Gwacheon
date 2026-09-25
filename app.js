@@ -1,5 +1,5 @@
 // --- APP VERSION ---
-const APP_VERSION = '20260923134224';
+const APP_VERSION = '20260925174836';
 window.__APP_VERSION__ = APP_VERSION;
 function getInitialLanguage() {
     const saved = localStorage.getItem('app_lang');
@@ -640,9 +640,9 @@ function applyLanguage() {
     const aiInput = document.getElementById('aiPanelInput');
     if (aiTitle) aiTitle.textContent = currentLang === 'ko' ? 'AI 도우미' : 'AI 助手';
     if (aiNote) aiNote.innerHTML = currentLang === 'ko'
-        ? '이동: <b>cd 계1</b> / <b>계1:5 가요</b> | 복사: <b>cp 창1:1</b> / <b>cp 주기도문</b>'
-        : '跳轉: <b>cd 啟1</b> / <b>到 啟1:5</b> | 複製: <b>cp 創1:1</b> / <b>cp 主祈禱文</b>';
-    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? 'cd 계1 / 계1:5 가요 / cp 창1:1 / cp 주기도문' : 'cd 啟1 / 到 啟1:5 / cp 創1:1 / cp 主祈禱文';
+        ? '이동: <b>cd 계1</b> | 복사: <b>v 창1:1</b> / <b>태10장</b> / <b>v 주기도문</b>'
+        : '跳轉: <b>cd 啟1</b> | 複製: <b>v 創1:1</b> / <b>太10章</b> / <b>v 主祈禱文</b>';
+    if (aiInput) aiInput.placeholder = currentLang === 'ko' ? 'v 창1:1 / 태10장 / v 주기도문 / cd 계1' : 'v 創1:1 / 太10章 / v 主祈禱文 / cd 啟1';
     // 首頁第一頁標題和經文也更新
     if (document.getElementById('homeSection').classList.contains('active-section')) {
         initDailyVerse();
@@ -4777,8 +4777,9 @@ function hasNavigationIntentCue(input) {
         || /(?:이동해주세요|이동해줘|이동하세요|이동해요|이동해|이동)/.test(input)
         || /(?:^|\s)(?:가세요|가요|가자|가지|가)(?:\s|$)/.test(input);
 }
+const AI_COPY_COMMAND_PATTERN = /^(?:v|copy|cp|複製|复制|복사)\s+(.+)$/i;
 function parseBibleCopyCommand(input) {
-    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    const match = input.trim().match(AI_COPY_COMMAND_PATTERN);
     if (!match) return null;
     const parsed = parseBibleQuery(match[1].trim());
     return parsed.queries.length > 0 ? parsed : null;
@@ -4822,7 +4823,7 @@ function parsePrayerNavigationQuery(input) {
     return hasNavigationIntent && isPrayerTarget(target);
 }
 function parsePrayerCopyCommand(input) {
-    const match = input.trim().match(/^(?:copy|cp|複製|复制|복사)\s+(.+)$/i);
+    const match = input.trim().match(AI_COPY_COMMAND_PATTERN);
     if (!match) return null;
     const { language, cleanInput } = detectBibleCopyLanguage(match[1]);
     return isPrayerTarget(cleanInput) ? { language } : null;
@@ -5083,7 +5084,7 @@ window.aiPanelSearch = async () => {
         input.value = '';
         return;
     }
-    // 模式 0-b：複製主祈禱文，例如 cp 主禱文 / cp 주기도문 / cp lords prayer
+    // 模式 0-b：複製主祈禱文，例如 v 主禱文 / v 주기도문 / v lords prayer
     const prayerCopyCommand = parsePrayerCopyCommand(query);
     if (prayerCopyCommand) {
         sendBtn.disabled = true;
@@ -5100,7 +5101,7 @@ window.aiPanelSearch = async () => {
         }
         return;
     }
-    // 模式 0：明確複製指令，例如 copy gen1:1 / cp gen1:1
+    // 模式 0：明確複製指令，例如 v gen1:1
     const copyCommand = parseBibleCopyCommand(query);
     if (copyCommand) {
         sendBtn.disabled = true;
@@ -5252,7 +5253,7 @@ async function parseAiAssistantIntentWithAI(query) {
 規則：
 - 判斷使用者真正意圖，不要只看是否有聖經章節。
 - 有「移動、移动、到、去、前往、打開、打开、開啟、이동、이동해주세요、이동해、이동해요、가、가요、가세요、go to、move to、open、cd」等語氣時，優先判斷為 navigate_bible 或 open_prayer。
-- 有「複製、复制、복사、copy、cp」才判斷為 copy_bible 或 copy_prayer。
+- 有「v、複製、复制、복사、copy、cp」，或只輸入經文引用（例如「太10章」）時，判斷為 copy_bible；「v 主祈禱文」判斷為 copy_prayer。
 - 使用者若是在問聖經含義、屬靈應用、相關經文、罪/美德/操練/安慰/勸勉，或用自然語句請你查經，回 semantic_bible_search。
 - 使用者提到聖經但意圖不清楚，不要擅自複製，回 clarify_intent 並用使用者語言反問：要複製、移動，還是查詢相關經文。
 - 完全不是聖經、主禱文或信仰經文相關，回 unknown。
@@ -5265,9 +5266,9 @@ async function parseAiAssistantIntentWithAI(query) {
 移動 創5章 → {"action":"navigate_bible","bookId":"gen","chapter":5,"verse":null}
 이동해주세요 창5장 → {"action":"navigate_bible","bookId":"gen","chapter":5,"verse":null}
 啟5章 → {"action":"copy_bible","queries":[{"bookId":"rev","chapter":5,"verses":"all"}],"language":"zh"}
-cp gen1:1 kr → {"action":"copy_bible","queries":[{"bookId":"gen","chapter":1,"verses":[1]}],"language":"ko"}
+v gen1:1 kr → {"action":"copy_bible","queries":[{"bookId":"gen","chapter":1,"verses":[1]}],"language":"ko"}
 我常常懶惰拖延，請找相關經文幫助我 → {"action":"semantic_bible_search","question":"我常常懶惰拖延，請找相關經文幫助我","language":"zh"}
-cp 주기도문 → {"action":"copy_prayer","language":"ko"}
+v 주기도문 → {"action":"copy_prayer","language":"ko"}
 移動到主禱文 → {"action":"open_prayer"}
 輸入：${query}`;
     const response = await fetchAiWorker(prompt);
@@ -5281,8 +5282,8 @@ async function runAiAssistantIntent(intent, query, input) {
     if (!intent || intent.action === 'unknown') return false;
     if (intent.action === 'clarify_intent') {
         const fallbackMessage = currentLang === 'ko'
-            ? '원하시는 작업이 복사인지, 이동인지, 관련 경문 검색인지 확인해 주세요.\n예: cp 창1:1 / cd 창1:1 / 게으름에 관한 말씀 찾아줘'
-            : '我不太確定你想做哪一件事，請確認是要「複製經文」、「移動到章節」，還是「查詢相關經文」。\n例：cp 創1:1 / cd 創1:1 / 查詢懶惰相關經文';
+            ? '원하시는 작업이 복사인지, 이동인지, 관련 경문 검색인지 확인해 주세요.\n예: v 창1:1 / cd 창1:1 / 게으름에 관한 말씀 찾아줘'
+            : '我不太確定你想做哪一件事，請確認是要「複製經文」、「移動到章節」，還是「查詢相關經文」。\n例：v 創1:1 / cd 創1:1 / 查詢懶惰相關經文';
         saveAiPanelResult({
             query,
             text: intent.message || fallbackMessage,
@@ -5506,6 +5507,7 @@ window.smartCopy = async () => {
         input.focus();
         return;
     }
+    const copyTarget = query.match(AI_COPY_COMMAND_PATTERN)?.[1] || query;
     // 構建書卷對照表（給AI用）
     const allBooks = [...bibleBooks.oldTestament, ...bibleBooks.newTestament];
     const bookRef = allBooks.map(b => {
@@ -5549,13 +5551,13 @@ ${bookRef}
 - "사2:4 중국어" → isa 2章 4節 language=zh
 - "創1:2-3、6 出2:1 中" → gen 1章 2,3,6節 + exo 2章 1節 language=zh
 - 如果無法解析，返回 { "error": "無法識別的經文格式" }
-用戶輸入：${query}`;
+用戶輸入：${copyTarget}`;
     // UI 狀態
     btn.classList.add('loading');
     btn.disabled = true;
     resultDiv.classList.remove('show');
     try {
-        const localParsed = parseBibleQuery(query);
+        const localParsed = parseBibleQuery(copyTarget);
         const localFormatted = localParsed.queries.length > 0
             ? await formatBibleResult(localParsed)
             : { text: '', foundCount: 0 };

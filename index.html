@@ -13,7 +13,7 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=20260923134224">
+<link rel="modulepreload" href="/app.js?v=20260925174836">
 <link rel="stylesheet" href="/fonts.css?v=20260914220550">
 <title>비공개의 새싹</title>
 <link rel="stylesheet" href="/style.css?v=20260914220550">
@@ -166,7 +166,7 @@ right: 0 !important;
 <div class="ai-panel-body">
 <div class="ai-panel-input-wrap">
 <input type="text" class="ai-panel-input" id="aiPanelInput"
-placeholder="創1:1 中 / 到 啟1章 / 聖經字體"
+placeholder="v 創1:1 / 太10章 / cd 啟1"
 onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <button class="ai-panel-send" onclick="window.aiPanelSearch()">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
@@ -175,7 +175,7 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 </button>
 </div>
 <div class="ai-panel-note">
-<span style="color: var(--text-secondary); font-size: 11px;" id="aiPanelNote">經文: 創1:1 中 | 跳轉: 到 啟1章 | 字體: 聖經字體</span>
+<span style="color: var(--text-secondary); font-size: 11px;" id="aiPanelNote">複製: v 創1:1 / 太10章 | 跳轉: cd 啟1</span>
 </div>
 <div class="ai-panel-result" id="aiPanelResult"></div>
 </div>
@@ -472,11 +472,11 @@ CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
 AI 智能複製
 </div>
 <div class="smart-copy-examples" id="smartCopyExamples">
-例：創1:1-3 中文 / 창1:1、3、5 / 啟1:1 太1:5-7
+例：太10章 / v 創1:1-3 中文 / 창1:1、3、5
 </div>
 <div class="smart-copy-input-wrap">
 <input type="text" class="smart-copy-input" id="smartCopyInput"
-placeholder="輸入經文如：創1:1-3 中文"
+placeholder="太10章 / v 創1:1-3 中文"
 onkeydown="if(event.key==='Enter') window.smartCopy()">
 </div>
 <button class="smart-copy-btn" id="smartCopyBtn" onclick="window.smartCopy()">
@@ -646,6 +646,6 @@ AI
 </div>
 </div>
 </div>
-<script type="module" src="/app.js?v=20260923134224"></script>
+<script type="module" src="/app.js?v=20260925174836"></script>
 </body>
 </html>
