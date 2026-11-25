@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#f5f0e8" id="themeColorMeta">
+<meta name="color-scheme" content="light dark">
+<script>
+(() => {
+let preference;
+try { preference = localStorage.getItem('app_theme'); } catch {}
+const dark = preference === 'dark' ||
+(preference !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+document.getElementById('themeColorMeta').content = dark ? '#131413' : '#f5f0e8';
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="비공개의 새싹">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -13,10 +24,10 @@
 <link rel="shortcut icon" href="/favicon-2.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-2.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="modulepreload" href="/app.js?v=2026.11.22.01">
-<link rel="stylesheet" href="/fonts.css?v=2026.11.22.01">
+<link rel="modulepreload" href="/app.js?v=2026.11.26.01">
+<link rel="stylesheet" href="/fonts.css?v=2026.11.26.01">
 <title>비공개의 새싹</title>
-<link rel="stylesheet" href="/style.css?v=2026.11.22.01">
+<link rel="stylesheet" href="/style.css?v=2026.11.26.01">
 <script>
 (function() {
 try {
@@ -24,98 +35,86 @@ if (localStorage.getItem('serifPackInstalled') === '1') {
 var link = document.createElement('link');
 link.id = 'serif-font-stylesheet';
 link.rel = 'stylesheet';
-link.href = '/fonts-serif.css?v=2026.11.22.01';
+link.href = '/fonts-serif.css?v=2026.11.26.01';
 document.head.appendChild(link);
 }
 } catch(e) {}
 })();
 </script>
-<style>
-#homeSection .home-hero-title {
-left: 0 !important;
-right: 0 !important;
-}
-</style>
 </head>
 <body>
-<nav>
-<div class="nav-left">
-<div class="nav-title"><img src="/logo-20260509.avif" alt="logo" width="28" height="28" decoding="async" fetchpriority="high" style="width:28px;height:28px;vertical-align:middle;"></div>
-<div class="menu-toggle" onclick="window.toggleMenu()" aria-expanded="false" aria-controls="menuDropdown">
-<span id="current-page-icon" class="nav-current-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg></span>
-<span id="current-page-title">홈</span>
-<span class="dropdown-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+<aside id="appSidebar" class="app-sidebar" aria-label="사이트 메뉴">
+<div class="app-sidebar-brand">
+<img class="app-sidebar-logo" src="/logo-20260509.avif" alt="" width="32" height="32" decoding="async">
 </div>
-<div class="menu-dropdown" id="menuDropdown">
-<div class="menu-category" id="menu-category-home">
-<div class="menu-category-title home-link" onclick="window.switchPage('home')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg></span><span id="menu-home-title">홈</span></span>
-</div>
-</div>
-<div class="menu-category" id="menu-category-notifications">
-<div class="menu-category-title notifications-link" onclick="window.switchPage('notifications')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><span id="menu-notifications-title">알림</span></span>
-<span class="menu-notification-badge" id="menuNotificationBadge" hidden>0</span>
-</div>
-</div>
-<div class="menu-category" id="menu-category-faith-auto">
-<div class="menu-category-title" onclick="window.toggleSubMenu('faith-auto')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="8" rx="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.6 2.6M16.4 16.4 19 19M19 5l-2.6 2.6M7.6 16.4 5 19"/></svg></span><span id="menu-faith-auto-title">에이전트 관리</span></span>
-<span class="submenu-arrow">▶</span>
-</div>
+<button type="button" class="app-sidebar-button" data-sidebar-item="home" aria-label="홈" onclick="window.switchPage('home')"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg><span class="app-sidebar-label" id="menu-home-title">홈</span></button>
+<div class="menu-category" id="menu-category-faith-auto" data-sidebar-item="faith-auto">
+<button type="button" class="app-sidebar-button" aria-expanded="false" aria-controls="submenu-faith-auto" aria-label="에이전트 관리" onclick="window.toggleSubMenu('faith-auto')"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="8" height="8" rx="2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.6 2.6M16.4 16.4 19 19M19 5l-2.6 2.6M7.6 16.4 5 19"/></svg><span class="app-sidebar-label" id="menu-faith-auto-title">에이전트 관리</span></button>
 <div class="menu-submenu" id="submenu-faith-auto">
 </div>
 </div>
-<div class="menu-category" id="menu-category-books">
-<div class="menu-category-title" onclick="window.toggleSubMenu('books')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5c2.2-.9 4.6-.6 7.5 1.1v12.2c-2.7-1.6-5.1-2-7.5-1.1z"/><path d="M19.5 5.5c-2.2-.9-4.6-.6-7.5 1.1v12.2c2.7-1.6 5.1-2 7.5-1.1z"/><path d="M12 6.6v12.2"/></svg></span><span id="menu-books-title">서적</span></span>
-<span class="submenu-arrow">▶</span>
-</div>
+<div class="menu-category" id="menu-category-books" data-sidebar-item="books">
+<button type="button" class="app-sidebar-button" aria-expanded="false" aria-controls="submenu-books" aria-label="서적" onclick="window.toggleSubMenu('books')"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4.5 5.5c2.2-.9 4.6-.6 7.5 1.1v12.2c-2.7-1.6-5.1-2-7.5-1.1z"/><path d="M19.5 5.5c-2.2-.9-4.6-.6-7.5 1.1v12.2c2.7-1.6 5.1-2 7.5-1.1z"/><path d="M12 6.6v12.2"/></svg><span class="app-sidebar-label" id="menu-books-title">서적</span></button>
 <div class="menu-submenu" id="submenu-books">
+<div class="menu-submenu-items">
 <button class="menu-btn" onclick="window.switchPage('bible')" id="btn-bible">성경</button>
 <button class="menu-btn" onclick="window.switchPage('lords-prayer')" id="btn-lords-prayer">주기도문</button>
 <button class="menu-btn" onclick="window.switchPage('verse-cloze')" id="btn-verse-cloze">성경 빈칸 게임</button>
 <button class="menu-btn" onclick="window.switchPage('terminal-bible')" id="btn-terminal-bible">터미널 성경</button>
 </div>
 </div>
-<div class="menu-category" id="menu-category-settings">
-<div class="menu-category-title settings-link" onclick="window.switchPage('settings')">
-<span class="menu-title-main"><span class="menu-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M2.8 12h2.4M18.8 12h2.4M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><path d="M8.8 3.7 7.7 6.1M16.3 17.9l-1.1 2.4M3.7 15.2l2.4 1.1M17.9 7.7l2.4 1.1M3.7 8.8l2.4-1.1M17.9 16.3l2.4-1.1M8.8 20.3l-1.1-2.4M16.3 6.1l-1.1-2.4"/></svg></span><span id="menu-settings-title">설정</span></span>
 </div>
-</div>
-</div>
-</div>
-<div class="settings-group">
-<button class="nav-bible-search-btn" id="navBibleSearchBtn" onclick="window.openBibleSearch()" title="搜尋經文" aria-label="搜尋經文" aria-expanded="false" aria-controls="bibleSearchPanel">
-<svg viewBox="0 0 512 512" aria-hidden="true">
-<rect x="62" y="62" width="388" height="388" rx="38"/>
-<path d="M132 142h248"/>
-<path d="M132 234h248"/>
-<path d="M132 342h84"/>
-<circle cx="323" cy="342" r="74"/>
-<path d="m377 396 72 72"/>
-</svg>
+<div class="app-sidebar-divider" aria-hidden="true"></div>
+<button type="button" class="app-sidebar-button" data-sidebar-item="notifications" id="sidebarNotificationBtn" aria-label="알림" onclick="window.switchPage('notifications')"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span class="app-sidebar-label" id="menu-notifications-title">알림</span>
+<span class="menu-notification-badge" id="menuNotificationBadge" hidden>0</span></button>
+<button type="button" class="app-sidebar-button" data-sidebar-item="settings" aria-label="설정" onclick="window.switchPage('settings')"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M2.8 12h2.4M18.8 12h2.4M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><path d="M8.8 3.7 7.7 6.1M16.3 17.9l-1.1 2.4M3.7 15.2l2.4 1.1M17.9 7.7l2.4 1.1M3.7 8.8l2.4-1.1M17.9 16.3l2.4-1.1M8.8 20.3l-1.1-2.4M16.3 6.1l-1.1-2.4"/></svg><span class="app-sidebar-label" id="menu-settings-title">설정</span></button>
+<button type="button" class="app-sidebar-button app-sidebar-toggle" id="sidebarToggle" aria-controls="appSidebar" aria-expanded="false" aria-label="사이드바 펼치기" onclick="window.toggleSidebar()">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
 </button>
+</aside>
+<div id="sidebarBackdrop" class="app-sidebar-backdrop" aria-hidden="true" onclick="window.closeSidebarDrawer()"></div>
+<header id="appTopbar" class="app-topbar">
+<button type="button" id="sidebarOpen" class="app-sidebar-open" aria-controls="appSidebar" aria-expanded="false" aria-label="메뉴 열기" onclick="window.toggleSidebarDrawer()">
+<span id="sidebarOpenIcon" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg></span>
+</button>
+<div id="appSearch" class="app-search">
+<div class="app-search-surface">
+<div class="app-search-field">
+<svg class="app-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+<input id="appSearchInput" type="text" role="combobox" aria-expanded="false" aria-controls="appSearchDropdown" aria-label="搜尋經文" autocomplete="off" enterkeyhint="search" onfocus="window.openAppSearch()" onkeydown="window.appSearchHandleKeydown(event)">
+<button type="button" id="appSearchClose" class="app-search-close" aria-label="關閉搜尋" onclick="window.closeAppSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+<button type="button" id="appSearchSubmit" class="app-search-submit" aria-label="搜尋" onclick="window.appSearchSubmit()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>
+</div>
+<div id="appSearchDropdown" class="app-search-dropdown" inert>
+<div class="app-search-content">
+<div id="appSearchCommandResults" aria-live="polite"></div>
+<div id="appSearchHistory" class="bible-search-section" hidden>
+<div id="txtSearchHistory" class="bible-search-section-title"></div>
+<div class="bible-search-history"></div>
+</div>
+<div id="appSearchHint" class="bible-search-hint"></div>
+<div id="appSearchLoading" class="bible-search-ai-loading" style="display:none" role="status"></div>
+<div id="appSearchConfirm" class="app-search-confirm" hidden></div>
+<div id="appSearchResultsTitle" class="app-search-results-title" hidden></div>
+<div id="appSearchResults" class="bible-search-results" style="display:none"></div>
+<div id="appSearchPreview" hidden>
+<div class="bible-search-preview-header">
+<button type="button" id="appSearchPreviewBack" class="app-search-preview-action" aria-label="返回結果" onclick="window.closeSearchPreview(false)">&#8592;</button>
+<div class="bible-search-preview-title"></div>
+<button type="button" id="appSearchPreviewChapter" class="app-search-preview-action" onclick="window.closeSearchPreview()">閱讀本章</button>
+</div>
+<div class="bible-search-preview-body"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <button class="nav-bible-display-btn" id="navBibleDisplayBtn" onclick="window.toggleBibleDisplayPanel()" title="經文顯示" aria-label="經文顯示" aria-expanded="false" aria-controls="bibleDisplayPanel">
 <svg viewBox="0 0 24 24" aria-hidden="true">
 <text x="12" y="16.6" text-anchor="middle">文</text>
 </svg>
 </button>
-<button class="nav-ai-btn" onclick="window.toggleAiPanel()" title="AI Assistant" aria-expanded="false" aria-controls="aiPanel">
-<span class="nav-ai-text">AI</span>
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-</svg>
-</button>
-<button class="nav-notification-btn" id="navNotificationBtn" onclick="window.toggleNotificationPanel()" title="通知" aria-label="通知" aria-expanded="false" aria-controls="notificationPanel">
-<svg viewBox="0 0 24 24" aria-hidden="true">
-<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
-<path d="M10 21h4"/>
-</svg>
-<span class="nav-notification-badge" id="navNotificationBadge" hidden>0</span>
-</button>
-</div>
-</nav>
+</header>
 <div class="bible-display-overlay" id="bibleDisplayOverlay" onclick="window.closeBibleDisplayPanel()"></div>
 <section class="bible-display-panel" id="bibleDisplayPanel" role="dialog" aria-modal="true" aria-labelledby="bibleDisplayPanelTitle">
 <header class="bible-display-header">
@@ -152,122 +151,46 @@ right: 0 !important;
 </section>
 </div>
 </section>
-<div class="ai-panel-overlay" id="aiPanelOverlay" onclick="window.toggleAiPanel()"></div>
-<div class="ai-panel" id="aiPanel">
-<div class="ai-panel-header">
-<span class="ai-panel-title">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20" style="vertical-align:middle; margin-right:6px; color:var(--primary-green);">
-<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="11" r="1.5" fill="currentColor"/><circle cx="15" cy="11" r="1.5" fill="currentColor"/><path d="M9 15.5c0 0 1.5 1.5 3 1.5s3-1.5 3-1.5"/><path d="M8 4V2m8 2V2"/>
-</svg>
-<span id="aiPanelTitle">AI 助手</span>
-</span>
-<button class="ai-panel-close" onclick="window.toggleAiPanel()" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-</div>
-<div class="ai-panel-body">
-<div class="ai-panel-input-wrap">
-<input type="text" class="ai-panel-input" id="aiPanelInput"
-placeholder="v 創1:1 / 太10章 / cd 啟1"
-onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
-<button class="ai-panel-send" onclick="window.aiPanelSearch()">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>
-</svg>
-</button>
-</div>
-<div class="ai-panel-note">
-<span style="color: var(--text-secondary); font-size: 11px;" id="aiPanelNote">複製: v 創1:1 / 太10章 | 跳轉: cd 啟1</span>
-</div>
-<div class="ai-panel-result" id="aiPanelResult"></div>
-</div>
-</div>
-<div class="notification-panel-overlay" id="notificationPanelOverlay" onclick="window.closeNotificationPanel()"></div>
-<section class="notification-panel" id="notificationPanel" role="dialog" aria-modal="true" aria-labelledby="notificationPanelTitle">
-<header class="notification-panel-header">
-<span class="notification-panel-title">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
-<span id="notificationPanelTitle">通知</span>
-</span>
-<button type="button" class="notification-panel-close" onclick="window.closeNotificationPanel()" aria-label="關閉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-</header>
-<div class="notification-panel-body">
-<div class="notification-app-status" id="notificationAppStatus"></div>
-<button type="button" class="notification-permission-btn" id="notificationPermissionBtn" onclick="window.requestAppNotificationPermission()" hidden></button>
-<div class="notification-list" id="notificationList"></div>
-<p class="notification-empty" id="notificationEmpty" hidden></p>
-<button type="button" class="notification-view-all" id="notificationViewAll" onclick="window.openNotificationsPage()">查看全部通知</button>
-</div>
-</section>
 <div class="container">
 <div id="homeSection" class="page-section active-section">
 <div class="home-container">
-<div class="home-slide home-slide-1" id="dailyVerseSection">
-<div class="home-hero-image">
-<div class="daily-verse-bg" id="dailyVerseBg"></div>
-<div class="daily-verse-overlay"></div>
-<div class="home-hero-title" id="dailyVerseLabel">매일 묵상</div>
-</div>
-<div class="home-wave-transition">
-<svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0,0 L1440,0 L1440,40 C1200,90 960,10 720,50 C480,90 240,20 0,60 Z" fill="rgba(160,158,140,0.4)"/>
-<path d="M0,30 C240,80 480,15 720,55 C960,95 1200,25 1440,60 L1440,100 L0,100 Z" fill="#f5f0e8"/>
-</svg>
-</div>
-<div class="home-verse-area">
-<div style="position:relative;">
-<div class="verse-clip"></div>
-<div class="verse-hanging-card">
-<div class="home-verse-ref" id="dailyVerseReference">--</div>
-<div class="home-verse-body" id="dailyVerseText">--</div>
-</div>
-</div>
-</div>
-</div>
-<div class="home-pinch-transition">
-<div class="pinch-ornament"></div>
-</div>
-<div class="home-slide home-slide-2" id="homeCardsSection">
-<div class="home-features-wrapper">
-<div class="home-feature" onclick="window.switchPage('bible')">
-<div class="home-feature-img">
-<img src="home-bible.avif" alt="Bible" loading="lazy" decoding="async">
-</div>
-<div class="home-feature-text">
-<div class="home-feature-icon">
-<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M24 6v36M24 8C21 6 15 5 6 7v32c9-2 15-1 18 3m0-34C27 6 33 5 42 7v32c-9-2-15-1-18 3"/></svg>
-</div>
-<div class="home-feature-title" id="home-feat-bible-title">성경</div>
-<div class="home-feature-desc" id="home-feat-bible-desc">말씀을 읽고, 묵상하고,<br>마음에 새기는 시간</div>
-</div>
-</div>
-<div class="home-feature reverse" onclick="window.switchPage('faithAuto')">
-<div class="home-feature-img">
-<img src="home-auto.avif" alt="Faith Automation" loading="lazy" decoding="async">
-</div>
-<div class="home-feature-text">
-<div class="home-feature-icon">
-<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="24" cy="24" r="8"/><path d="M24 4v6m0 28v6m20-20h-6M10 24H4m34.1-14.1l-4.2 4.2M18.1 29.9l-4.2 4.2m24.2 0l-4.2-4.2M18.1 18.1l-4.2-4.2"/></svg>
-</div>
-<div class="home-feature-title" id="home-feat-auto-title">에이전트 관리</div>
-<div class="home-feature-desc" id="home-feat-auto-desc">신앙 생활을 체계적으로<br>관리하고 성장하는 도구</div>
-</div>
-</div>
-</div>
+<section class="home-verse-card" id="dailyVerseSection" aria-label="오늘의 말씀">
+<h2 class="home-verse-title"><span id="dailyVerseReference"></span></h2>
+<p class="home-verse-text" id="dailyVerseText"></p>
+</section>
+<section class="home-feature-grid" id="homeCardsSection">
+<button type="button" class="home-feature-card" onclick="window.switchPage('bible')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4.5c3-1 6-.5 9 1.5v15c-3-2-6-2.5-9-1.5zM21 4.5c-3-1-6-.5-9 1.5v15c3-2 6-2.5 9-1.5z"/></svg>
+<span class="home-feature-title" id="home-feat-bible-title">성경</span>
+</button>
+<button type="button" class="home-feature-card" onclick="window.switchPage('lords-prayer')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21h10M12 21V3M6 9h12"/></svg>
+<span class="home-feature-title" id="home-feat-lords-prayer-title">주기도문</span>
+</button>
+<button type="button" class="home-feature-card" onclick="window.switchPage('verse-cloze')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 14h3m4 0h3"/></svg>
+<span class="home-feature-title" id="home-feat-verse-cloze-title">성경 빈칸 게임</span>
+</button>
+<button type="button" class="home-feature-card" onclick="window.switchPage('notifications')">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+<span class="home-feature-title" id="home-feat-notifications-title">알림</span>
+</button>
+</section>
 <div class="home-copyright-section">
 <div class="home-copyright-main" id="copyrightMain">Yeongnim 개인 소유</div>
 <div class="home-copyright-sub">Personal property of Yeongnim</div>
 </div>
 </div>
 </div>
-</div>
 <div id="notificationsSection" class="page-section">
-<main class="notifications-page" aria-labelledby="notificationsPageTitle">
-<header class="notifications-page-header">
+<header class="page-header">
 <div>
-<h2 id="notificationsPageTitle">通知</h2>
-<p id="notificationsPageRetention">保留最近 30 天</p>
+<h2 class="page-title" id="notificationsPageTitle">通知</h2>
+<p id="notificationsPageRetention">一般通知保留最近 30 天，更新紀錄永久保留</p>
 </div>
 <button type="button" class="notifications-mark-all" id="notificationsMarkAll" onclick="window.markAllNotificationsRead()">全部標記為已讀</button>
 </header>
+<main class="notifications-page" aria-labelledby="notificationsPageTitle">
 <section class="notifications-permission" aria-labelledby="notificationsPermissionTitle">
 <div>
 <h3 id="notificationsPermissionTitle">App 通知</h3>
@@ -296,15 +219,15 @@ onkeydown="if(event.key==='Enter') window.aiPanelSearch()">
 <div id="bibleSection" class="page-section">
 <div class="bible-container">
 <div id="bibleBooksList" class="bible-books-list">
-<div class="bible-section-title" id="txt-old-testament">구약성경</div>
+<div class="page-header"><div class="page-title" id="txt-old-testament">구약성경</div></div>
 <div class="bible-books-grid" id="oldTestamentBooks">
 </div>
-<div class="bible-section-title" id="txt-new-testament">신약성경</div>
+<div class="page-header"><div class="page-title" id="txt-new-testament">신약성경</div></div>
 <div class="bible-books-grid" id="newTestamentBooks">
 </div>
 <div class="bible-collection-section" id="bibleCollectionSection">
-<div class="bible-collection-title-row">
-<div class="bible-section-title bible-collection-title" id="txt-bible-collection-title">收藏</div>
+<div class="page-header bible-collection-title-row">
+<div class="page-title" id="txt-bible-collection-title">收藏</div>
 </div>
 <div class="bible-collection-sync" id="bibleCollectionSync">
 <div class="bible-collection-sync-status local" id="bibleCollectionSyncStatus">
@@ -409,11 +332,9 @@ CUNP-新標點和合本(神版) © 1988, 1989, 1996 聯合聖經公會<br>
 </div>
 <div id="lordsPrayerSection" class="page-section">
 <div class="prayer-page">
-<div class="prayer-header">
-<div>
-<h2 id="lordsPrayerTitle">주기도문</h2>
-</div>
-</div>
+<header class="page-header">
+<h2 class="page-title" id="lordsPrayerTitle">주기도문</h2>
+</header>
 <div class="prayer-content" id="lordsPrayerContent">
 <div class="loading-dots-wrapper"><div class="loading-dots"><span></span><span></span><span></span></div></div>
 </div>
@@ -490,49 +411,6 @@ onkeydown="if(event.key==='Enter') window.smartCopy()">
 </div>
 </div>
 <div class="copy-mode-hint" id="copyModeHint">點擊經文選取，再次點擊取消選取</div>
-<div class="bible-search-overlay" id="bibleSearchOverlay" onclick="window.closeBibleSearch()"></div>
-<div class="bible-search-panel" id="bibleSearchPanel">
-<div class="bible-search-header">
-<div class="bible-search-input-wrap">
-<svg class="bible-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-<input type="text" class="bible-search-input" id="bibleSearchInput"
-placeholder="" autocomplete="off" autocorrect="off" spellcheck="false"
-oninput="window.handleSearchInput(this.value)"
-onkeydown="window.handleSearchKeydown(event)">
-<button class="bible-search-clear" id="bibleSearchClear" onclick="window.clearSearchInput()">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M18 6L6 18M6 6l12 12"/></svg>
-</button>
-<button class="bible-search-ai-btn" id="bibleSearchAiBtn" onclick="window.runBibleAiSearch()" title="AI Search" aria-label="AI Search">
-AI
-</button>
-</div>
-<button class="bible-search-close" onclick="window.closeBibleSearch()" id="bibleSearchCloseBtn">
-<span id="bibleSearchCancelText">취소</span>
-</button>
-</div>
-<div class="bible-search-body" id="bibleSearchBody">
-<div id="bibleSearchHistorySection" class="bible-search-section">
-<div class="bible-search-section-title" id="txtSearchHistory">최근 검색</div>
-<div class="bible-search-history" id="bibleSearchHistory"></div>
-</div>
-<div class="bible-search-hint" id="bibleSearchHint">
-<span id="txtSearchHint"></span>
-</div>
-<div class="bible-search-ai-loading" id="bibleSearchAiLoading" style="display:none;">
-<div class="loading-dots"><span></span><span></span><span></span></div>
-<span id="bibleSearchAiLoadingText">AI 분석 중...</span>
-</div>
-<div class="bible-search-results" id="bibleSearchResults" style="display:none;"></div>
-</div>
-</div>
-<div class="bible-search-preview" id="bibleSearchPreview">
-<div class="bible-search-preview-header">
-<button class="bible-search-close" onclick="window.closeSearchPreview()">←</button>
-<div class="bible-search-preview-title" id="bibleSearchPreviewTitle"></div>
-</div>
-<div class="bible-search-preview-body" id="bibleSearchPreviewBody">
-</div>
-</div>
 <div class="bible-partial-copy-modal" id="biblePartialCopyModal">
 <div class="bible-partial-copy-bubble">
 <div class="bible-partial-copy-header">
@@ -545,7 +423,10 @@ AI
 </div>
 </div>
 <div id="settingsSection" class="page-section">
-<h2 id="txt-settings-header">설정</h2>
+<header class="page-header">
+<h2 class="page-title" id="txt-settings-header">설정</h2>
+</header>
+<div class="settings-body">
 <div class="settings-block">
 <div class="settings-block-title" id="txt-settings-font-section">글꼴</div>
 <div class="settings-card" id="settingsSerifCard">
@@ -636,17 +517,41 @@ AI
 </div>
 </div>
 <div class="settings-block">
+<div class="settings-card" id="settingsThemeCard">
+<div class="settings-card-header">
+<div class="settings-card-main">
+<div class="settings-card-title" id="txt-settings-theme-title">화면 모드</div>
+<div class="settings-card-desc" id="txt-settings-theme-desc">밝은 화면과 어두운 화면 중에서 고르세요</div>
+</div>
+</div>
+<div class="settings-font-options settings-language-options" role="group" aria-labelledby="txt-settings-theme-title">
+<label class="settings-font-option">
+<input type="radio" name="settingsThemeMode" value="auto" onchange="window.setThemePreference(this.value)" checked>
+<span class="settings-font-option-title" id="txt-settings-theme-auto">시스템 설정 따르기</span>
+</label>
+<label class="settings-font-option">
+<input type="radio" name="settingsThemeMode" value="light" onchange="window.setThemePreference(this.value)">
+<span class="settings-font-option-title" id="txt-settings-theme-light">라이트</span>
+</label>
+<label class="settings-font-option">
+<input type="radio" name="settingsThemeMode" value="dark" onchange="window.setThemePreference(this.value)">
+<span class="settings-font-option-title" id="txt-settings-theme-dark">다크</span>
+</label>
+</div>
+</div>
+</div>
+<div class="settings-block">
 <div class="settings-block-title" id="txt-settings-about-section">정보</div>
 <div class="settings-card">
 <div class="settings-meta-row">
 <span class="settings-meta-label" id="txt-settings-version-label">웹사이트 버전</span>
 <span class="settings-meta-value" id="aboutAppVersion">-</span>
 </div>
-<div class="settings-release-notes" id="appReleaseNotes" aria-live="polite"></div>
 </div>
 </div>
 </div>
 </div>
-<script type="module" src="/app.js?v=2026.11.22.01"></script>
+</div>
+<script type="module" src="/app.js?v=2026.11.26.01"></script>
 </body>
 </html>
